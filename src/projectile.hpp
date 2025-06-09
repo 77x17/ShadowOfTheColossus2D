@@ -4,9 +4,9 @@
 
 class Projectile {
 private:
-    sf::Sprite sprite;
+    sf::Sprite   sprite;
     sf::Vector2f velocity;
-    float lifetime;
+    float        lifetime;
 public:
     static sf::Vector2f normalize(const sf::Vector2f& source);
     

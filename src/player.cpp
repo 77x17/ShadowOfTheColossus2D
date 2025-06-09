@@ -1,43 +1,41 @@
 #include "player.hpp"
 
-Player::Player(int _x = 0, int _y = 0) 
-    : x(_x), y(_y), vx(0), vy(0), shadow(TextureManager::get("player_shadow"), 13, 5, 1, 0, 0.f, false) {
-    shape.setSize(sf::Vector2f(WIDTH, HEIGHT));
+Player::Player(float x = 0, float y = 0) 
+    : position(x, y), movingDirection(0, 0), shadow(TextureManager::get("playerShadow"), 13, 5, 1, 0, 0.f, false), state(0) {
+    shape.setSize(size);
     shape.setFillColor(sf::Color::Cyan);
     shape.setPosition(x, y);
 
-    animationManager.addAnimation(PlayerState::IDLE_LEFT    , TextureManager::get("player_sprite"), 19, 21, 2, 7, 0.5f , true );
-    animationManager.addAnimation(PlayerState::IDLE_RIGHT   , TextureManager::get("player_sprite"), 19, 21, 2, 7, 0.5f , false);
-    animationManager.addAnimation(PlayerState::IDLE_UP_LEFT , TextureManager::get("player_sprite"), 19, 21, 2, 8, 0.5f , true);
-    animationManager.addAnimation(PlayerState::IDLE_UP_RIGHT, TextureManager::get("player_sprite"), 19, 21, 2, 8, 0.5f , false);
-    animationManager.addAnimation(PlayerState::IDLE_DOWN    , TextureManager::get("player_sprite"), 19, 21, 2, 7, 0.5f , false);
-    animationManager.addAnimation(PlayerState::WALK_LEFT    , TextureManager::get("player_sprite"), 19, 21, 4, 0, 0.2f , true );
-    animationManager.addAnimation(PlayerState::WALK_RIGHT   , TextureManager::get("player_sprite"), 19, 21, 4, 0, 0.2f , false);
-    animationManager.addAnimation(PlayerState::WALK_UP_LEFT , TextureManager::get("player_sprite"), 19, 21, 3, 1, 0.2f , true );
-    animationManager.addAnimation(PlayerState::WALK_UP_RIGHT, TextureManager::get("player_sprite"), 19, 21, 3, 1, 0.2f , false);
-    animationManager.addAnimation(PlayerState::WALK_DOWN    , TextureManager::get("player_sprite"), 19, 21, 3, 0, 0.2f , false);
-    animationManager.addAnimation(PlayerState::DASH         , TextureManager::get("player_sprite"), 19, 21, 4, 3, 0.09f, false);
+    animationManager.addAnimation((int)PlayerState::IDLE_LEFT    , TextureManager::get("playerSprite"), 19, 21, 2, 7, 0.5f , true );
+    animationManager.addAnimation((int)PlayerState::IDLE_RIGHT   , TextureManager::get("playerSprite"), 19, 21, 2, 7, 0.5f , false);
+    animationManager.addAnimation((int)PlayerState::IDLE_UP_LEFT , TextureManager::get("playerSprite"), 19, 21, 2, 8, 0.5f , true);
+    animationManager.addAnimation((int)PlayerState::IDLE_UP_RIGHT, TextureManager::get("playerSprite"), 19, 21, 2, 8, 0.5f , false);
+    animationManager.addAnimation((int)PlayerState::IDLE_DOWN    , TextureManager::get("playerSprite"), 19, 21, 2, 7, 0.5f , false);
+    animationManager.addAnimation((int)PlayerState::WALK_LEFT    , TextureManager::get("playerSprite"), 19, 21, 4, 0, 0.2f , true );
+    animationManager.addAnimation((int)PlayerState::WALK_RIGHT   , TextureManager::get("playerSprite"), 19, 21, 4, 0, 0.2f , false);
+    animationManager.addAnimation((int)PlayerState::WALK_UP_LEFT , TextureManager::get("playerSprite"), 19, 21, 3, 1, 0.2f , true );
+    animationManager.addAnimation((int)PlayerState::WALK_UP_RIGHT, TextureManager::get("playerSprite"), 19, 21, 3, 1, 0.2f , false);
+    animationManager.addAnimation((int)PlayerState::WALK_DOWN    , TextureManager::get("playerSprite"), 19, 21, 3, 0, 0.2f , false);
+    animationManager.addAnimation((int)PlayerState::DASH_LEFT    , TextureManager::get("playerSprite"), 19, 21, 4, 3, 0.09f, true );
+    animationManager.addAnimation((int)PlayerState::DASH_RIGHT   , TextureManager::get("playerSprite"), 19, 21, 4, 3, 0.09f, false);
 }
 
 void Player::handleInput(const sf::RenderWindow& window) {
-    vx = 0.f;
-    vy = 0.f;
+    movingDirection = sf::Vector2f(0, 0);
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-        vx = -1.f;
+        movingDirection.x = -1.f;
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-        vx =  1.f;
+        movingDirection.x =  1.f;
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-        vy =  1.f;
+        movingDirection.y =  1.f;
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
-        vy = -1.f;
+        movingDirection.y = -1.f;
     }
 
-    sf::Vector2f normalizeVector = Projectile::normalize(sf::Vector2f(vx, vy));
-    vx = normalizeVector.x;
-    vy = normalizeVector.y;
+    movingDirection = Projectile::normalize(movingDirection);
     
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift) && dashCooldownTimer <= 0.f && !isDashing) {
         isDashing         = true;
@@ -46,52 +44,53 @@ void Player::handleInput(const sf::RenderWindow& window) {
 
         // Xác định hướng lướt: dựa trên hướng di chuyển hiện tại.
         // Nếu đứng yên, lướt theo hướng đang nhìn.
-        if (vx != 0 || vy != 0) {
-            dashDirection = sf::Vector2f(vx, vy);
+        if (movingDirection.x != 0 || movingDirection.y != 0) {
+            dashDirection = movingDirection;
         } 
-        else if (state == PlayerState::IDLE_RIGHT    || state == PlayerState::WALK_RIGHT) {
-            dashDirection = {1.f, 0.f};
+        else if (state == (int)PlayerState::IDLE_LEFT     || state == (int)PlayerState::WALK_LEFT) {
+            dashDirection = sf::Vector2f(-1.f,  0.f);
         }
-        else if (state == PlayerState::IDLE_LEFT     || state == PlayerState::WALK_LEFT) {
-            dashDirection = {-1.f, 0.f};
+        else if (state == (int)PlayerState::IDLE_RIGHT    || state == (int)PlayerState::WALK_RIGHT) {
+            dashDirection = sf::Vector2f( 1.f,  0.f);
         }
-        else if (state == PlayerState::IDLE_UP_LEFT  || state == PlayerState::WALK_UP_LEFT) {
-            dashDirection = {0.f, -1.f};
+        else if (state == (int)PlayerState::IDLE_UP_LEFT  || state == (int)PlayerState::WALK_UP_LEFT) {
+            dashDirection = sf::Vector2f( 0.f, -1.f);
         }
-        else if (state == PlayerState::IDLE_UP_RIGHT || state == PlayerState::WALK_UP_RIGHT) {
-            dashDirection = {0.f, -1.f};
+        else if (state == (int)PlayerState::IDLE_UP_RIGHT || state == (int)PlayerState::WALK_UP_RIGHT) {
+            dashDirection = sf::Vector2f( 0.f, -1.f);
         }
-        else if (state == PlayerState::IDLE_DOWN     || state == PlayerState::WALK_DOWN) {
-            dashDirection = {0.f, 1.f};
+        else if (state == (int)PlayerState::IDLE_DOWN     || state == (int)PlayerState::WALK_DOWN) {
+            dashDirection = sf::Vector2f( 0.f,  1.f);
         }
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && shootCooldownTimer <= 0.f && !isDashing) {
         shootCooldownTimer = SHOOT_COOLDOWN; 
         
         sf::Vector2f playerCenter = getPosition();
-        sf::Vector2f direction;
-        if (vx != 0 || vy != 0) {
-            direction = sf::Vector2f(vx, vy);
-        } else if (state == PlayerState::IDLE_RIGHT  || state == PlayerState::WALK_RIGHT) {
-            direction = {1.f, 0.f};
+        sf::Vector2f projectileDirection;
+        if (movingDirection.x != 0 || movingDirection.y != 0) {
+            projectileDirection = movingDirection;
         }
-        else if (state == PlayerState::IDLE_LEFT     || state == PlayerState::WALK_LEFT) {
-            direction = {-1.f, 0.f};
+        else if (state == (int)PlayerState::IDLE_LEFT     || state == (int)PlayerState::WALK_LEFT) {
+            projectileDirection = sf::Vector2f(-1.f,  0.f);
         }
-        else if (state == PlayerState::IDLE_UP_LEFT  || state == PlayerState::WALK_UP_LEFT) {
-            direction = {0.f, -1.f};
+        else if (state == (int)PlayerState::IDLE_RIGHT    || state == (int)PlayerState::WALK_RIGHT) {
+            projectileDirection = sf::Vector2f( 1.f,  0.f);
         }
-        else if (state == PlayerState::IDLE_UP_RIGHT || state == PlayerState::WALK_UP_RIGHT) {
-            direction = {0.f, -1.f};
+        else if (state == (int)PlayerState::IDLE_UP_LEFT  || state == (int)PlayerState::WALK_UP_LEFT) {
+            projectileDirection = sf::Vector2f( 0.f, -1.f);
         }
-        else if (state == PlayerState::IDLE_DOWN     || state == PlayerState::WALK_DOWN) {
-            direction = {0.f, 1.f};
+        else if (state == (int)PlayerState::IDLE_UP_RIGHT || state == (int)PlayerState::WALK_UP_RIGHT) {
+            projectileDirection = sf::Vector2f( 0.f, -1.f);
+        }
+        else if (state == (int)PlayerState::IDLE_DOWN     || state == (int)PlayerState::WALK_DOWN) {
+            projectileDirection = sf::Vector2f( 0.f,  1.f);
         }
 
         projectiles.emplace_back(
             TextureManager::get("arrow"),
-            playerCenter,
-            direction,
+            playerCenter + size / 2.f,
+            projectileDirection,
             PROJECTILE_SPEED,
             PROJECTILE_LIFETIME
         );
@@ -123,8 +122,7 @@ void Player::update(sf::View& view) {
     
     if (isDashing) {
         // Di chuyển theo hướng dash với tốc độ dash
-        x += dashDirection.x * DASH_SPEED * dt * 50;
-        y += dashDirection.y * DASH_SPEED * dt * 50;
+        position += dashDirection * DASH_SPEED;
 
         // Giảm bộ đếm thời gian dash
         dashTimer -= dt;
@@ -135,53 +133,55 @@ void Player::update(sf::View& view) {
         }    
     } else {
         // Di chuyển bình thường nếu không dash
-        x += vx * MOVE_SPEED * dt * 100;
-        y += vy * MOVE_SPEED * dt * 100;
+        position += movingDirection * MOVE_SPEED;
     }
 
-    shape.setPosition(x, y);
+    shape.setPosition(position);
 
     if (isDashing) {
-        state = PlayerState::DASH;
+        state = (movingDirection.x < 0 ? (int)PlayerState::DASH_LEFT : (int)PlayerState::DASH_RIGHT);
     }
-    else if (vx == 0 && vy == 0) {
-        if (state == PlayerState::WALK_RIGHT) {
-            state = PlayerState::IDLE_RIGHT;
+    else if (movingDirection == sf::Vector2f(0, 0)) {
+        if (state == (int)PlayerState::WALK_RIGHT) {
+            state = (int)PlayerState::IDLE_RIGHT;
         }
-        else if (state == PlayerState::WALK_LEFT) {
-            state = PlayerState::IDLE_LEFT;
+        else if (state == (int)PlayerState::WALK_LEFT) {
+            state = (int)PlayerState::IDLE_LEFT;
         }
-        else if (state == PlayerState::WALK_UP_LEFT) {
-            state = PlayerState::IDLE_UP_LEFT;
+        else if (state == (int)PlayerState::WALK_UP_LEFT) {
+            state = (int)PlayerState::IDLE_UP_LEFT;
         }
-        else if (state == PlayerState::WALK_UP_RIGHT) {
-            state = PlayerState::IDLE_UP_RIGHT;
+        else if (state == (int)PlayerState::WALK_UP_RIGHT) {
+            state = (int)PlayerState::IDLE_UP_RIGHT;
         }
-        else if (state == PlayerState::WALK_DOWN) {
-            state = PlayerState::IDLE_DOWN;
+        else if (state == (int)PlayerState::WALK_DOWN) {
+            state = (int)PlayerState::IDLE_DOWN;
         }
-        else if (state == PlayerState::DASH) {
-            state = PlayerState::IDLE_RIGHT;
+        else if (state == (int)PlayerState::DASH_LEFT) {
+            state = (int)PlayerState::IDLE_LEFT;
+        }
+        else if (state == (int)PlayerState::DASH_RIGHT) {
+            state = (int)PlayerState::IDLE_RIGHT;
         }
     }
-    else if (vy < 0) {
-        state = (vx > 0 ? PlayerState::WALK_UP_RIGHT : PlayerState::WALK_UP_LEFT);
+    else if (movingDirection.y < 0) {
+        state = (movingDirection.x > 0 ? (int)PlayerState::WALK_UP_RIGHT : (int)PlayerState::WALK_UP_LEFT);
     }
-    else if (vx != 0) {
-        state = (vx > 0 ? PlayerState::WALK_RIGHT : PlayerState::WALK_LEFT);
+    else if (movingDirection.x != 0) {
+        state = (movingDirection.x > 0 ? (int)PlayerState::WALK_RIGHT : (int)PlayerState::WALK_LEFT);
     }
-    else if (vy > 0) {
-        state = PlayerState::WALK_DOWN;
+    else if (movingDirection.y > 0) {
+        state = (int)PlayerState::WALK_DOWN;
     }
 
     animationManager.setState(state);
-    animationManager.setPosition(sf::Vector2f(x - 3, y - 6));
+    animationManager.setPosition(position - sf::Vector2f(3, 6));
     animationManager.update();
 
-    shadow.setPosition(sf::Vector2f(x + 3, y + HEIGHT - 5));
+    shadow.setPosition(position + sf::Vector2f(3, size.y - 5));
 
     sf::Vector2f currentCenter = view.getCenter();
-    sf::Vector2f targetCenter  = sf::Vector2f(x, y);
+    sf::Vector2f targetCenter  = position;
     sf::Vector2f lerped        = currentCenter + 0.1f * (targetCenter - currentCenter);
 
     view.setCenter(lerped);
@@ -189,13 +189,16 @@ void Player::update(sf::View& view) {
 
 void Player::draw(sf::RenderWindow& window) const {
     window.draw(shape);
+    
     shadow.draw(window);
+    
     animationManager.draw(window);
+
     for (auto& p : projectiles) {
         p.draw(window);
     }
 }
 
 sf::Vector2f Player::getPosition() const {
-    return sf::Vector2f(x, y);
+    return position;
 }

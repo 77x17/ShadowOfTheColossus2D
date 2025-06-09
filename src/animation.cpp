@@ -38,11 +38,11 @@ void Animation::draw(sf::RenderWindow& window) const {
     window.draw(sprite);
 }
 
-AnimationManager::AnimationManager() : currentState(PlayerState::IDLE_RIGHT) {
+AnimationManager::AnimationManager() : currentState(0) {
     // nothing
 }
 
-void AnimationManager::addAnimation(PlayerState state, const sf::Texture& texture, int frameW, int frameH, int totalF, int frameLayer, float frameT, bool flip = false) {
+void AnimationManager::addAnimation(int state, const sf::Texture& texture, int frameW, int frameH, int totalF, int frameLayer, float frameT, bool flip = false) {
     // Dùng emplace để xây dựng Animation trực tiếp trong map.
     // Không tạo biến tạm thời, không sao chép.
     animations.emplace(
@@ -52,7 +52,7 @@ void AnimationManager::addAnimation(PlayerState state, const sf::Texture& textur
     );
 }
 
-void AnimationManager::setState(PlayerState state) {
+void AnimationManager::setState(int state) {
     if (state != currentState) {
         currentState = state;
         animations[currentState].reset();

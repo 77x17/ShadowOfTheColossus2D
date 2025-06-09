@@ -3,6 +3,7 @@
 #include "constants.hpp"
 #include "animation.hpp"
 #include "player.hpp"
+#include "bat.hpp"
 
 void drawGrid(Player& player, sf::RenderWindow& window) {
     sf::RectangleShape tile;
@@ -46,15 +47,24 @@ int main() {
     sf::RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "2D Pattern Window");
     window.setFramerateLimit(60);
 
-    TextureManager::load("player_sprite", "sprites/player.png");
-    TextureManager::load("player_shadow", "sprites/playerShadow.png");
+    TextureManager::load("playerSprite", "sprites/player.png");
+    TextureManager::load("playerShadow", "sprites/playerShadow.png");
     TextureManager::load("arrow", "sprites/arrow.png");
+
+    TextureManager::load("alert", "sprites/alert.png");
+    TextureManager::load("batSprite", "sprites/bat.png");
+    TextureManager::load("batShadow", "sprites/batShadow.png");
 
     bool isMinimized = false;
 
     sf::View view = window.getView();
 
     Player player(0, 0);
+    std::vector<Bat> bats;
+    bats.push_back(Bat(251, 0));
+    bats.push_back(Bat(0, 251));
+    bats.push_back(Bat(-251, 0));
+    bats.push_back(Bat(0, -251));
 
     while (window.isOpen()) {
         sf::Event event;
@@ -90,6 +100,9 @@ int main() {
         player.handleInput(window);
 
         player.update(view);
+        for (Bat& bat : bats) {
+            bat.update(player);
+        }
 
         window.clear(sf::Color::White);
 
@@ -98,6 +111,9 @@ int main() {
         drawGrid(player, window);
 
         player.draw(window);
+        for (Bat& bat : bats) {
+            bat.draw(window);
+        }
 
         window.display();
     }

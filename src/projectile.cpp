@@ -32,7 +32,7 @@ Projectile::Projectile(const sf::Texture& texture, sf::Vector2f startPos, sf::Ve
 
 
 void Projectile::update(float dt) {
-    sprite.move(velocity * dt);
+    sprite.move(velocity * dt * 100.f * static_cast<float>(std::pow(4, 1.0 - lifetime)));
     lifetime -= dt; // Decrease the remaining lifetime
 }
 
