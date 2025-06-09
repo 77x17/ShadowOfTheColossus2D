@@ -1,31 +1,31 @@
-// #include "SoundManager.hpp"
+#include "SoundManager.hpp"
 
-// #include <iostream>
+#include <iostream>
 
-// bool SoundManager::loadSound(const std::string& name, const std::string& filepath) {
-//     sf::SoundBuffer& buffer = soundBuffers[name];
+std::unordered_map<std::string, sf::SoundBuffer> SoundManager::buffers;
+std::unordered_map<std::string, sf::Sound> SoundManager::sounds;
 
-//     if (!buffer.loadFromFile(filepath)) {
-//         std::cerr << "Failed to load sound: " << filepath << "\n";
-//         soundBuffers.erase(name); 
-//         return false;
-//     }
+void SoundManager::loadSound(const std::string& name, const std::string& filepath) {
+    sf::SoundBuffer buffer;
+    if (!buffer.loadFromFile(filepath)) {
+        std::cerr << "Failed to load " << filepath << '\n';
+        return;
+    }
+    buffers[name] = buffer;
+    sounds[name].setBuffer(buffers[name]);
+}
 
-//     sounds[name].setBuffer(buffer);
-//     return true;
-// }
+void SoundManager::playSound(const std::string& name) {
+    auto it = sounds.find(name);
+    if (it != sounds.end()) {
+        it->second.play();
+    } else {
+        std::cerr << "Sound not found: " << name << "\n";
+    }
+}
 
-// void SoundManager::playSound(const std::string& name) {
-//     auto it = sounds.find(name);
-//     if (it != sounds.end()) {
-//         it->second.play();
-//     } else {
-//         std::cerr << "Sound not found: " << name << "\n";
-//     }
-// }
-
-// void SoundManager::stopAll() {
-//     for (auto& pair : sounds) {
-//         pair.second.stop();
-//     }
-// }
+void SoundManager::stopAll() {
+    for (auto& pair : sounds) {
+        pair.second.stop();
+    }
+}

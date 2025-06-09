@@ -1,11 +1,9 @@
-# Makefile for SFML 2D Pattern Game
-
 # Compiler and flags
 CXX = g++
-CXXFLAGS = -std=c++17 -Wall -I./src
+CXXFLAGS = -Wall -g
 
 # SFML flags (adjust if SFML is in a custom path)
-SFML_LIBS = -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -lsfml-network
+SFML_LIBS = -lsfml-system -lsfml-graphics -lsfml-window -lsfml-audio 
 
 # Directories
 SRC_DIR = Sources
@@ -25,7 +23,7 @@ all: $(TARGET)
 
 # Link object files into binary
 $(TARGET): $(OBJS)
-	$(CXX) $(CXXFLAGS) -o $@ $^ $(SFML_LIBS)
+	$(CXX) -g $(CXXFLAGS) -o $@ $^ $(SFML_LIBS)
 
 # Compile .cpp to .o and generate .d dependency file
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp

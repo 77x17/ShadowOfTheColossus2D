@@ -4,6 +4,7 @@
 
 #include <unordered_map>
 #include <iostream>
+#include <memory>
 
 class TextureManager {
 private:

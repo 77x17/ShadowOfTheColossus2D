@@ -1,9 +1,10 @@
 #include "Player.hpp"
 
 Player::Player(float x = 0, float y = 0) : basePosition(x, y) {
+    position = basePosition;
+    
     shadow = Animation(TextureManager::get("playerShadow"), 13, 5, 1, 0, 0.f, false);
 
-    position = basePosition;
     hitbox.setSize(size);
     hitbox.setOutlineColor(sf::Color::Red);
     hitbox.setOutlineThickness(1.f);
@@ -22,9 +23,6 @@ Player::Player(float x = 0, float y = 0) : basePosition(x, y) {
     animationManager.addAnimation((int)PlayerState::WALK_DOWN    , TextureManager::get("playerSprite"), 19, 21, 3, 0, 0.2f , false);
     animationManager.addAnimation((int)PlayerState::DASH_LEFT    , TextureManager::get("playerSprite"), 19, 21, 4, 3, 0.09f, true );
     animationManager.addAnimation((int)PlayerState::DASH_RIGHT   , TextureManager::get("playerSprite"), 19, 21, 4, 3, 0.09f, false);
-
-    // soundManager.loadSound("arrow", "Sounds/arrow.wav");
-    // soundManager.loadSound("hurt" , "Sounds/playerHurt.wav");
 }
 
 void Player::handleInput(const sf::RenderWindow& window) {
@@ -102,7 +100,7 @@ void Player::handleInput(const sf::RenderWindow& window) {
             PROJECTILE_LIFETIME
         );
 
-        // soundManager.playSound("arrow");
+        SoundManager::playSound("arrow");
     }
 }
 
@@ -127,11 +125,12 @@ bool Player::isAlive() const {
 void Player::kill() {
     lifeState = PlayerState::DEAD;
 
-    // soundManager.playSound("hurt");
+    SoundManager::playSound("playerHurt");
 }
 
 void Player::respawn() {
     position        = basePosition;
+    hitbox.setPosition(position);
     movingDirection = sf::Vector2f(0.f, 0.f);
     lifeState       = PlayerState::ALIVE;
 }
@@ -162,7 +161,7 @@ void Player::update(sf::View& view) {
             ++it;
         }
     }
-    
+
     if (isDashing) {
         // Di chuyển theo hướng dash với tốc độ dash
         position += dashDirection * DASH_SPEED;
@@ -185,11 +184,11 @@ void Player::update(sf::View& view) {
         state = (movingDirection.x < 0 ? (int)PlayerState::DASH_LEFT : (int)PlayerState::DASH_RIGHT);
     }
     else if (movingDirection == sf::Vector2f(0, 0)) {
-        if (state == (int)PlayerState::WALK_RIGHT) {
-            state = (int)PlayerState::IDLE_RIGHT;
-        }
-        else if (state == (int)PlayerState::WALK_LEFT) {
+        if (state == (int)PlayerState::WALK_LEFT) {
             state = (int)PlayerState::IDLE_LEFT;
+        }
+        else if (state == (int)PlayerState::WALK_RIGHT) {
+            state = (int)PlayerState::IDLE_RIGHT;
         }
         else if (state == (int)PlayerState::WALK_UP_LEFT) {
             state = (int)PlayerState::IDLE_UP_LEFT;

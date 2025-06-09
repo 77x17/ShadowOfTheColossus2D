@@ -17,6 +17,10 @@ Animation::Animation(const sf::Texture& texture, int frameW, int frameH, int tot
 } 
 
 void Animation::update() {
+    if (totalFrames == 0) {
+        std::cerr << "Bug nay lam toi mat 5 tieng cuoc doi\n";
+        return;
+    }
     if (clock.getElapsedTime().asSeconds() > frameTime) {
         currentFrame = (currentFrame + 1) % totalFrames;
         sprite.setTextureRect(sf::IntRect(currentFrame * frameWidth, layer * frameHeight, frameWidth, frameHeight));

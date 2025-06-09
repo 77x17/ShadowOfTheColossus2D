@@ -41,9 +41,7 @@ private:
     sf::RectangleShape hitbox;
     AnimationManager   animationManager;
     Animation          shadow;
-    int                state;
-
-    // SoundManager soundManager;
+    int                state = 0;
 
     // Biến trạng thái cho Dash
     const float DASH_SPEED    = MOVE_SPEED * 2;         // Tốc độ khi lướt

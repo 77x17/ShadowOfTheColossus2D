@@ -5,6 +5,7 @@
 
 Bat::Bat(float x = 0, float y = 0) : basePosition(x, y) {
     position = basePosition;
+    
     shadow = Animation(TextureManager::get("batShadow"), 12,  5, 1, 0, 0.f, false);
     alert  = Animation(TextureManager::get("alert")    ,  8, 10, 1, 0, 0.f, false);
 
@@ -17,8 +18,6 @@ Bat::Bat(float x = 0, float y = 0) : basePosition(x, y) {
     animationManager.addAnimation((int)BatState::IDLE_LEFT , TextureManager::get("batSprite"), 16, 16, 2, 0, 0.5f, true );
     animationManager.addAnimation((int)BatState::IDLE_RIGHT, TextureManager::get("batSprite"), 16, 16, 2, 0, 0.5f, false);
     animationManager.addAnimation((int)BatState::DYING     , TextureManager::get("batDead")  , 16, 16, 2, 0, 0.5f, false);
-
-    // soundManager.loadSound("hurt", "Sounds/enemyHurt.wav");
 }
 
 bool Bat::isAlive() const {
@@ -57,9 +56,9 @@ void Bat::update(Player& player) {
     if (player.isCollisionProjectiles(hitbox.getGlobalBounds())) {
         lifeState = BatState::DYING;
         dyingCooldownTimer = DYING_TIME;
-
-        // soundManager.playSound("hurt");
         
+        SoundManager::playSound("enemyHurt");
+
         return;
     }
 

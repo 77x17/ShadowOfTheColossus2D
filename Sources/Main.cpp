@@ -4,6 +4,7 @@
 #include "Animation.hpp"
 #include "Player.hpp"
 #include "Bat.hpp"
+#include "SoundManager.hpp"
 
 void drawGrid(Player& player, sf::RenderWindow& window) {
     sf::RectangleShape tile;
@@ -46,7 +47,7 @@ void drawGrid(Player& player, sf::RenderWindow& window) {
 int main() {
     sf::RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "Shadow Of The Colossus 2D");
     window.setFramerateLimit(60);
-
+    
     TextureManager::load("playerSprite", "Sprites/player.png");
     TextureManager::load("playerShadow", "Sprites/playerShadow.png");
     TextureManager::load("arrow"       , "Sprites/arrow.png");
@@ -56,16 +57,24 @@ int main() {
     TextureManager::load("batShadow", "Sprites/batShadow.png");
     TextureManager::load("batDead"  , "Sprites/batDead.png");
 
+    SoundManager::loadSound("arrow", "Sounds/arrow.wav");
+    SoundManager::loadSound("playerHurt" , "Sounds/playerHurt.wav");
+    SoundManager::loadSound("enemyHurt", "Sounds/enemyHurt.wav");
+
     bool isMinimized = false;
 
     sf::View view = window.getView();
 
     Player player(0, 0);
     std::vector<Bat> bats;
-    bats.push_back(Bat( 251,    0));
-    bats.push_back(Bat(   0,  251));
-    bats.push_back(Bat(-251,    0));
-    bats.push_back(Bat(   0, -251));
+    // bats.push_back(Bat( 251,    0));
+    // bats.push_back(Bat(   0,  251));
+    // bats.push_back(Bat(-251,    0));
+    // bats.push_back(Bat(   0, -251));
+    bats.push_back(Bat( 251,  251));
+    bats.push_back(Bat(-251,  251));
+    bats.push_back(Bat( 251, -251));
+    bats.push_back(Bat(-251, -251));
 
     while (window.isOpen()) {
         sf::Event event;

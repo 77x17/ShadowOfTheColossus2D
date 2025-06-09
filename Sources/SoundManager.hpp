@@ -7,17 +7,17 @@
 
 class SoundManager {
 private:
-    std::unordered_map<std::string, sf::SoundBuffer> soundBuffers;
-    std::unordered_map<std::string, sf::Sound> sounds;
+    static std::unordered_map<std::string, sf::SoundBuffer> buffers;
+    static std::unordered_map<std::string, sf::Sound> sounds;
     
 public:
     // Load 1 âm thanh vào bộ nhớ
-    bool loadSound(const std::string& name, const std::string& filepath);
+    static void loadSound(const std::string& name, const std::string& filepath);
 
     // Phát âm thanh theo tên
-    void playSound(const std::string& name);
+    static void playSound(const std::string& name);
 
     // Dừng toàn bộ
-    void stopAll();
+    static void stopAll();
 
 };

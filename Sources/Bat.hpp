@@ -35,8 +35,6 @@ private:
     Animation          alert;
     int                state = 0;
     
-    // SoundManager soundManager;
-
     sf::Clock   deltaClock;
     const float DETECION_RANGE     = 200.0f;
     const float ALERT_LIFETIME     = 1.0f;

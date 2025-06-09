@@ -1,1 +1,1 @@
-Build/SoundManager.o: Sources/SoundManager.cpp
+Build/SoundManager.o: Sources/SoundManager.cpp Sources/SoundManager.hpp
