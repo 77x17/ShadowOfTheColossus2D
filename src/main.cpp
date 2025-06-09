@@ -54,6 +54,7 @@ int main() {
     TextureManager::load("alert", "sprites/alert.png");
     TextureManager::load("batSprite", "sprites/bat.png");
     TextureManager::load("batShadow", "sprites/batShadow.png");
+    TextureManager::load("batDead", "sprites/batDead.png");
 
     bool isMinimized = false;
 
@@ -100,8 +101,11 @@ int main() {
         player.handleInput(window);
 
         player.update(view);
-        for (Bat& bat : bats) {
+        for (Bat& bat : bats) if (bat.isAlive()) {
             bat.update(player);
+        }
+        else {
+            bat.respawn();
         }
 
         window.clear(sf::Color::White);
@@ -111,7 +115,7 @@ int main() {
         drawGrid(player, window);
 
         player.draw(window);
-        for (Bat& bat : bats) {
+        for (Bat& bat : bats) if (bat.isAlive()) {
             bat.draw(window);
         }
 

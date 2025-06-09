@@ -1,9 +1,12 @@
 #include "player.hpp"
 
-Player::Player(float x = 0, float y = 0) 
-    : position(x, y), movingDirection(0, 0), shadow(TextureManager::get("playerShadow"), 13, 5, 1, 0, 0.f, false), state(0) {
+Player::Player(float x = 0, float y = 0) : position(x, y) {
+    shadow = Animation(TextureManager::get("playerShadow"), 13, 5, 1, 0, 0.f, false);
+
     shape.setSize(size);
-    shape.setFillColor(sf::Color::Cyan);
+    shape.setOutlineColor(sf::Color::Red);
+    shape.setOutlineThickness(1.f);
+    shape.setFillColor(sf::Color::Transparent);
     shape.setPosition(x, y);
 
     animationManager.addAnimation((int)PlayerState::IDLE_LEFT    , TextureManager::get("playerSprite"), 19, 21, 2, 7, 0.5f , true );
@@ -95,6 +98,16 @@ void Player::handleInput(const sf::RenderWindow& window) {
             PROJECTILE_LIFETIME
         );
     }
+}
+
+bool Player::isCollisionProjectiles(const sf::FloatRect& rect) const {
+    for (auto& p : projectiles) {
+        if (p.isCollision(rect)) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 void Player::update(sf::View& view) {

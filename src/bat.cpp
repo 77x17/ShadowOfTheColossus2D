@@ -2,19 +2,60 @@
 
 #include <cmath>
 
-Bat::Bat(float x = 0, float y = 0) : position(x, y), movingDirection(0, 0) {
+Bat::Bat(float x = 0, float y = 0) : basePosition(x, y) {
+    position = basePosition;
     shadow = Animation(TextureManager::get("batShadow"), 12,  5, 1, 0, 0.f, false);
     alert  = Animation(TextureManager::get("alert")    ,  8, 10, 1, 0, 0.f, false);
 
     shape.setSize(size);
-    shape.setFillColor(sf::Color::Cyan);
+    shape.setOutlineColor(sf::Color::Red);
+    shape.setOutlineThickness(1.f);
+    shape.setFillColor(sf::Color::Transparent);
     shape.setPosition(x, y);
 
     animationManager.addAnimation((int)BatState::IDLE_LEFT , TextureManager::get("batSprite"), 16, 16, 2, 0, 0.5f, true );
     animationManager.addAnimation((int)BatState::IDLE_RIGHT, TextureManager::get("batSprite"), 16, 16, 2, 0, 0.5f, false);
+    animationManager.addAnimation((int)BatState::DYING, TextureManager::get("batDead"), 16, 16, 2, 0, 0.5f, false);
 }
 
-void Bat::update(const Player& player) {
+bool Bat::isAlive() const {
+    return lifeState != BatState::DEAD;
+}
+
+void Bat::respawn() {
+    position        = basePosition;
+    movingDirection = sf::Vector2f(0.f, 0.f);
+    lifeState       = BatState::ALIVE;
+}
+
+void Bat::update(Player& player) {
+    if (lifeState == BatState::DYING || lifeState == BatState::DEAD) {
+        float dt = deltaClock.restart().asSeconds();
+        if (dyingCooldownTimer > 0) {
+            dyingCooldownTimer -= dt;
+            
+            animationManager.setState((int)BatState::DYING);
+            animationManager.setPosition(position);
+            animationManager.update();
+        }
+        else {
+            lifeState = BatState::DEAD;
+        }
+
+        return;
+    }
+
+    if (player.isCollisionProjectiles(shape.getGlobalBounds())) {
+        lifeState = BatState::DYING;
+        dyingCooldownTimer = DYING_TIME;
+        
+        return;
+    }
+
+    // if (player.isCollision(shape.getGlobalBounds())) {
+    //     player.kill();
+    // }
+
     float dt = deltaClock.restart().asSeconds();
     if (alertCooldownTimer > 0) {
         alertCooldownTimer -= dt;
@@ -40,7 +81,12 @@ void Bat::update(const Player& player) {
 
     shape.setPosition(position);
 
-    state = (movingDirection.x < 0 ? (int)BatState::IDLE_LEFT : (int)BatState::IDLE_RIGHT);
+    if (movingDirection.x < 0) {
+        state = (int)BatState::IDLE_LEFT;
+    }
+    else if (movingDirection.x > 0) {
+        state = (int)BatState::IDLE_RIGHT;
+    }
 
     animationManager.setState(state);
     animationManager.setPosition(position);

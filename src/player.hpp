@@ -29,8 +29,8 @@ private:
     sf::Vector2f size = sf::Vector2f(TILE_SIZE, TILE_SIZE);
 
     // position
-    sf::Vector2f position;
-    sf::Vector2f movingDirection;
+    sf::Vector2f position        = sf::Vector2f(0.f, 0.f);
+    sf::Vector2f movingDirection = sf::Vector2f(0.f, 0.f);
     
     sf::RectangleShape shape;
     AnimationManager   animationManager;
@@ -58,6 +58,8 @@ public:
     Player(float x, float y);
 
     void handleInput(const sf::RenderWindow& window);
+    bool isCollisionProjectiles(const sf::FloatRect& rect) const;
+
     void update(sf::View& view);
     sf::Vector2f getPosition() const;
 

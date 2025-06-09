@@ -11,6 +11,9 @@
 enum class BatState {
     IDLE_LEFT,
     IDLE_RIGHT,
+    ALIVE,
+    DEAD,
+    DYING
 };
 
 class Bat {
@@ -20,8 +23,9 @@ private:
     sf::Vector2f size = sf::Vector2f(TILE_SIZE, TILE_SIZE);
 
     // position
-    sf::Vector2f position;
-    sf::Vector2f movingDirection;
+    sf::Vector2f basePosition    = sf::Vector2f(0.f, 0.f);
+    sf::Vector2f position        = sf::Vector2f(0.f, 0.f);
+    sf::Vector2f movingDirection = sf::Vector2f(0.f, 0.f);
     
     sf::RectangleShape shape;
     AnimationManager   animationManager;
@@ -29,15 +33,23 @@ private:
     Animation          alert;
     int                state = 0;
     
-    sf::Clock deltaClock;
-    const float DETECION_RANGE = 200.0f;
-    const float ALERT_LIFETIME = 1.0f;
-    float   alertCooldownTimer = 0.0f;
+    sf::Clock   deltaClock;
+    const float DETECION_RANGE     = 200.0f;
+    const float ALERT_LIFETIME     = 1.0f;
+    float       alertCooldownTimer = 0.0f;
+
+    BatState    lifeState          = BatState::ALIVE;
+    const float DYING_TIME         = 1.0f;
+    float       dyingCooldownTimer = 0.0f;
 
 public:
     Bat(float x, float y);
 
-    void update(const Player& player);
+    bool isAlive() const;
+
+    void respawn();
+
+    void update(Player& player);
     sf::Vector2f getPosition() const;
 
     void draw(sf::RenderWindow& window) const;
