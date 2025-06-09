@@ -1,12 +1,12 @@
-#include "Bat.hpp"
+#include "Eye.hpp"
 
 #include <cmath>
 #include <random>
 
-Bat::Bat(float x = 0, float y = 0) : basePosition(x, y) {
+Eye::Eye(float x = 0, float y = 0) : basePosition(x, y) {
     position = basePosition;
 
-    shadow = Animation(TextureManager::get("batShadow"), 12,  5, 1, 0, 0.f, false);
+    shadow = Animation(TextureManager::get("eyeShadow"), 12,  5, 1, 0, 0.f, false);
     alert  = Animation(TextureManager::get("alert")    ,  8, 10, 1, 0, 0.f, false);
 
     hitbox.setSize(size);
@@ -24,16 +24,16 @@ Bat::Bat(float x = 0, float y = 0) : basePosition(x, y) {
         hitbox.getPosition().y + hitbox.getSize().y / 2.f - DETECION_RANGE
     );
 
-    animationManager.addAnimation((int)BatState::IDLE_LEFT , TextureManager::get("batSprite"), 16, 16, 2, 0, 0.5f, true );
-    animationManager.addAnimation((int)BatState::IDLE_RIGHT, TextureManager::get("batSprite"), 16, 16, 2, 0, 0.5f, false);
-    animationManager.addAnimation((int)BatState::DYING     , TextureManager::get("batDead")  , 16, 16, 2, 0, 0.5f, false);
+    animationManager.addAnimation((int)EyeState::IDLE_LEFT , TextureManager::get("eyeSprite"), 20, 20, 2, 0, 0.5f, true );
+    animationManager.addAnimation((int)EyeState::IDLE_RIGHT, TextureManager::get("eyeSprite"), 20, 20, 2, 0, 0.5f, false);
+    animationManager.addAnimation((int)EyeState::DYING     , TextureManager::get("eyeDead")  , 20, 20, 2, 0, 0.5f, false);
 }
 
-bool Bat::isAlive() const {
-    return lifeState != BatState::DEAD;
+bool Eye::isAlive() const {
+    return lifeState != EyeState::DEAD;
 }
 
-void Bat::respawn() {
+void Eye::respawn() {
     if (respawnCooldownTimer <= 0) {
         position        = basePosition;
         movingDirection = sf::Vector2f(0.f, 0.f);
@@ -44,16 +44,18 @@ void Bat::respawn() {
             hitbox.getPosition().y + hitbox.getSize().y / 2.f - DETECION_RANGE
         );
 
-        lifeState = BatState::ALIVE;
+        lifeState = EyeState::ALIVE;
+
+        projectile = Projectile();
     }
 }
 
-float Bat::distance(const Player& player) const {
+float Eye::distance(const Player& player) const {
     sf::Vector2f normalizeDirection = player.getPosition() - position;
     return std::sqrt(normalizeDirection.x * normalizeDirection.x + normalizeDirection.y * normalizeDirection.y);
 }
 
-void Bat::update(Player& player) {
+void Eye::update(Player& player) {
     float dt = deltaClock.restart().asSeconds();
     if (alertCooldownTimer > 0) {
         alertCooldownTimer -= dt;
@@ -64,15 +66,18 @@ void Bat::update(Player& player) {
     if (respawnCooldownTimer > 0) {
         respawnCooldownTimer -= dt;
     }
+    if (shootCooldownTimer > 0) {
+        shootCooldownTimer -= dt;
+    }
 
-    if (lifeState == BatState::DYING || lifeState == BatState::DEAD) {
+    if (lifeState == EyeState::DYING || lifeState == EyeState::DEAD) {
         if (dyingCooldownTimer > 0) {
-            animationManager.setState((int)BatState::DYING);
-            animationManager.setPosition(position);
+            animationManager.setState((int)EyeState::DYING);
+            animationManager.setPosition(position - sf::Vector2f(4, 4));
             animationManager.update();
         }
-        else if (lifeState == BatState::DYING) {
-            lifeState = BatState::DEAD;
+        else if (lifeState == EyeState::DYING) {
+            lifeState = EyeState::DEAD;
 
             respawnCooldownTimer = RESPAWN_TIME;
         }
@@ -86,7 +91,7 @@ void Bat::update(Player& player) {
     }
 
     if (player.isCollisionProjectiles(hitbox.getGlobalBounds())) {
-        lifeState = BatState::DYING;
+        lifeState = EyeState::DYING;
         dyingCooldownTimer = DYING_TIME;
         
         SoundManager::playSound("enemyHurt");
@@ -100,15 +105,29 @@ void Bat::update(Player& player) {
     if (length <= DETECION_RANGE) {
         if (length != 0)
             normalizeDirection /= length;
-    
-        if (alertCooldownTimer <= 0 && randomCooldownTimer > 0) {
-            alertCooldownTimer  = ALERT_LIFETIME;
-            randomCooldownTimer = 0;
+
+        if (alertCooldownTimer <= 0 && shootCooldownTimer <= 0) {
+            shootCooldownTimer = SHOOT_COOLDOWN / 2.f;
         }
+
+        if (shootCooldownTimer <= 0) {
+            projectile = Projectile(
+                TextureManager::get("fireball"),
+                getPosition() + size / 2.f,
+                normalizeDirection,
+                PROJECTILE_SPEED,
+                PROJECTILE_LIFETIME
+            );
+
+            shootCooldownTimer = SHOOT_COOLDOWN;
+        }
+        else if (shootCooldownTimer < 0.2f) {
+            alertCooldownTimer = ALERT_LIFETIME;
+        }   
         
-        movingDirection = normalizeDirection;
+        // movingDirection = normalizeDirection;
     }
-    else {
+    // else {
         // randomCooldownTimer được kích hoạt khi quái vật không tìm thấy người chơi trong phạm vi
         // stayingCooldownTimer được chỉnh để bằng 3/4 thời gian của ramdomCooldownTimer
         // mục đích để quái di chuyển 1/4 và 3/4 thời gian còn lại đứng yên tại chỗ
@@ -139,8 +158,19 @@ void Bat::update(Player& player) {
 
             movingDirection = sf::Vector2f(0.f, 0.f);
         }
+    // }
+
+    if (projectile.isAlive()) { 
+        projectile.update(dt);
+        
+        if (projectile.isCollision(player.getHitBox())) {
+            player.kill();
+        }
     }
-    
+    else {
+        projectile = Projectile();
+    }
+
     position += movingDirection * MOVE_SPEED;
 
     hitbox.setPosition(position);
@@ -150,21 +180,21 @@ void Bat::update(Player& player) {
     );
 
     if (movingDirection.x < 0) {
-        state = (int)BatState::IDLE_LEFT;
+        state = (int)EyeState::IDLE_LEFT;
     }
     else if (movingDirection.x > 0) {
-        state = (int)BatState::IDLE_RIGHT;
+        state = (int)EyeState::IDLE_RIGHT;
     }
 
     animationManager.setState(state, true);
-    animationManager.setPosition(position);
+    animationManager.setPosition(position - sf::Vector2f(4, 4));
     animationManager.update();
 
     alert .setPosition(position + sf::Vector2f(8, -15));
     shadow.setPosition(position + sf::Vector2f(4, size.y - 8));
 }
 
-void Bat::draw(sf::RenderWindow& window) const {
+void Eye::draw(sf::RenderWindow& window) const {
     window.draw(hitbox);
     window.draw(detectionBox);
     
@@ -174,8 +204,10 @@ void Bat::draw(sf::RenderWindow& window) const {
     shadow.draw(window);
     
     animationManager.draw(window);
+
+    projectile.draw(window);
 }
 
-sf::Vector2f Bat::getPosition() const {
+sf::Vector2f Eye::getPosition() const {
     return position;
 }

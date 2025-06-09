@@ -11,6 +11,8 @@ private:
 public:
     static sf::Vector2f normalize(const sf::Vector2f& source);
     
+    Projectile() = default;
+
     Projectile(const sf::Texture& texture, sf::Vector2f startPos, sf::Vector2f direction, float speed, float life);
 
     bool isCollision(const sf::FloatRect& rect) const;
@@ -18,6 +20,6 @@ public:
     void update(float dt);
     void draw(sf::RenderWindow& window) const;
 
-    bool isAlive() const;
+    bool isAlive() const;  
 
 };

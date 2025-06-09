@@ -4,38 +4,38 @@
 #include "Animation.hpp"
 #include "Player.hpp"
 #include "Bat.hpp"
+#include "Eye.hpp"
 #include "SoundManager.hpp"
 
-void drawGrid(Player& player, sf::RenderWindow& window) {
+void drawGrid(const sf::Vector2f& entityPosition, sf::RenderWindow& window) {
     sf::RectangleShape tile;
     tile.setSize(sf::Vector2f(TILE_SIZE, TILE_SIZE));
     tile.setFillColor(sf::Color::White);
     tile.setOutlineColor(sf::Color(139, 139, 139, 139));
     tile.setOutlineThickness(2);
 
-    sf::Vector2f playerPosition = player.getPosition();
     for (int x = 0; x <= TILE_SIZE * 5; x += TILE_SIZE) {
         for (int y = 0; y <= TILE_SIZE * 5; y += TILE_SIZE) {
             sf::Vector2f fixedPosition;
-            fixedPosition = sf::Vector2f(playerPosition.x + x, playerPosition.y + y);
+            fixedPosition = sf::Vector2f(entityPosition.x + x, entityPosition.y + y);
             fixedPosition.x = static_cast<int>(fixedPosition.x / TILE_SIZE) * TILE_SIZE;
             fixedPosition.y = static_cast<int>(fixedPosition.y / TILE_SIZE) * TILE_SIZE;
             tile.setPosition(fixedPosition);
             window.draw(tile);
         
-            fixedPosition   = sf::Vector2f(playerPosition.x + x, playerPosition.y - y);
+            fixedPosition   = sf::Vector2f(entityPosition.x + x, entityPosition.y - y);
             fixedPosition.x = static_cast<int>(fixedPosition.x / TILE_SIZE) * TILE_SIZE;
             fixedPosition.y = static_cast<int>(fixedPosition.y / TILE_SIZE) * TILE_SIZE;
             tile.setPosition(fixedPosition);
             window.draw(tile);
 
-            fixedPosition   = sf::Vector2f(playerPosition.x - x, playerPosition.y + y);
+            fixedPosition   = sf::Vector2f(entityPosition.x - x, entityPosition.y + y);
             fixedPosition.x = static_cast<int>(fixedPosition.x / TILE_SIZE) * TILE_SIZE;
             fixedPosition.y = static_cast<int>(fixedPosition.y / TILE_SIZE) * TILE_SIZE;
             tile.setPosition(fixedPosition);
             window.draw(tile);
 
-            fixedPosition   = sf::Vector2f(playerPosition.x - x, playerPosition.y - y);
+            fixedPosition   = sf::Vector2f(entityPosition.x - x, entityPosition.y - y);
             fixedPosition.x = static_cast<int>(fixedPosition.x / TILE_SIZE) * TILE_SIZE;
             fixedPosition.y = static_cast<int>(fixedPosition.y / TILE_SIZE) * TILE_SIZE;
             tile.setPosition(fixedPosition);
@@ -45,7 +45,7 @@ void drawGrid(Player& player, sf::RenderWindow& window) {
 }
 
 int main() {
-    sf::RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "Shadow Of The Colossus 2D");
+    sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Shadow Of The Colossus 2D");
     window.setFramerateLimit(60);
     
     TextureManager::load("playerSprite", "Sprites/player.png");
@@ -56,10 +56,15 @@ int main() {
     TextureManager::load("batSprite", "Sprites/bat.png");
     TextureManager::load("batShadow", "Sprites/batShadow.png");
     TextureManager::load("batDead"  , "Sprites/batDead.png");
+    
+    TextureManager::load("eyeSprite", "Sprites/eye.png");
+    TextureManager::load("eyeShadow", "Sprites/eyeShadow.png");
+    TextureManager::load("eyeDead"  , "Sprites/eyeDead.png");
+    TextureManager::load("fireball" , "Sprites/fireball.png");
 
-    SoundManager::loadSound("arrow", "Sounds/arrow.wav");
-    SoundManager::loadSound("playerHurt" , "Sounds/playerHurt.wav");
-    SoundManager::loadSound("enemyHurt", "Sounds/enemyHurt.wav");
+    SoundManager::loadSound("arrow"     , "Sounds/arrow.wav");
+    SoundManager::loadSound("playerHurt", "Sounds/playerHurt.wav");
+    SoundManager::loadSound("enemyHurt" , "Sounds/enemyHurt.wav");
 
     bool isMinimized = false;
 
@@ -67,14 +72,16 @@ int main() {
 
     Player player(0, 0);
     std::vector<Bat> bats;
-    // bats.push_back(Bat( 251,    0));
-    // bats.push_back(Bat(   0,  251));
-    // bats.push_back(Bat(-251,    0));
-    // bats.push_back(Bat(   0, -251));
-    bats.push_back(Bat( 251,  251));
-    bats.push_back(Bat(-251,  251));
-    bats.push_back(Bat( 251, -251));
-    bats.push_back(Bat(-251, -251));
+    bats.push_back(Bat( 300,    0));
+    bats.push_back(Bat(   0,  300));
+    bats.push_back(Bat(-300,    0));
+    bats.push_back(Bat(   0, -300));
+
+    std::vector<Eye> eyes;
+    eyes.push_back(Eye( 300,  300));
+    eyes.push_back(Eye(-300,  300));
+    eyes.push_back(Eye( 300, -300));
+    eyes.push_back(Eye(-300, -300));
 
     while (window.isOpen()) {
         sf::Event event;
@@ -92,7 +99,7 @@ int main() {
                 float aspectRatio = static_cast<float>(event.size.width) / event.size.height;
                 
                 view = window.getView();
-                view.setSize(windowHeight * aspectRatio, windowHeight);  // giữ chiều cao cố định
+                view.setSize(WINDOW_HEIGHT * aspectRatio, WINDOW_HEIGHT);  // giữ chiều cao cố định
                 view.setCenter(view.getSize().x / 2, view.getSize().y / 2);
             }
             else if (event.type == sf::Event::KeyPressed) {
@@ -117,24 +124,40 @@ int main() {
             for (Bat& bat : bats) {
                 bat.respawn();
             }
+            for (Eye& eye : eyes) {
+                eye.respawn();
+            }
         }
-
-        for (Bat& bat : bats) if (bat.isAlive()) {
+        for (Bat& bat : bats) if (bat.distance(player) <= LOADING_DISTANCE) {
             bat.update(player);
         }
-        else {
-            bat.respawn();
+        for (Eye& eye : eyes) if (eye.distance(player) <= LOADING_DISTANCE) {
+            eye.update(player);
         }
 
         window.clear(sf::Color::White);
 
         window.setView(view);
 
-        drawGrid(player, window);
-
+        drawGrid(player.getPosition(), window);
+        
         player.draw(window);
-        for (Bat& bat : bats) if (bat.isAlive()) {
-            bat.draw(window);
+
+        for (Bat& bat : bats) if (bat.distance(player) <= LOADING_DISTANCE) {
+            if (bat.isAlive()) {
+                bat.draw(window);
+            }
+            else {
+                bat.respawn();
+            }
+        }
+        for (Eye& eye : eyes) if (eye.distance(player) <= LOADING_DISTANCE) {
+            if (eye.isAlive()) {
+                eye.draw(window);
+            }
+            else {
+                eye.respawn();
+            }
         }
 
         window.display();

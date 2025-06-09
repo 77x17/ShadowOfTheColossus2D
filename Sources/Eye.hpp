@@ -4,10 +4,11 @@
 
 #include "Constants.hpp"
 #include "Animation.hpp"
+#include "Projectile.hpp"
 #include "Player.hpp"
 #include "SoundManager.hpp"
 
-enum class BatState {
+enum class EyeState {
     IDLE_LEFT,
     IDLE_RIGHT,
 
@@ -16,7 +17,7 @@ enum class BatState {
     DYING
 };
 
-class Bat {
+class Eye {
 private:
     // const
     const float MOVE_SPEED = 2.0f; 
@@ -35,11 +36,11 @@ private:
     int                state = 0;
     
     sf::Clock   deltaClock;
-    const float DETECION_RANGE     = 150.0f;
+    const float DETECION_RANGE     = 250.0f;
     const float ALERT_LIFETIME     = 1.0f;
     float       alertCooldownTimer = 0.0f;
 
-    BatState    lifeState          = BatState::ALIVE;
+    EyeState    lifeState          = EyeState::ALIVE;
     const float DYING_TIME         = 1.0f;
     float       dyingCooldownTimer = 0.0f;
 
@@ -50,8 +51,14 @@ private:
     const float RESPAWN_TIME         = 5.0f;
     float       respawnCooldownTimer = 0.0f;
 
+    Projectile  projectile;
+    const float SHOOT_COOLDOWN      = 2.0f;
+    const float PROJECTILE_SPEED    = MOVE_SPEED;
+    const float PROJECTILE_LIFETIME = 1.0f;
+    float shootCooldownTimer        = 0.0f;
+
 public:
-    Bat(float x, float y);
+    Eye(float x, float y);
 
     bool isAlive() const;
 

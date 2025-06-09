@@ -39,6 +39,7 @@ private:
     sf::Vector2f movingDirection = sf::Vector2f(0.f, 0.f);
     
     sf::RectangleShape hitbox;
+    sf::CircleShape    loadingBox;
     AnimationManager   animationManager;
     Animation          shadow;
     int                state = 0;
@@ -72,6 +73,8 @@ public:
     bool isAlive() const;
     void kill();
     void respawn();
+
+    sf::FloatRect getHitBox() const;
 
     void update(sf::View& view);
     sf::Vector2f getPosition() const;

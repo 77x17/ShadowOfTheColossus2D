@@ -2,7 +2,7 @@
 
 Player::Player(float x = 0, float y = 0) : basePosition(x, y) {
     position = basePosition;
-    
+
     shadow = Animation(TextureManager::get("playerShadow"), 13, 5, 1, 0, 0.f, false);
 
     hitbox.setSize(size);
@@ -10,6 +10,15 @@ Player::Player(float x = 0, float y = 0) : basePosition(x, y) {
     hitbox.setOutlineThickness(1.f);
     hitbox.setFillColor(sf::Color::Transparent);
     hitbox.setPosition(x, y);
+
+    loadingBox.setRadius(LOADING_DISTANCE);
+    loadingBox.setOutlineColor(sf::Color::Blue);
+    loadingBox.setOutlineThickness(1.f);
+    loadingBox.setFillColor(sf::Color::Transparent);
+    loadingBox.setPosition(
+        hitbox.getPosition().x + hitbox.getSize().x / 2.f - LOADING_DISTANCE,
+        hitbox.getPosition().y + hitbox.getSize().y / 2.f - LOADING_DISTANCE
+    );
 
     animationManager.addAnimation((int)PlayerState::IDLE_LEFT    , TextureManager::get("playerSprite"), 19, 21, 2, 7, 0.5f , true );
     animationManager.addAnimation((int)PlayerState::IDLE_RIGHT   , TextureManager::get("playerSprite"), 19, 21, 2, 7, 0.5f , false);
@@ -71,7 +80,6 @@ void Player::handleInput(const sf::RenderWindow& window) {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && shootCooldownTimer <= 0.f && !isDashing) {
         shootCooldownTimer = SHOOT_COOLDOWN; 
         
-        sf::Vector2f playerCenter = getPosition();
         sf::Vector2f projectileDirection;
         if (movingDirection.x != 0 || movingDirection.y != 0) {
             projectileDirection = movingDirection;
@@ -94,7 +102,7 @@ void Player::handleInput(const sf::RenderWindow& window) {
 
         projectiles.emplace_back(
             TextureManager::get("arrow"),
-            playerCenter + size / 2.f,
+            getPosition() + size / 2.f,
             projectileDirection,
             PROJECTILE_SPEED,
             PROJECTILE_LIFETIME
@@ -130,9 +138,19 @@ void Player::kill() {
 
 void Player::respawn() {
     position        = basePosition;
-    hitbox.setPosition(position);
     movingDirection = sf::Vector2f(0.f, 0.f);
-    lifeState       = PlayerState::ALIVE;
+
+    hitbox.setPosition(position);
+    loadingBox.setPosition(
+        hitbox.getPosition().x + hitbox.getSize().x / 2.f,
+        hitbox.getPosition().y + hitbox.getSize().y / 2.f
+    );
+    
+    lifeState = PlayerState::ALIVE;
+}
+
+sf::FloatRect Player::getHitBox() const {
+    return hitbox.getGlobalBounds();
 }
 
 void Player::update(sf::View& view) {
@@ -179,6 +197,10 @@ void Player::update(sf::View& view) {
     }
 
     hitbox.setPosition(position);
+    loadingBox.setPosition(
+        hitbox.getPosition().x + hitbox.getSize().x / 2.f - LOADING_DISTANCE,
+        hitbox.getPosition().y + hitbox.getSize().y / 2.f - LOADING_DISTANCE
+    );
 
     if (isDashing) {
         state = (movingDirection.x < 0 ? (int)PlayerState::DASH_LEFT : (int)PlayerState::DASH_RIGHT);
@@ -231,7 +253,8 @@ void Player::update(sf::View& view) {
 
 void Player::draw(sf::RenderWindow& window) const {
     window.draw(hitbox);
-    
+    window.draw(loadingBox);
+
     shadow.draw(window);
     
     animationManager.draw(window);
