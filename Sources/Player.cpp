@@ -22,6 +22,9 @@ Player::Player(float x = 0, float y = 0) : basePosition(x, y) {
     animationManager.addAnimation((int)PlayerState::WALK_DOWN    , TextureManager::get("playerSprite"), 19, 21, 3, 0, 0.2f , false);
     animationManager.addAnimation((int)PlayerState::DASH_LEFT    , TextureManager::get("playerSprite"), 19, 21, 4, 3, 0.09f, true );
     animationManager.addAnimation((int)PlayerState::DASH_RIGHT   , TextureManager::get("playerSprite"), 19, 21, 4, 3, 0.09f, false);
+
+    // soundManager.loadSound("arrow", "Sounds/arrow.wav");
+    // soundManager.loadSound("hurt" , "Sounds/playerHurt.wav");
 }
 
 void Player::handleInput(const sf::RenderWindow& window) {
@@ -98,6 +101,8 @@ void Player::handleInput(const sf::RenderWindow& window) {
             PROJECTILE_SPEED,
             PROJECTILE_LIFETIME
         );
+
+        // soundManager.playSound("arrow");
     }
 }
 
@@ -121,6 +126,8 @@ bool Player::isAlive() const {
 
 void Player::kill() {
     lifeState = PlayerState::DEAD;
+
+    // soundManager.playSound("hurt");
 }
 
 void Player::respawn() {

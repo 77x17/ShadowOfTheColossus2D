@@ -3,10 +3,11 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 
-#include "constants.hpp"
-#include "animation.hpp"
-#include "projectile.hpp"
-#include "player.hpp"
+#include "Constants.hpp"
+#include "Animation.hpp"
+#include "Projectile.hpp"
+#include "Player.hpp"
+#include "SoundManager.hpp"
 
 enum class BatState {
     IDLE_LEFT,
@@ -34,6 +35,8 @@ private:
     Animation          alert;
     int                state = 0;
     
+    // SoundManager soundManager;
+
     sf::Clock   deltaClock;
     const float DETECION_RANGE     = 200.0f;
     const float ALERT_LIFETIME     = 1.0f;

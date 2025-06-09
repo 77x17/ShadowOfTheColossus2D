@@ -5,7 +5,7 @@ CXX = g++
 CXXFLAGS = -std=c++17 -Wall -I./src
 
 # SFML flags (adjust if SFML is in a custom path)
-SFML_LIBS = -lsfml-graphics -lsfml-window -lsfml-system
+SFML_LIBS = -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -lsfml-network
 
 # Directories
 SRC_DIR = Sources

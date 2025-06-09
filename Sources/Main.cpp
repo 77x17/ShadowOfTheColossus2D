@@ -47,14 +47,14 @@ int main() {
     sf::RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "Shadow Of The Colossus 2D");
     window.setFramerateLimit(60);
 
-    TextureManager::load("playerSprite", "sprites/player.png");
-    TextureManager::load("playerShadow", "sprites/playerShadow.png");
-    TextureManager::load("arrow", "sprites/arrow.png");
+    TextureManager::load("playerSprite", "Sprites/player.png");
+    TextureManager::load("playerShadow", "Sprites/playerShadow.png");
+    TextureManager::load("arrow"       , "Sprites/arrow.png");
 
-    TextureManager::load("alert", "sprites/alert.png");
-    TextureManager::load("batSprite", "sprites/bat.png");
-    TextureManager::load("batShadow", "sprites/batShadow.png");
-    TextureManager::load("batDead", "sprites/batDead.png");
+    TextureManager::load("alert"    , "Sprites/alert.png");
+    TextureManager::load("batSprite", "Sprites/bat.png");
+    TextureManager::load("batShadow", "Sprites/batShadow.png");
+    TextureManager::load("batDead"  , "Sprites/batDead.png");
 
     bool isMinimized = false;
 

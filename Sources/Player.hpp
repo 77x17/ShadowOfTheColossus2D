@@ -6,6 +6,7 @@
 #include "Constants.hpp"
 #include "Animation.hpp"
 #include "Projectile.hpp"
+#include "SoundManager.hpp"
 
 enum class PlayerState {
     IDLE_LEFT,
@@ -41,6 +42,8 @@ private:
     AnimationManager   animationManager;
     Animation          shadow;
     int                state;
+
+    // SoundManager soundManager;
 
     // Biến trạng thái cho Dash
     const float DASH_SPEED    = MOVE_SPEED * 2;         // Tốc độ khi lướt
