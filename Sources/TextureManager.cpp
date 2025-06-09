@@ -1,4 +1,4 @@
-#include "textureManager.hpp"
+#include "TextureManager.hpp"
 
 std::unordered_map<std::string, sf::Texture> TextureManager::textures;
 

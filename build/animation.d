@@ -1,1 +1,1 @@
-build/animation.o: src/animation.cpp src/animation.hpp
+Build/Animation.o: Sources/Animation.cpp Sources/Animation.hpp

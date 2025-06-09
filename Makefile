@@ -8,11 +8,11 @@ CXXFLAGS = -std=c++17 -Wall -I./src
 SFML_LIBS = -lsfml-graphics -lsfml-window -lsfml-system
 
 # Directories
-SRC_DIR = src
-BUILD_DIR = build
+SRC_DIR = Sources
+BUILD_DIR = Build
 
 # Output binary
-TARGET = demo
+TARGET = Demo
 
 # Find all .cpp files in SRC_DIR
 SRCS := $(wildcard $(SRC_DIR)/*.cpp)

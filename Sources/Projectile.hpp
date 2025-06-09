@@ -4,7 +4,7 @@
 
 class Projectile {
 private:
-    sf::RectangleShape shape;
+    sf::RectangleShape hitbox;
     sf::Sprite         sprite;
     sf::Vector2f       velocity;
     float              lifetime;

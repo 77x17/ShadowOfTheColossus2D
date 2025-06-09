@@ -1,1 +1,1 @@
-build/projectile.o: src/projectile.cpp src/projectile.hpp
+Build/Projectile.o: Sources/Projectile.cpp Sources/Projectile.hpp

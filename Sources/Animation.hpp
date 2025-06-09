@@ -51,6 +51,7 @@ public:
 
     void addAnimation(int state, const sf::Texture& texture, int frameW, int frameH, int totalF, int frameLayer, float frameT, bool flip);
     void setState(int state);
+    void setState(int state, bool notReset);
     void setPosition(sf::Vector2f position);
     void update();
 

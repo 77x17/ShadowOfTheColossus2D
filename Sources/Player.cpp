@@ -1,13 +1,14 @@
-#include "player.hpp"
+#include "Player.hpp"
 
-Player::Player(float x = 0, float y = 0) : position(x, y) {
+Player::Player(float x = 0, float y = 0) : basePosition(x, y) {
     shadow = Animation(TextureManager::get("playerShadow"), 13, 5, 1, 0, 0.f, false);
 
-    shape.setSize(size);
-    shape.setOutlineColor(sf::Color::Red);
-    shape.setOutlineThickness(1.f);
-    shape.setFillColor(sf::Color::Transparent);
-    shape.setPosition(x, y);
+    position = basePosition;
+    hitbox.setSize(size);
+    hitbox.setOutlineColor(sf::Color::Red);
+    hitbox.setOutlineThickness(1.f);
+    hitbox.setFillColor(sf::Color::Transparent);
+    hitbox.setPosition(x, y);
 
     animationManager.addAnimation((int)PlayerState::IDLE_LEFT    , TextureManager::get("playerSprite"), 19, 21, 2, 7, 0.5f , true );
     animationManager.addAnimation((int)PlayerState::IDLE_RIGHT   , TextureManager::get("playerSprite"), 19, 21, 2, 7, 0.5f , false);
@@ -110,7 +111,29 @@ bool Player::isCollisionProjectiles(const sf::FloatRect& rect) const {
     return false;
 }
 
+bool Player::isCollision(const sf::FloatRect& rect) const {
+    return rect.intersects(hitbox.getGlobalBounds());
+}
+
+bool Player::isAlive() const {
+    return lifeState != PlayerState::DEAD;
+}
+
+void Player::kill() {
+    lifeState = PlayerState::DEAD;
+}
+
+void Player::respawn() {
+    position        = basePosition;
+    movingDirection = sf::Vector2f(0.f, 0.f);
+    lifeState       = PlayerState::ALIVE;
+}
+
 void Player::update(sf::View& view) {
+    if (lifeState == PlayerState::DEAD) {
+        return;
+    }
+
     float dt = deltaClock.restart().asSeconds();
     if (dashCooldownTimer > 0) {
         dashCooldownTimer -= dt;
@@ -149,7 +172,7 @@ void Player::update(sf::View& view) {
         position += movingDirection * MOVE_SPEED;
     }
 
-    shape.setPosition(position);
+    hitbox.setPosition(position);
 
     if (isDashing) {
         state = (movingDirection.x < 0 ? (int)PlayerState::DASH_LEFT : (int)PlayerState::DASH_RIGHT);
@@ -201,7 +224,7 @@ void Player::update(sf::View& view) {
 }
 
 void Player::draw(sf::RenderWindow& window) const {
-    window.draw(shape);
+    window.draw(hitbox);
     
     shadow.draw(window);
     

@@ -1,21 +1,22 @@
-#include "bat.hpp"
+#include "Bat.hpp"
 
 #include <cmath>
+#include <random>
 
 Bat::Bat(float x = 0, float y = 0) : basePosition(x, y) {
     position = basePosition;
     shadow = Animation(TextureManager::get("batShadow"), 12,  5, 1, 0, 0.f, false);
     alert  = Animation(TextureManager::get("alert")    ,  8, 10, 1, 0, 0.f, false);
 
-    shape.setSize(size);
-    shape.setOutlineColor(sf::Color::Red);
-    shape.setOutlineThickness(1.f);
-    shape.setFillColor(sf::Color::Transparent);
-    shape.setPosition(x, y);
+    hitbox.setSize(size);
+    hitbox.setOutlineColor(sf::Color::Red);
+    hitbox.setOutlineThickness(1.f);
+    hitbox.setFillColor(sf::Color::Transparent);
+    hitbox.setPosition(x, y);
 
     animationManager.addAnimation((int)BatState::IDLE_LEFT , TextureManager::get("batSprite"), 16, 16, 2, 0, 0.5f, true );
     animationManager.addAnimation((int)BatState::IDLE_RIGHT, TextureManager::get("batSprite"), 16, 16, 2, 0, 0.5f, false);
-    animationManager.addAnimation((int)BatState::DYING, TextureManager::get("batDead"), 16, 16, 2, 0, 0.5f, false);
+    animationManager.addAnimation((int)BatState::DYING     , TextureManager::get("batDead")  , 16, 16, 2, 0, 0.5f, false);
 }
 
 bool Bat::isAlive() const {
@@ -24,6 +25,7 @@ bool Bat::isAlive() const {
 
 void Bat::respawn() {
     position        = basePosition;
+    hitbox.setPosition(position);
     movingDirection = sf::Vector2f(0.f, 0.f);
     lifeState       = BatState::ALIVE;
 }
@@ -44,17 +46,18 @@ void Bat::update(Player& player) {
 
         return;
     }
+    else {
+        if (player.isCollision(hitbox.getGlobalBounds())) {
+            player.kill();
+        }
+    }
 
-    if (player.isCollisionProjectiles(shape.getGlobalBounds())) {
+    if (player.isCollisionProjectiles(hitbox.getGlobalBounds())) {
         lifeState = BatState::DYING;
         dyingCooldownTimer = DYING_TIME;
         
         return;
     }
-
-    // if (player.isCollision(shape.getGlobalBounds())) {
-    //     player.kill();
-    // }
 
     float dt = deltaClock.restart().asSeconds();
     if (alertCooldownTimer > 0) {
@@ -68,18 +71,49 @@ void Bat::update(Player& player) {
         if (length != 0)
             normalizeDirection /= length;
     
-        if (movingDirection == sf::Vector2f(0.f, 0.f)) {
-            alertCooldownTimer = ALERT_LIFETIME;
+        if (alertCooldownTimer <= 0 && randomCooldownTimer > 0) {
+            alertCooldownTimer  = ALERT_LIFETIME;
+            randomCooldownTimer = 0;
         }
+        
         movingDirection = normalizeDirection;
     }
     else {
-        movingDirection = sf::Vector2f(0.f, 0.f);
+        // randomCooldownTimer được kích hoạt khi quái vật không tìm thấy người chơi trong phạm vi
+        // stayingCooldownTimer được chỉnh để bằng 3/4 thời gian của ramdomCooldownTimer
+        // mục đích để quái di chuyển 1/4 và 3/4 thời gian còn lại đứng yên tại chỗ
+        if (randomCooldownTimer > 0) {
+            randomCooldownTimer -= dt;
+            
+            if (stayingCooldownTimer > 0) {
+                stayingCooldownTimer -= dt;
+            }
+            else {
+                movingDirection = sf::Vector2f(rand() % 3 - 1.f, rand() % 3 - 1.f);
+
+                // normalize
+                length = std::sqrt(movingDirection.x * movingDirection.x + movingDirection.y * movingDirection.y);
+                if (length != 0) {
+                    movingDirection /= length * 3;
+                }
+                else {
+                    movingDirection = sf::Vector2f(0.f, 0.f);
+                }
+
+                stayingCooldownTimer = randomCooldownTimer;
+            }
+        }
+        else {
+            randomCooldownTimer  = RANDOM_TIME;
+            stayingCooldownTimer = 3 * RANDOM_TIME / 4;
+
+            movingDirection = sf::Vector2f(0.f, 0.f);
+        }
     }
     
     position += movingDirection * MOVE_SPEED;
 
-    shape.setPosition(position);
+    hitbox.setPosition(position);
 
     if (movingDirection.x < 0) {
         state = (int)BatState::IDLE_LEFT;
@@ -88,7 +122,7 @@ void Bat::update(Player& player) {
         state = (int)BatState::IDLE_RIGHT;
     }
 
-    animationManager.setState(state);
+    animationManager.setState(state, true);
     animationManager.setPosition(position);
     animationManager.update();
 
@@ -97,7 +131,7 @@ void Bat::update(Player& player) {
 }
 
 void Bat::draw(sf::RenderWindow& window) const {
-    window.draw(shape);
+    window.draw(hitbox);
     
     if (alertCooldownTimer > 0) {
         alert.draw(window);

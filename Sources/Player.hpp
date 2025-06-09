@@ -3,9 +3,9 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 
-#include "constants.hpp"
-#include "animation.hpp"
-#include "projectile.hpp"
+#include "Constants.hpp"
+#include "Animation.hpp"
+#include "Projectile.hpp"
 
 enum class PlayerState {
     IDLE_LEFT,
@@ -19,7 +19,11 @@ enum class PlayerState {
     WALK_UP_RIGHT,
     WALK_DOWN,
     DASH_LEFT,
-    DASH_RIGHT
+    DASH_RIGHT,
+
+    ALIVE,
+    DEAD,
+    DYING
 };
 
 class Player {
@@ -29,10 +33,11 @@ private:
     sf::Vector2f size = sf::Vector2f(TILE_SIZE, TILE_SIZE);
 
     // position
+    sf::Vector2f basePosition    = sf::Vector2f(0.f, 0.f);
     sf::Vector2f position        = sf::Vector2f(0.f, 0.f);
     sf::Vector2f movingDirection = sf::Vector2f(0.f, 0.f);
     
-    sf::RectangleShape shape;
+    sf::RectangleShape hitbox;
     AnimationManager   animationManager;
     Animation          shadow;
     int                state;
@@ -54,11 +59,18 @@ private:
     const float PROJECTILE_LIFETIME = 1.0f;
     float shootCooldownTimer        = 0.0f;
 
+    PlayerState lifeState = PlayerState::ALIVE;
+
 public:
     Player(float x, float y);
 
     void handleInput(const sf::RenderWindow& window);
     bool isCollisionProjectiles(const sf::FloatRect& rect) const;
+    bool isCollision(const sf::FloatRect& rect) const;
+
+    bool isAlive() const;
+    void kill();
+    void respawn();
 
     void update(sf::View& view);
     sf::Vector2f getPosition() const;

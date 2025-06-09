@@ -1,9 +1,9 @@
 #include <SFML/Graphics.hpp>
 
-#include "constants.hpp"
-#include "animation.hpp"
-#include "player.hpp"
-#include "bat.hpp"
+#include "Constants.hpp"
+#include "Animation.hpp"
+#include "Player.hpp"
+#include "Bat.hpp"
 
 void drawGrid(Player& player, sf::RenderWindow& window) {
     sf::RectangleShape tile;
@@ -44,7 +44,7 @@ void drawGrid(Player& player, sf::RenderWindow& window) {
 }
 
 int main() {
-    sf::RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "2D Pattern Window");
+    sf::RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "Shadow Of The Colossus 2D");
     window.setFramerateLimit(60);
 
     TextureManager::load("playerSprite", "sprites/player.png");
@@ -62,10 +62,10 @@ int main() {
 
     Player player(0, 0);
     std::vector<Bat> bats;
-    bats.push_back(Bat(251, 0));
-    bats.push_back(Bat(0, 251));
-    bats.push_back(Bat(-251, 0));
-    bats.push_back(Bat(0, -251));
+    bats.push_back(Bat( 251,    0));
+    bats.push_back(Bat(   0,  251));
+    bats.push_back(Bat(-251,    0));
+    bats.push_back(Bat(   0, -251));
 
     while (window.isOpen()) {
         sf::Event event;
@@ -100,7 +100,16 @@ int main() {
 
         player.handleInput(window);
 
-        player.update(view);
+        if (player.isAlive()) {
+            player.update(view);
+        }
+        else {
+            player.respawn();
+            for (Bat& bat : bats) {
+                bat.respawn();
+            }
+        }
+
         for (Bat& bat : bats) if (bat.isAlive()) {
             bat.update(player);
         }

@@ -11,6 +11,7 @@
 enum class BatState {
     IDLE_LEFT,
     IDLE_RIGHT,
+
     ALIVE,
     DEAD,
     DYING
@@ -27,7 +28,7 @@ private:
     sf::Vector2f position        = sf::Vector2f(0.f, 0.f);
     sf::Vector2f movingDirection = sf::Vector2f(0.f, 0.f);
     
-    sf::RectangleShape shape;
+    sf::RectangleShape hitbox;
     AnimationManager   animationManager;
     Animation          shadow;
     Animation          alert;
@@ -41,6 +42,10 @@ private:
     BatState    lifeState          = BatState::ALIVE;
     const float DYING_TIME         = 1.0f;
     float       dyingCooldownTimer = 0.0f;
+
+    const float RANDOM_TIME          = 5.0f;
+    float       randomCooldownTimer  = 0.0f;
+    float       stayingCooldownTimer = 0.0f;
 
 public:
     Bat(float x, float y);

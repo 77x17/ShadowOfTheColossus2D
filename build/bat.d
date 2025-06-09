@@ -1,2 +1,2 @@
-build/bat.o: src/bat.cpp src/bat.hpp src/constants.hpp src/animation.hpp \
- src/projectile.hpp src/player.hpp
+Build/Bat.o: Sources/Bat.cpp Sources/Bat.hpp Sources/constants.hpp \
+ Sources/animation.hpp Sources/projectile.hpp Sources/player.hpp

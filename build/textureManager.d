@@ -1,1 +1,2 @@
-build/textureManager.o: src/textureManager.cpp src/textureManager.hpp
+Build/TextureManager.o: Sources/TextureManager.cpp \
+ Sources/TextureManager.hpp

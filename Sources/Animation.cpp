@@ -1,4 +1,4 @@
-#include "animation.hpp"
+#include "Animation.hpp"
 
 Animation::Animation(const sf::Texture& texture, int frameW, int frameH, int totalF, int frameLayer, float frameT, bool flip = false) 
     : frameWidth(frameW), frameHeight(frameH), currentFrame(0), totalFrames(totalF), layer(frameLayer), frameTime(frameT) {
@@ -56,6 +56,12 @@ void AnimationManager::setState(int state) {
     if (state != currentState) {
         currentState = state;
         animations[currentState].reset();
+    }
+}
+
+void AnimationManager::setState(int state, bool notReset) {
+    if (state != currentState) {
+        currentState = state;
     }
 }
 

@@ -1,2 +1,2 @@
-build/player.o: src/player.cpp src/player.hpp src/constants.hpp \
- src/animation.hpp src/projectile.hpp
+Build/Player.o: Sources/Player.cpp Sources/Player.hpp \
+ Sources/Constants.hpp Sources/Animation.hpp Sources/Projectile.hpp
