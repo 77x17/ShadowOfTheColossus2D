@@ -2,66 +2,19 @@
 
 #include <SFML/Graphics.hpp>
 
-#include "Constants.hpp"
-#include "Animation.hpp"
-#include "Player.hpp"
-#include "SoundManager.hpp"
+#include "Enemy.hpp"
 
 enum class BatState {
+    DYING = -2,
+    DEAD  = -1,
     IDLE_LEFT,
-    IDLE_RIGHT,
-
-    ALIVE,
-    DEAD,
-    DYING
+    IDLE_RIGHT
 };
 
-class Bat {
-private:
-    // const
-    const float MOVE_SPEED = 2.0f; 
-    sf::Vector2f size = sf::Vector2f(TILE_SIZE, TILE_SIZE);
-
-    // position
-    sf::Vector2f basePosition    = sf::Vector2f(0.f, 0.f);
-    sf::Vector2f position        = sf::Vector2f(0.f, 0.f);
-    sf::Vector2f movingDirection = sf::Vector2f(0.f, 0.f);
-    
-    sf::RectangleShape hitbox;
-    sf::CircleShape    detectionBox;
-    AnimationManager   animationManager;
-    Animation          shadow;
-    Animation          alert;
-    int                state = 0;
-    
-    sf::Clock   deltaClock;
-    const float DETECION_RANGE     = 150.0f;
-    const float ALERT_LIFETIME     = 1.0f;
-    float       alertCooldownTimer = 0.0f;
-
-    BatState    lifeState          = BatState::ALIVE;
-    const float DYING_TIME         = 1.0f;
-    float       dyingCooldownTimer = 0.0f;
-
-    const float RANDOM_TIME          = 5.0f;
-    float       randomCooldownTimer  = 0.0f;
-    float       stayingCooldownTimer = 0.0f;
-
-    const float RESPAWN_TIME         = 5.0f;
-    float       respawnCooldownTimer = 0.0f;
-
+class Bat : public Enemy {
 public:
     Bat(float x, float y);
 
-    bool isAlive() const;
-
-    void respawn();
-
-    float distance(const Player& player) const;
-
-    void update(Player& player);
-    sf::Vector2f getPosition() const;
-
-    void draw(sf::RenderWindow& window) const;
+    void updateAnimation() override;
 
 };

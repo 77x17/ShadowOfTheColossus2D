@@ -47,7 +47,7 @@ bool Projectile::isCollision(const sf::FloatRect& rect) const {
 }
 
 void Projectile::update(float dt) {
-    hitbox.move(velocity * dt * 100.f * static_cast<float>(std::pow(4, 1.0 - lifetime)));
+    hitbox.move(velocity * dt * static_cast<float>(std::pow(4, 1.0 - lifetime)));
     sprite.setPosition(hitbox.getPosition());
     lifetime -= dt; // Decrease the remaining lifetime
 }

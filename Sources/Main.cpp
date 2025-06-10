@@ -8,48 +8,9 @@
 #include "SoundManager.hpp"
 #include "TileMap.hpp"
 
-void drawGrid(const sf::Vector2f& entityPosition, sf::RenderWindow& window) {
-    sf::RectangleShape tile;
-    tile.setSize(sf::Vector2f(TILE_SIZE, TILE_SIZE));
-    tile.setFillColor(sf::Color::Transparent);
-    tile.setOutlineColor(sf::Color(139, 139, 139, 139));
-    tile.setOutlineThickness(2);
-
-    for (int x = 0; x <= TILE_SIZE * 5; x += TILE_SIZE) {
-        for (int y = 0; y <= TILE_SIZE * 5; y += TILE_SIZE) {
-            sf::Vector2f fixedPosition;
-            fixedPosition = sf::Vector2f(entityPosition.x + x, entityPosition.y + y);
-            fixedPosition.x = static_cast<int>(fixedPosition.x / TILE_SIZE) * TILE_SIZE;
-            fixedPosition.y = static_cast<int>(fixedPosition.y / TILE_SIZE) * TILE_SIZE;
-            tile.setPosition(fixedPosition);
-            window.draw(tile);
-        
-            fixedPosition   = sf::Vector2f(entityPosition.x + x, entityPosition.y - y);
-            fixedPosition.x = static_cast<int>(fixedPosition.x / TILE_SIZE) * TILE_SIZE;
-            fixedPosition.y = static_cast<int>(fixedPosition.y / TILE_SIZE) * TILE_SIZE;
-            tile.setPosition(fixedPosition);
-            window.draw(tile);
-
-            fixedPosition   = sf::Vector2f(entityPosition.x - x, entityPosition.y + y);
-            fixedPosition.x = static_cast<int>(fixedPosition.x / TILE_SIZE) * TILE_SIZE;
-            fixedPosition.y = static_cast<int>(fixedPosition.y / TILE_SIZE) * TILE_SIZE;
-            tile.setPosition(fixedPosition);
-            window.draw(tile);
-
-            fixedPosition   = sf::Vector2f(entityPosition.x - x, entityPosition.y - y);
-            fixedPosition.x = static_cast<int>(fixedPosition.x / TILE_SIZE) * TILE_SIZE;
-            fixedPosition.y = static_cast<int>(fixedPosition.y / TILE_SIZE) * TILE_SIZE;
-            tile.setPosition(fixedPosition);
-            window.draw(tile);
-        }
-    }
-}
-
 int main() {
     sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Shadow Of The Colossus 2D");
-    // window.setFramerateLimit(60);
-    window.setVerticalSyncEnabled(true); 
-
+    window.setFramerateLimit(60);
     
     TextureManager::load("playerSprite", "Sprites/player.png");
     TextureManager::load("playerShadow", "Sprites/playerShadow.png");
@@ -66,25 +27,13 @@ int main() {
     TextureManager::load("fireball" , "Sprites/fireball.png");
 
     SoundManager::loadSound("arrow"     , "Sounds/arrow.wav");
+    SoundManager::loadSound("roll"      , "Sounds/roll.wav");
     SoundManager::loadSound("playerHurt", "Sounds/playerHurt.wav");
     SoundManager::loadSound("enemyHurt" , "Sounds/enemyHurt.wav");
 
     bool isMinimized = false;
-
     sf::View view = window.getView();
-
-    Player player(0, 0);
-    std::vector<Bat> bats;
-    // bats.push_back(Bat( 300,    0));
-    // bats.push_back(Bat(   0,  300));
-    // bats.push_back(Bat(-300,    0));
-    // bats.push_back(Bat(   0, -300));
-
-    std::vector<Eye> eyes;
-    // eyes.push_back(Eye( 300,  300));
-    // eyes.push_back(Eye(-300,  300));
-    // eyes.push_back(Eye( 300, -300));
-    // eyes.push_back(Eye(-300, -300));
+    sf::Clock clock;
 
     TileMap map;
     if (!map.load("Maps/test.tmx", "Maps/overworld.png")) {
@@ -93,7 +42,20 @@ int main() {
     map.scale(2.f, 2.f);
     map.updateCollisionRects();
 
+    Player player(300, 300);
+
+    std::vector<Bat> bats;
+    bats.push_back(Bat(950, 200));
+    bats.push_back(Bat(1250, 200));
+    bats.push_back(Bat(1550, 200));
+    bats.push_back(Bat(1850, 200));
+    
+    std::vector<Eye> eyes;
+    eyes.push_back(Eye(1400, 500));
+
     while (window.isOpen()) {
+        float dt = clock.restart().asSeconds();
+        
         sf::Event event;
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
@@ -124,10 +86,8 @@ int main() {
             continue;
         }
 
-        player.handleInput(window);
-
         if (player.isAlive()) {
-            player.update(view, map.getCollisionRects());
+            player.update(dt, window, map.getCollisionRects());
         }
         else {
             player.respawn();
@@ -138,23 +98,25 @@ int main() {
                 eye.respawn();
             }
         }
-        for (Bat& bat : bats) if (bat.distance(player) <= LOADING_DISTANCE) {
-            bat.update(player);
+        for (Bat& bat : bats) if (bat.calculateDistance(player) <= LOADING_DISTANCE) {
+            bat.update(dt, player, map.getCollisionRects());
         }
-        for (Eye& eye : eyes) if (eye.distance(player) <= LOADING_DISTANCE) {
-            eye.update(player);
+        for (Eye& eye : eyes) if (eye.calculateDistance(player) <= LOADING_DISTANCE) {
+            eye.update(dt, player, map.getCollisionRects());
         }
+
+        // Điều chỉnh camera theo player
+        sf::Vector2f currentCenter = view.getCenter();
+        sf::Vector2f targetCenter  = player.getPosition();
+        sf::Vector2f lerped        = currentCenter + 0.1f * (targetCenter - currentCenter);
+        view.setCenter(lerped);
+        window.setView(view);
 
         window.clear(sf::Color::White);
         window.draw(map);
-
-        window.setView(view);
-
-        // drawGrid(player.getPosition(), window);
         
         player.draw(window);
-
-        for (Bat& bat : bats) if (bat.distance(player) <= LOADING_DISTANCE) {
+        for (Bat& bat : bats) if (bat.calculateDistance(player) <= LOADING_DISTANCE) {
             if (bat.isAlive()) {
                 bat.draw(window);
             }
@@ -162,7 +124,7 @@ int main() {
                 bat.respawn();
             }
         }
-        for (Eye& eye : eyes) if (eye.distance(player) <= LOADING_DISTANCE) {
+        for (Eye& eye : eyes) if (eye.calculateDistance(player) <= LOADING_DISTANCE) {
             if (eye.isAlive()) {
                 eye.draw(window);
             }

@@ -3,13 +3,11 @@
 #include <sstream>
 #include <algorithm>
 
-bool TileMap::load(const std::string& tmxPath, const std::string& tilesetPath)
-{
+bool TileMap::load(const std::string& tmxPath, const std::string& tilesetPath) {
     // Xóa dữ liệu cũ nếu có
     m_layersVertices.clear();
 
-    if (!m_tilesetTexture.loadFromFile(tilesetPath))
-    {
+    if (!m_tilesetTexture.loadFromFile(tilesetPath)) {
         std::cerr << "Failed to load tileset texture: " << tilesetPath << '\n';
         return false;
     }
@@ -122,7 +120,7 @@ void TileMap::draw(sf::RenderTarget& target, sf::RenderStates states) const {
     }
 
     sf::RectangleShape hitbox;
-    hitbox.setOutlineColor(sf::Color::Red);
+    hitbox.setOutlineColor(sf::Color::Cyan);
     hitbox.setOutlineThickness(1.f);
     hitbox.setFillColor(sf::Color::Transparent);
     for (const sf::FloatRect& rect : m_collisionRects) {
