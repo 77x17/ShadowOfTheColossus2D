@@ -1,5 +1,7 @@
 #include "Player.hpp"
 
+#include <cmath>
+
 Player::Player(float x = 0, float y = 0) : basePosition(x, y) {
     position = basePosition;
 
@@ -112,9 +114,10 @@ void Player::handleInput(const sf::RenderWindow& window) {
     }
 }
 
-bool Player::isCollisionProjectiles(const sf::FloatRect& rect) const {
-    for (auto& p : projectiles) {
+bool Player::isCollisionProjectiles(const sf::FloatRect& rect) {
+    for (Projectile& p : projectiles) {
         if (p.isCollision(rect)) {
+            p.kill();
             return true;
         }
     }
@@ -153,7 +156,7 @@ sf::FloatRect Player::getHitBox() const {
     return hitbox.getGlobalBounds();
 }
 
-void Player::update(sf::View& view) {
+void Player::update(sf::View& view, const std::vector<sf::FloatRect>& collisionRects) {
     if (lifeState == PlayerState::DEAD) {
         return;
     }
@@ -164,6 +167,12 @@ void Player::update(sf::View& view) {
     }
     if (shootCooldownTimer > 0) { 
         shootCooldownTimer -= dt;
+    }
+    if (dashTimer > 0) {
+        dashTimer -= dt;
+    }
+    else {
+        isDashing = false;
     }
 
     for (auto& p : projectiles) {
@@ -180,22 +189,98 @@ void Player::update(sf::View& view) {
         }
     }
 
+    sf::Vector2f velocity(0.f, 0.f);
     if (isDashing) {
         // Di chuyển theo hướng dash với tốc độ dash
-        position += dashDirection * DASH_SPEED;
-
-        // Giảm bộ đếm thời gian dash
-        dashTimer -= dt;
-
-        // Nếu hết thời gian dash, dừng lại
-        if (dashTimer <= 0.f) {
-            isDashing = false;
-        }    
+        velocity.x = dashDirection.x * DASH_SPEED;
+        velocity.y = dashDirection.y * DASH_SPEED;
     } else {
         // Di chuyển bình thường nếu không dash
-        position += movingDirection * MOVE_SPEED;
+        velocity.x = movingDirection.x * MOVE_SPEED;
+        velocity.y = movingDirection.y * MOVE_SPEED;
     }
 
+    sf::FloatRect nextPlayerRect_x = sf::FloatRect(position + velocity, size);
+    sf::FloatRect nextPlayerRect_y = sf::FloatRect(position + velocity, size);
+
+    if (velocity.x != 0.0f) {
+        for (const sf::FloatRect& rect : collisionRects) {
+            while (rect.intersects(nextPlayerRect_x)) {
+                if (velocity.x > 0.0f) {
+                    nextPlayerRect_x.left = rect.left - nextPlayerRect_x.width - 0.1f;
+                }
+                else if (velocity.x < 0.0f) {
+                    nextPlayerRect_x.left = rect.left + rect.width + 0.1f;
+                }
+                else {
+                    float a = rect.left - nextPlayerRect_x.width - 0.1f - nextPlayerRect_x.left;
+                    float b = rect.left + rect.width + 0.1f - nextPlayerRect_x.left;
+                    nextPlayerRect_x.left = a < b ? rect.left - nextPlayerRect_x.width - 0.1f : rect.left + rect.width + 0.1f;
+                }
+            }
+        }
+    }
+    if (velocity.y != 0.0f) {
+        for (const sf::FloatRect& rect : collisionRects) {
+            while (rect.intersects(nextPlayerRect_x)) {
+                if (velocity.y > 0.0f) {
+                    nextPlayerRect_x.top = rect.top - nextPlayerRect_x.height - 0.1f;
+                }
+                else if (velocity.y < 0.0f) {
+                    nextPlayerRect_x.top = rect.top + rect.height + 0.1f;
+                }
+                else {
+                    float a = rect.top - nextPlayerRect_x.height - 0.1f - nextPlayerRect_x.top;
+                    float b = rect.top + rect.height + 0.1f - nextPlayerRect_x.top;
+                    nextPlayerRect_x.top = a < b ? rect.top - nextPlayerRect_x.height - 0.1f : rect.top + rect.height + 0.1f;
+                }
+            }
+        }
+    }
+    if (velocity.y != 0.0f) {
+        for (const sf::FloatRect& rect : collisionRects) {
+            while (rect.intersects(nextPlayerRect_y)) {
+                if (velocity.y > 0.0f) {
+                    nextPlayerRect_y.top = rect.top - nextPlayerRect_y.height - 0.1f;
+                }
+                else if (velocity.y < 0.0f) {
+                    nextPlayerRect_y.top = rect.top + rect.height + 0.1f;
+                }
+                else {
+                    float a = rect.top - nextPlayerRect_y.height - 0.1f - nextPlayerRect_y.top;
+                    float b = rect.top + rect.height + 0.1f - nextPlayerRect_y.top;
+                    nextPlayerRect_y.top = a < b ? rect.top - nextPlayerRect_y.height - 0.1f : rect.top + rect.height + 0.1f;
+                }
+            }
+        }
+    }
+    if (velocity.x != 0.0f) {
+        for (const sf::FloatRect& rect : collisionRects) {
+            while (rect.intersects(nextPlayerRect_y)) {
+                if (velocity.x > 0.0f) {
+                    nextPlayerRect_y.left = rect.left - nextPlayerRect_y.width - 0.1f;
+                }
+                else if (velocity.x < 0.0f) {
+                    nextPlayerRect_y.left = rect.left + rect.width + 0.1f;
+                }
+                else {
+                    float a = rect.left - nextPlayerRect_y.width - 0.1f - nextPlayerRect_y.left;
+                    float b = rect.left + rect.width + 0.1f - nextPlayerRect_y.left;
+                    nextPlayerRect_y.left = a < b ? rect.left - nextPlayerRect_y.width - 0.1f : rect.left + rect.width + 0.1f;
+                }
+            }
+        }
+    }
+    
+    float distance_x = std::abs(position.x - nextPlayerRect_x.left);
+    float distance_y = std::abs(position.y - nextPlayerRect_y.top);
+
+    if (distance_x != 0 || distance_y != 0) {
+        std::cerr << distance_x << ' ' << distance_y << '\n';
+    }
+
+    position = distance_x < distance_y ? nextPlayerRect_x.getPosition() : nextPlayerRect_y.getPosition();
+    position = nextPlayerRect_x.getPosition();
     hitbox.setPosition(position);
     loadingBox.setPosition(
         hitbox.getPosition().x + hitbox.getSize().x / 2.f - LOADING_DISTANCE,
@@ -253,7 +338,7 @@ void Player::update(sf::View& view) {
 
 void Player::draw(sf::RenderWindow& window) const {
     window.draw(hitbox);
-    window.draw(loadingBox);
+    // window.draw(loadingBox);
 
     shadow.draw(window);
     

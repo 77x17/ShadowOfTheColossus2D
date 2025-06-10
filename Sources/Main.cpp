@@ -6,11 +6,12 @@
 #include "Bat.hpp"
 #include "Eye.hpp"
 #include "SoundManager.hpp"
+#include "TileMap.hpp"
 
 void drawGrid(const sf::Vector2f& entityPosition, sf::RenderWindow& window) {
     sf::RectangleShape tile;
     tile.setSize(sf::Vector2f(TILE_SIZE, TILE_SIZE));
-    tile.setFillColor(sf::Color::White);
+    tile.setFillColor(sf::Color::Transparent);
     tile.setOutlineColor(sf::Color(139, 139, 139, 139));
     tile.setOutlineThickness(2);
 
@@ -46,7 +47,9 @@ void drawGrid(const sf::Vector2f& entityPosition, sf::RenderWindow& window) {
 
 int main() {
     sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Shadow Of The Colossus 2D");
-    window.setFramerateLimit(60);
+    // window.setFramerateLimit(60);
+    window.setVerticalSyncEnabled(true); 
+
     
     TextureManager::load("playerSprite", "Sprites/player.png");
     TextureManager::load("playerShadow", "Sprites/playerShadow.png");
@@ -72,16 +75,23 @@ int main() {
 
     Player player(0, 0);
     std::vector<Bat> bats;
-    bats.push_back(Bat( 300,    0));
-    bats.push_back(Bat(   0,  300));
-    bats.push_back(Bat(-300,    0));
-    bats.push_back(Bat(   0, -300));
+    // bats.push_back(Bat( 300,    0));
+    // bats.push_back(Bat(   0,  300));
+    // bats.push_back(Bat(-300,    0));
+    // bats.push_back(Bat(   0, -300));
 
     std::vector<Eye> eyes;
-    eyes.push_back(Eye( 300,  300));
-    eyes.push_back(Eye(-300,  300));
-    eyes.push_back(Eye( 300, -300));
-    eyes.push_back(Eye(-300, -300));
+    // eyes.push_back(Eye( 300,  300));
+    // eyes.push_back(Eye(-300,  300));
+    // eyes.push_back(Eye( 300, -300));
+    // eyes.push_back(Eye(-300, -300));
+
+    TileMap map;
+    if (!map.load("Maps/test.tmx", "Maps/overworld.png")) {
+        return -1;
+    }
+    map.scale(2.f, 2.f);
+    map.updateCollisionRects();
 
     while (window.isOpen()) {
         sf::Event event;
@@ -117,7 +127,7 @@ int main() {
         player.handleInput(window);
 
         if (player.isAlive()) {
-            player.update(view);
+            player.update(view, map.getCollisionRects());
         }
         else {
             player.respawn();
@@ -136,10 +146,11 @@ int main() {
         }
 
         window.clear(sf::Color::White);
+        window.draw(map);
 
         window.setView(view);
 
-        drawGrid(player.getPosition(), window);
+        // drawGrid(player.getPosition(), window);
         
         player.draw(window);
 

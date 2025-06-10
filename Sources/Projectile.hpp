@@ -21,5 +21,6 @@ public:
     void draw(sf::RenderWindow& window) const;
 
     bool isAlive() const;  
+    void kill();
 
 };

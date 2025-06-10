@@ -67,7 +67,7 @@ public:
     Player(float x, float y);
 
     void handleInput(const sf::RenderWindow& window);
-    bool isCollisionProjectiles(const sf::FloatRect& rect) const;
+    bool isCollisionProjectiles(const sf::FloatRect& rect);
     bool isCollision(const sf::FloatRect& rect) const;
 
     bool isAlive() const;
@@ -76,7 +76,7 @@ public:
 
     sf::FloatRect getHitBox() const;
 
-    void update(sf::View& view);
+    void update(sf::View& view, const std::vector<sf::FloatRect>& collisionRects);
     sf::Vector2f getPosition() const;
 
     void draw(sf::RenderWindow& window) const;

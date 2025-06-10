@@ -26,7 +26,7 @@ Bat::Bat(float x = 0, float y = 0) : basePosition(x, y) {
 
     animationManager.addAnimation((int)BatState::IDLE_LEFT , TextureManager::get("batSprite"), 16, 16, 2, 0, 0.5f, true );
     animationManager.addAnimation((int)BatState::IDLE_RIGHT, TextureManager::get("batSprite"), 16, 16, 2, 0, 0.5f, false);
-    animationManager.addAnimation((int)BatState::DYING     , TextureManager::get("batDead")  , 16, 16, 2, 0, 0.5f, false);
+    animationManager.addAnimation((int)BatState::DYING     , TextureManager::get("batDead")  , 16, 16, 1, 0, 0.5f, false);
 }
 
 bool Bat::isAlive() const {
@@ -165,8 +165,8 @@ void Bat::update(Player& player) {
 }
 
 void Bat::draw(sf::RenderWindow& window) const {
-    window.draw(hitbox);
-    window.draw(detectionBox);
+    // window.draw(hitbox);
+    // window.draw(detectionBox);
     
     if (alertCooldownTimer > 0) {
         alert.draw(window);

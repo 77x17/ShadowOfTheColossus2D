@@ -53,11 +53,15 @@ void Projectile::update(float dt) {
 }
 
 void Projectile::draw(sf::RenderWindow& window) const {
+    // window.draw(hitbox);
+
     window.draw(sprite);
-    
-    window.draw(hitbox);
 }
 
 bool Projectile::isAlive() const {
     return lifetime > 0;
+}
+
+void Projectile::kill() {
+    lifetime = 0;
 }

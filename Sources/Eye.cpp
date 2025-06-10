@@ -26,7 +26,7 @@ Eye::Eye(float x = 0, float y = 0) : basePosition(x, y) {
 
     animationManager.addAnimation((int)EyeState::IDLE_LEFT , TextureManager::get("eyeSprite"), 20, 20, 2, 0, 0.5f, true );
     animationManager.addAnimation((int)EyeState::IDLE_RIGHT, TextureManager::get("eyeSprite"), 20, 20, 2, 0, 0.5f, false);
-    animationManager.addAnimation((int)EyeState::DYING     , TextureManager::get("eyeDead")  , 20, 20, 2, 0, 0.5f, false);
+    animationManager.addAnimation((int)EyeState::DYING     , TextureManager::get("eyeDead")  , 20, 20, 1, 0, 0.5f, false);
 }
 
 bool Eye::isAlive() const {
@@ -165,6 +165,8 @@ void Eye::update(Player& player) {
         
         if (projectile.isCollision(player.getHitBox())) {
             player.kill();
+
+            projectile = Projectile();
         }
     }
     else {
@@ -195,8 +197,8 @@ void Eye::update(Player& player) {
 }
 
 void Eye::draw(sf::RenderWindow& window) const {
-    window.draw(hitbox);
-    window.draw(detectionBox);
+    // window.draw(hitbox);
+    // window.draw(detectionBox);
     
     if (alertCooldownTimer > 0) {
         alert.draw(window);
