@@ -16,6 +16,9 @@ Player::Player(float x = 0, float y = 0) {
     RESPAWN_TIME         = 2.0f;
     respawnCooldownTimer = 0.0f;
 
+    INVINCIBLE_TIME         = 5.0f;
+    invincibleCooldownTimer = INVINCIBLE_TIME;
+
     VIEW_LEAP_SPEED = 2.0f;
 
     dashDirection     = sf::Vector2f(0.f, 0.f); 
@@ -165,7 +168,7 @@ bool Player::isAlive() const {
 }
 
 void Player::kill() {
-    if (isAlive()) {
+    if (isAlive() && invincibleCooldownTimer <= 0) {
         state              = static_cast<int>(PlayerState::DYING);
         dyingCooldownTimer = DYING_TIME;
 
@@ -187,6 +190,8 @@ void Player::respawn() {
         );
         
         state = 0;
+
+        invincibleCooldownTimer = INVINCIBLE_TIME;
     }
 }
 
@@ -208,6 +213,9 @@ void Player::updateTimer(const float &dt) {
     }
     if (respawnCooldownTimer > 0) {
         respawnCooldownTimer -= dt;
+    }
+    if (invincibleCooldownTimer > 0) {
+        invincibleCooldownTimer -= dt;
     }
 
     if (dashTimer > 0) {
@@ -362,6 +370,14 @@ void Player::draw(sf::RenderWindow& window) {
 
     for (auto& p : projectiles) {
         p.draw(window);
+    }
+
+    if (invincibleCooldownTimer > 0) {
+        sf::RectangleShape invincibleBox;
+        invincibleBox.setSize(size);
+        invincibleBox.setPosition(position);
+        invincibleBox.setFillColor(sf::Color(200, 200, 200, 100));
+        window.draw(invincibleBox);   
     }
 }
 

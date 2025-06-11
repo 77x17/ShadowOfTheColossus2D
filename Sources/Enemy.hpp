@@ -33,6 +33,9 @@ protected:
 
     float RESPAWN_TIME;
     float respawnCooldownTimer;
+    
+    float INVINCIBLE_TIME;
+    float invincibleCooldownTimer;
 
     float DETECION_RANGE;
     float ALERT_LIFETIME;

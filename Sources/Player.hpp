@@ -40,6 +40,9 @@ private:
     
     float RESPAWN_TIME;
     float respawnCooldownTimer;
+        
+    float INVINCIBLE_TIME;
+    float invincibleCooldownTimer;
 
     float VIEW_LEAP_SPEED;
 

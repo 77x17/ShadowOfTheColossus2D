@@ -56,6 +56,9 @@ Enemy::Enemy(const float& x = 0, const float& y = 0, const float& width = TILE_S
     RESPAWN_TIME         = 5.0f;
     respawnCooldownTimer = 0.0f;
 
+    INVINCIBLE_TIME         = 5.0f;
+    invincibleCooldownTimer = INVINCIBLE_TIME;
+
     DETECION_RANGE     = 150.0f;
     ALERT_LIFETIME     = 0.5f;
     alertCooldownTimer = 0.0f;
@@ -105,6 +108,8 @@ void Enemy::respawn() {
         state = 0;          // ALIVE
 
         healthPoints = maxHealthPoints;
+
+        invincibleCooldownTimer = INVINCIBLE_TIME;
     }
 }
 
@@ -125,6 +130,9 @@ void Enemy::updateTimer(const float &dt) {
     }
     if (respawnCooldownTimer > 0) {
         respawnCooldownTimer -= dt;
+    }
+    if (invincibleCooldownTimer > 0) {
+        invincibleCooldownTimer -= dt;
     }
 
     if (alertCooldownTimer > 0) {
@@ -184,10 +192,12 @@ void Enemy::moveRandomly() {
 
 void Enemy::updateThinking(Player& player) {
     if (calculateDistance(player) <= DETECION_RANGE) {
-        if (player.isCollision(hitbox.getGlobalBounds())) {
-            player.kill();
+        if (invincibleCooldownTimer <= 0) {
+            if (player.isCollision(hitbox.getGlobalBounds())) {
+                player.kill();
 
-            return;
+                return;
+            }
         }
 
         attackPlayer(player);
@@ -259,13 +269,15 @@ void Enemy::update(const float& dt, Player& player, const std::vector<sf::FloatR
     }
 
     if (player.isCollisionProjectiles(hitbox.getGlobalBounds())) {
-        healthPoints -= 1.0f;
+        if (invincibleCooldownTimer <= 0) {
+            healthPoints -= 1.0f;
 
-        if (healthPoints <= 0) {
-            kill();
+            if (healthPoints <= 0) {
+                kill();
+            }
+
+            return;
         }
-
-        return;
     }
 
     updateThinking(player);
@@ -291,5 +303,13 @@ void Enemy::draw(sf::RenderWindow& window) {
     animationManager.draw(window);
     if (alertCooldownTimer > 0) {
         alert.draw(window);
+    }
+
+    if (invincibleCooldownTimer > 0) {
+        sf::RectangleShape invincibleBox;
+        invincibleBox.setSize(size);
+        invincibleBox.setPosition(position);
+        invincibleBox.setFillColor(sf::Color(200, 200, 200, 100));
+        window.draw(invincibleBox);   
     }
 }
