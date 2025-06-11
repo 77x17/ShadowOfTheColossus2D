@@ -24,10 +24,12 @@ public:
     Eye(const float& x, const float& y);
 
     void respawn() override;
+    void kill() override;
 
     void updateTimer(const float &dt) override;
     void attackPlayer(const Player& player) override;
     void updateAnimation() override;
+    void updateProjectiles(const float& dt, Player& player);
     void update(const float& dt, Player& player, const std::vector<sf::FloatRect>& collisionRects) override;
 
     void draw(sf::RenderWindow& window) override;

@@ -43,6 +43,7 @@ public:
     virtual ~Enemy() = default;
 
     bool isAlive() const;
+    virtual void kill();
     virtual void respawn();
 
     float calculateDistance(const Player& player) const;

@@ -10,17 +10,10 @@ Bat::Bat(const float& x = 0, const float& y = 0) : Enemy(x, y, TILE_SIZE, TILE_S
 }
 
 void Bat::updateAnimation() {
-    if (state == static_cast<int>(BatState::DYING) || state == static_cast<int>(BatState::DEAD)) {
-        if (dyingCooldownTimer > 0) {
-            animationManager.setState((int)BatState::DYING);
-            animationManager.setPosition(position);
-            animationManager.update();
-        }
-
-        return;
+    if (!isAlive()) {
+        // nothing
     }
-
-    if (movingDirection.x < 0) {
+    else if (movingDirection.x < 0) {
         state = static_cast<int>(BatState::IDLE_LEFT);
     }
     else if (movingDirection.x > 0) {

@@ -2,10 +2,29 @@
 
 #include <cmath>
 
-Player::Player(float x = 0, float y = 0) : basePosition(x, y) {
-    position = basePosition;
+Player::Player(float x = 0, float y = 0) {
+    state      = 0;
+    MOVE_SPEED = 200.0f; 
+    size       = sf::Vector2f(TILE_SIZE, TILE_SIZE);
+    basePosition    = sf::Vector2f(x, y);
+    position        = basePosition;
+    movingDirection = sf::Vector2f(0.f, 0.f);
 
-    shadow = Animation(TextureManager::get("playerShadow"), 13, 5, 1, 0, 0.f, false);
+    DYING_TIME         = 1.0f;
+    dyingCooldownTimer = 0.0f;
+    
+    RESPAWN_TIME         = 2.0f;
+    respawnCooldownTimer = 0.0f;
+
+    VIEW_LEAP_SPEED = 2.0f;
+
+    dashDirection     = sf::Vector2f(0.f, 0.f); 
+    isDashing         = false;                    
+    DASH_SPEED        = MOVE_SPEED * 2;          
+    DASH_DURATION     = 0.4f;                     
+    dashTimer         = 0.0f;                    
+    DASH_COOLDOWN     = DASH_DURATION + 0.2f;     
+    dashCooldownTimer = 0.0f;                     
 
     hitbox.setSize(size);
     hitbox.setOutlineColor(sf::Color::Red);
@@ -22,18 +41,28 @@ Player::Player(float x = 0, float y = 0) : basePosition(x, y) {
         hitbox.getPosition().y + hitbox.getSize().y / 2.f - LOADING_DISTANCE
     );
 
-    animationManager.addAnimation(static_cast<int>(PlayerState::IDLE_LEFT)    , TextureManager::get("playerSprite"), 19, 21, 2, 7, 0.5f , true );
-    animationManager.addAnimation(static_cast<int>(PlayerState::IDLE_RIGHT)   , TextureManager::get("playerSprite"), 19, 21, 2, 7, 0.5f , false);
-    animationManager.addAnimation(static_cast<int>(PlayerState::IDLE_UP_LEFT) , TextureManager::get("playerSprite"), 19, 21, 2, 8, 0.5f , true);
-    animationManager.addAnimation(static_cast<int>(PlayerState::IDLE_UP_RIGHT), TextureManager::get("playerSprite"), 19, 21, 2, 8, 0.5f , false);
-    animationManager.addAnimation(static_cast<int>(PlayerState::IDLE_DOWN)    , TextureManager::get("playerSprite"), 19, 21, 2, 7, 0.5f , false);
-    animationManager.addAnimation(static_cast<int>(PlayerState::WALK_LEFT)    , TextureManager::get("playerSprite"), 19, 21, 4, 0, 0.2f , true );
-    animationManager.addAnimation(static_cast<int>(PlayerState::WALK_RIGHT)   , TextureManager::get("playerSprite"), 19, 21, 4, 0, 0.2f , false);
-    animationManager.addAnimation(static_cast<int>(PlayerState::WALK_UP_LEFT) , TextureManager::get("playerSprite"), 19, 21, 3, 1, 0.2f , true );
-    animationManager.addAnimation(static_cast<int>(PlayerState::WALK_UP_RIGHT), TextureManager::get("playerSprite"), 19, 21, 3, 1, 0.2f , false);
-    animationManager.addAnimation(static_cast<int>(PlayerState::WALK_DOWN)    , TextureManager::get("playerSprite"), 19, 21, 3, 0, 0.2f , false);
-    animationManager.addAnimation(static_cast<int>(PlayerState::DASH_LEFT)    , TextureManager::get("playerSprite"), 19, 21, 4, 3, 0.09f, true );
-    animationManager.addAnimation(static_cast<int>(PlayerState::DASH_RIGHT)   , TextureManager::get("playerSprite"), 19, 21, 4, 3, 0.09f, false);
+    animationManager.addAnimation(static_cast<int>(PlayerState::IDLE_LEFT)    , TextureManager::get("playerSprite"), 19, 21, 2,  7, 0.5f , true );
+    animationManager.addAnimation(static_cast<int>(PlayerState::IDLE_RIGHT)   , TextureManager::get("playerSprite"), 19, 21, 2,  7, 0.5f , false);
+    animationManager.addAnimation(static_cast<int>(PlayerState::IDLE_UP_LEFT) , TextureManager::get("playerSprite"), 19, 21, 2,  8, 0.5f , true);
+    animationManager.addAnimation(static_cast<int>(PlayerState::IDLE_UP_RIGHT), TextureManager::get("playerSprite"), 19, 21, 2,  8, 0.5f , false);
+    animationManager.addAnimation(static_cast<int>(PlayerState::IDLE_DOWN)    , TextureManager::get("playerSprite"), 19, 21, 2,  7, 0.5f , false);
+    animationManager.addAnimation(static_cast<int>(PlayerState::WALK_LEFT)    , TextureManager::get("playerSprite"), 19, 21, 4,  0, 0.2f , true );
+    animationManager.addAnimation(static_cast<int>(PlayerState::WALK_RIGHT)   , TextureManager::get("playerSprite"), 19, 21, 4,  0, 0.2f , false);
+    animationManager.addAnimation(static_cast<int>(PlayerState::WALK_UP_LEFT) , TextureManager::get("playerSprite"), 19, 21, 3,  1, 0.2f , true );
+    animationManager.addAnimation(static_cast<int>(PlayerState::WALK_UP_RIGHT), TextureManager::get("playerSprite"), 19, 21, 3,  1, 0.2f , false);
+    animationManager.addAnimation(static_cast<int>(PlayerState::WALK_DOWN)    , TextureManager::get("playerSprite"), 19, 21, 3,  0, 0.2f , false);
+    animationManager.addAnimation(static_cast<int>(PlayerState::DASH_LEFT)    , TextureManager::get("playerSprite"), 19, 21, 4,  3, 0.09f, true );
+    animationManager.addAnimation(static_cast<int>(PlayerState::DASH_RIGHT)   , TextureManager::get("playerSprite"), 19, 21, 4,  3, 0.09f, false);
+    animationManager.addAnimation(static_cast<int>(PlayerState::DYING)        , TextureManager::get("playerSprite"), 19, 21, 4,  9, 0.2f , false);
+    animationManager.addAnimation(static_cast<int>(PlayerState::DEAD)         , TextureManager::get("playerSprite"), 19, 21, 4, 10, 0.5f , false);
+
+    shadow = Animation(TextureManager::get("playerShadow"), 13, 5, 1, 0, 0.f, false);
+
+    projectiles         = std::vector<Projectile>();
+    SHOOT_COOLDOWN      = 0.2f;
+    PROJECTILE_SPEED    = MOVE_SPEED * 2;
+    PROJECTILE_LIFETIME = 1.0f;
+    shootCooldownTimer  = 0.0f;
 }
 
 void Player::handleInput(const sf::RenderWindow& window) {
@@ -132,35 +161,40 @@ bool Player::isCollision(const sf::FloatRect& rect) const {
 }
 
 bool Player::isAlive() const {
-    return state != static_cast<int>(PlayerState::DEAD);
+    return state != static_cast<int>(PlayerState::DYING) && state != static_cast<int>(PlayerState::DEAD);
 }
 
 void Player::kill() {
-    state = static_cast<int>(PlayerState::DEAD);
+    if (isAlive()) {
+        state              = static_cast<int>(PlayerState::DYING);
+        dyingCooldownTimer = DYING_TIME;
 
-    projectiles.clear();
-
-    SoundManager::playSound("playerHurt");
+        SoundManager::playSound("playerHurt");
+        
+        projectiles.clear();
+    }
 }
 
 void Player::respawn() {
-    position        = basePosition;
-    movingDirection = sf::Vector2f(0.f, 0.f);
+    if (state == static_cast<int>(PlayerState::DEAD) && respawnCooldownTimer <= 0) {
+        position        = basePosition;
+        movingDirection = sf::Vector2f(0.f, 0.f);
 
-    hitbox.setPosition(position);
-    loadingBox.setPosition(
-        hitbox.getPosition().x + hitbox.getSize().x / 2.f,
-        hitbox.getPosition().y + hitbox.getSize().y / 2.f
-    );
-    
-    state = 0;
+        hitbox.setPosition(position);
+        loadingBox.setPosition(
+            hitbox.getPosition().x + hitbox.getSize().x / 2.f,
+            hitbox.getPosition().y + hitbox.getSize().y / 2.f
+        );
+        
+        state = 0;
+    }
 }
 
 sf::FloatRect Player::getHitBox() const {
     return hitbox.getGlobalBounds();
 }
 
-void Player::update(const float& dt, const sf::RenderWindow& window, const std::vector<sf::FloatRect>& collisionRects) {
+void Player::updateTimer(const float &dt) {
     if (dyingCooldownTimer > 0) {
         dyingCooldownTimer -= dt;
     }
@@ -176,10 +210,6 @@ void Player::update(const float& dt, const sf::RenderWindow& window, const std::
         respawnCooldownTimer -= dt;
     }
 
-    if (!isAlive()) {
-        return;
-    }
-
     if (dashTimer > 0) {
         dashTimer -= dt;
     }
@@ -192,9 +222,9 @@ void Player::update(const float& dt, const sf::RenderWindow& window, const std::
     if (shootCooldownTimer > 0) { 
         shootCooldownTimer -= dt;
     }
+}
 
-    handleInput(window);
-
+void Player::updatePosition(const float& dt, const std::vector<sf::FloatRect>& collisionRects) {
     sf::Vector2f velocity(0.f, 0.f);
     if (isDashing) {
         // Di chuyển theo hướng dash với tốc độ dash
@@ -206,33 +236,40 @@ void Player::update(const float& dt, const sf::RenderWindow& window, const std::
         velocity.y = movingDirection.y * MOVE_SPEED * dt;
     }
 
-    sf::FloatRect nextPlayerRect = sf::FloatRect(position, size);
+    sf::FloatRect nextHitboxRect = sf::FloatRect(position, size);
     if (velocity.x != 0) {
-        nextPlayerRect.left += velocity.x;
+        nextHitboxRect.left += velocity.x;
         for (const sf::FloatRect& rect : collisionRects) {
-            while (rect.intersects(nextPlayerRect)) {
-                nextPlayerRect.left -= velocity.x / 10.0f;
+            while (rect.intersects(nextHitboxRect)) {
+                nextHitboxRect.left -= velocity.x / 10.0f;
             }
         }
     }
     if (velocity.y != 0) {
-        nextPlayerRect.top += velocity.y;
+        nextHitboxRect.top += velocity.y;
         for (const sf::FloatRect& rect : collisionRects) {
-            while (rect.intersects(nextPlayerRect)) {
-                nextPlayerRect.top -= velocity.y / 10.0f;
+            while (rect.intersects(nextHitboxRect)) {
+                nextHitboxRect.top -= velocity.y / 10.0f;
             }
         }
     }
 
-    position = nextPlayerRect.getPosition();
+    position = nextHitboxRect.getPosition();
+}
 
+void Player::updateHitbox() {
     hitbox.setPosition(position);
     loadingBox.setPosition(
         hitbox.getPosition().x + hitbox.getSize().x / 2.f - LOADING_DISTANCE,
         hitbox.getPosition().y + hitbox.getSize().y / 2.f - LOADING_DISTANCE
     );
+}
 
-    if (isDashing) {
+void Player::updateAnimation() {
+    if (!isAlive()) {
+        // nothing
+    }
+    else if (isDashing) {
         state = (movingDirection.x < 0 ? static_cast<int>(PlayerState::DASH_LEFT) : static_cast<int>(PlayerState::DASH_RIGHT));
     }
     else if (movingDirection == sf::Vector2f(0, 0)) {
@@ -273,7 +310,9 @@ void Player::update(const float& dt, const sf::RenderWindow& window, const std::
     animationManager.update();
 
     shadow.setPosition(position + sf::Vector2f(3, size.y - 5));
+}
 
+void Player::updateProjectiles(const float& dt) {
     for (auto& p : projectiles) {
         p.update(dt);
     }
@@ -289,21 +328,38 @@ void Player::update(const float& dt, const sf::RenderWindow& window, const std::
     }
 }
 
-void Player::draw(sf::RenderWindow& window) {
-    if (state != -1) {
-        window.draw(hitbox);
-        // window.draw(loadingBox);
+void Player::update(const float& dt, const sf::RenderWindow& window, const std::vector<sf::FloatRect>& collisionRects) {
+    updateTimer(dt);
 
-        shadow.draw(window);
+    if (!isAlive()) {
+        updateAnimation();
         
-        animationManager.draw(window);
-
-        for (auto& p : projectiles) {
-            p.draw(window);
-        }
-    }
-    else {
         respawn();
+
+        return;
+    }
+    
+    handleInput(window);
+
+    updatePosition(dt, collisionRects);
+
+    updateHitbox();
+
+    updateAnimation();
+
+    updateProjectiles(dt);
+}
+
+void Player::draw(sf::RenderWindow& window) {
+    window.draw(hitbox);
+    // window.draw(loadingBox);
+
+    shadow.draw(window);
+    
+    animationManager.draw(window);
+
+    for (auto& p : projectiles) {
+        p.draw(window);
     }
 }
 

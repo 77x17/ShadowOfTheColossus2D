@@ -129,21 +129,15 @@ int main() {
             enemy->update(dt, player, map.getCollisionRects());
         }
 
-        if (!player.isAlive()) {
-            for (Enemy* enemy : enemys) {
-                enemy->respawn();
-            }
-        }
-
         window.clear(sf::Color::White);
         window.setView(view);
 
         window.draw(map);
         
-        player.draw(window);
         for (Enemy* enemy : enemys) if (enemy->calculateDistance(player) <= LOADING_DISTANCE) {
             enemy->draw(window);
         }
+        player.draw(window);
 
         window.display();
     }

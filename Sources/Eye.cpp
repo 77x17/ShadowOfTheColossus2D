@@ -20,11 +20,17 @@ Eye::Eye(const float& x = 0, const float& y = 0) : Enemy(x, y, TILE_SIZE, TILE_S
 }
 
 void Eye::respawn() {
-    if (respawnCooldownTimer <= 0) {
+    if (state == static_cast<int>(EyeState::DEAD) && respawnCooldownTimer <= 0) {
         Enemy::respawn();
 
         projectile = Projectile();
     }
+}
+
+void Eye::kill() {
+    Enemy::kill();
+
+    projectile = Projectile();
 }
 
 void Eye::updateTimer(const float &dt) {
@@ -62,21 +68,16 @@ void Eye::attackPlayer(const Player& player) {
         alertCooldownTimer = ALERT_LIFETIME;
     }   
 
+    movingDirection = normalizeDirection;
+
     Enemy::moveRandomly();
 }
 
 void Eye::updateAnimation() {
-    if (state == static_cast<int>(EyeState::DYING) || state == static_cast<int>(EyeState::DEAD)) {
-        if (dyingCooldownTimer > 0) {
-            animationManager.setState(static_cast<int>(EyeState::DYING));
-            animationManager.setPosition(position - sf::Vector2f(4, 4));
-            animationManager.update();
-        }
-
-        return;
+    if (!isAlive()) {
+        // nothing
     }
-
-    if (movingDirection.x < 0) {
+    else if (movingDirection.x < 0) {
         state = static_cast<int>(EyeState::IDLE_LEFT);
     }
     else if (movingDirection.x > 0) {
@@ -91,32 +92,25 @@ void Eye::updateAnimation() {
     shadow.setPosition(position + sf::Vector2f(4, size.y - 8));
 }
 
-void Eye::update(const float& dt, Player& player, const std::vector<sf::FloatRect>& collisionRects) {
-    Enemy::update(dt, player,collisionRects);
-    
-    if (state == -2 || state == -1) {
-        if (projectile.isAlive()) {
-            projectile = Projectile();
-        }
-        return;
-    }
+void Eye::updateProjectiles(const float& dt, Player& player) {
+    projectile.update(dt);
 
     if (projectile.isAlive()) {
-        if (player.isCollisionProjectiles(hitbox.getGlobalBounds())) {
-            projectile = Projectile();
-        }
-        else if (projectile.isCollision(player.getHitBox())) {
+        if (projectile.isCollision(player.getHitBox())) {
             player.kill();
 
             projectile = Projectile();
-        }
-        else {
-            projectile.update(dt);
         }
     }
     else {
         projectile = Projectile();
     }
+}   
+
+void Eye::update(const float& dt, Player& player, const std::vector<sf::FloatRect>& collisionRects) {
+    Enemy::update(dt, player,collisionRects);
+    
+    updateProjectiles(dt, player);
 }
 
 void Eye::draw(sf::RenderWindow& window) {

@@ -28,40 +28,40 @@ enum class PlayerState {
 class Player {
 private:
     // const
-    int          state      = 0;
-    const float  MOVE_SPEED = 200.0f; 
-    sf::Vector2f size       = sf::Vector2f(TILE_SIZE, TILE_SIZE);
-    sf::Vector2f basePosition    = sf::Vector2f(0.f, 0.f);
-    sf::Vector2f position        = sf::Vector2f(0.f, 0.f);
-    sf::Vector2f movingDirection = sf::Vector2f(0.f, 0.f);
+    int          state;
+    float        MOVE_SPEED;
+    sf::Vector2f size;
+    sf::Vector2f basePosition;
+    sf::Vector2f position;
+    sf::Vector2f movingDirection;
 
-    float VIEW_LEAP_SPEED = 2.0f;
-
-    float DYING_TIME         = 1.0f;
-    float dyingCooldownTimer = 0.0f;
+    float DYING_TIME;
+    float dyingCooldownTimer;
     
-    float RESPAWN_TIME         = 5.0f;
-    float respawnCooldownTimer = 0.0f;
+    float RESPAWN_TIME;
+    float respawnCooldownTimer;
+
+    float VIEW_LEAP_SPEED;
 
     // Biến trạng thái cho Dash
-    sf::Vector2f dashDirection;                             // Hướng lướt
-    bool        isDashing         = false;                  // Có đang lướt không?
-    const float DASH_SPEED        = MOVE_SPEED * 2;         // Tốc độ khi lướt
-    const float DASH_DURATION     = 0.4f;                   // Lướt trong bao nhiêu giây
-    float       dashTimer         = 0.0f;                   // Đếm thời gian lướt
-    const float DASH_COOLDOWN     = DASH_DURATION + 0.2f;   // Hồi chiêu bao nhiêu giây
-    float       dashCooldownTimer = 0.0f;                   // Đếm thời gian hồi chiêu
-
-    std::vector<Projectile> projectiles;
-    const float SHOOT_COOLDOWN      = 0.2f;
-    const float PROJECTILE_SPEED    = MOVE_SPEED * 2;
-    const float PROJECTILE_LIFETIME = 1.0f;
-    float       shootCooldownTimer  = 0.0f;
+    sf::Vector2f dashDirection; // Hướng lướt
+    bool  isDashing;            // Có đang lướt không?
+    float DASH_SPEED;           // Tốc độ khi lướt
+    float DASH_DURATION;        // Lướt trong bao nhiêu giây
+    float dashTimer;            // Đếm thời gian lướt
+    float DASH_COOLDOWN;        // Hồi chiêu bao nhiêu giây
+    float dashCooldownTimer;    // Đếm thời gian hồi chiêu
 
     sf::RectangleShape hitbox;
     sf::CircleShape    loadingBox;
     AnimationManager   animationManager;
     Animation          shadow;
+
+    std::vector<Projectile> projectiles;
+    float SHOOT_COOLDOWN;
+    float PROJECTILE_SPEED;
+    float PROJECTILE_LIFETIME;
+    float shootCooldownTimer;
 
 public:
     Player(float x, float y);
@@ -76,6 +76,11 @@ public:
 
     sf::FloatRect getHitBox() const;
 
+    void updateTimer(const float &dt);
+    void updatePosition(const float& dt, const std::vector<sf::FloatRect>& collisionRects);
+    void updateHitbox();
+    void updateAnimation();
+    void updateProjectiles(const float& dt);
     void update(const float& dt, const sf::RenderWindow& window, const std::vector<sf::FloatRect>& collisionRects);
 
     void draw(sf::RenderWindow& window);

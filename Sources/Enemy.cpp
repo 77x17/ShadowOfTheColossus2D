@@ -46,6 +46,13 @@ bool Enemy::isAlive() const {
     return state != -1 && state != -2;     // DEAD
 }
 
+void Enemy::kill() {
+    state              = -2;
+    dyingCooldownTimer = DYING_TIME;
+    
+    SoundManager::playSound("enemyHurt");
+}
+
 void Enemy::respawn() {
     if (state == -1 && respawnCooldownTimer <= 0) {
         position        = basePosition;
@@ -74,8 +81,6 @@ void Enemy::updateTimer(const float &dt) {
         if (state == -2) {                          // dying and end dyingCooldown
             state                = -1;              // dead
             respawnCooldownTimer = RESPAWN_TIME;
-            
-            return;
         }
     }
     if (respawnCooldownTimer > 0) {
@@ -146,9 +151,13 @@ void Enemy::updateThinking(Player& player) {
         }
 
         attackPlayer(player);
+
+        detectionBox.setOutlineColor(sf::Color::Yellow);
     }
     else {
         moveRandomly();
+
+        detectionBox.setOutlineColor(sf::Color::Blue);
     }
 }
 
@@ -192,14 +201,14 @@ void Enemy::update(const float& dt, Player& player, const std::vector<sf::FloatR
         if (state == -2) {
             updateAnimation();
         }
+        else if (state == -1) {
+            respawn();
+        }
         return;
     }
 
     if (player.isCollisionProjectiles(hitbox.getGlobalBounds())) {
-        state              = -2;
-        dyingCooldownTimer = DYING_TIME;
-        
-        SoundManager::playSound("enemyHurt");
+        kill();
 
         return;
     }
@@ -214,17 +223,12 @@ void Enemy::update(const float& dt, Player& player, const std::vector<sf::FloatR
 }
 
 void Enemy::draw(sf::RenderWindow& window) {
-    if (state != -1) {
-        window.draw(hitbox);
-        window.draw(detectionBox);
-        
-        shadow.draw(window);
-        animationManager.draw(window);
-        if (alertCooldownTimer > 0) {
-            alert.draw(window);
-        }
-    }
-    else {
-        respawn();
+    window.draw(hitbox);
+    window.draw(detectionBox);
+    
+    shadow.draw(window);
+    animationManager.draw(window);
+    if (alertCooldownTimer > 0) {
+        alert.draw(window);
     }
 }
