@@ -114,7 +114,7 @@ void Enemy::kill() {
     state              = -2;
     dyingCooldownTimer = DYING_TIME;
     
-    SoundManager::playSound("enemyHurt");
+    SoundManager::playSound("enemyDie");
 }
 
 void Enemy::respawn() {
@@ -224,8 +224,12 @@ void Enemy::updateThinking(Player& player) {
             }
         }
 
-        followPlayer(player);
-        // moveRandomly();
+        if (player.isAlive()) {
+            followPlayer(player);
+        }
+        else {
+            moveRandomly();
+        }
 
         detectionBox.setOutlineColor(sf::Color::Yellow);
     }

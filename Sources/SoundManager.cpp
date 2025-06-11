@@ -2,9 +2,6 @@
 
 #include <iostream>
 
-std::unordered_map<std::string, sf::SoundBuffer> SoundManager::buffers;
-std::unordered_map<std::string, sf::Sound> SoundManager::sounds;
-
 void SoundManager::loadSound(const std::string& name, const std::string& filepath) {
     sf::SoundBuffer buffer;
     if (!buffer.loadFromFile(filepath)) {

@@ -1,14 +1,24 @@
 #include <SFML/Graphics.hpp>
 
 #include "Constants.hpp"
-#include "Player.hpp"
-#include "Enemy.hpp"
-#include "Bat.hpp"
-#include "Eye.hpp"
+
+#include "Font.hpp"
 #include "SoundManager.hpp"
 #include "TileMap.hpp"
 
+#include "Player.hpp"
+#include "UI.hpp"
+
+#include "Enemy.hpp"
+#include "Bat.hpp"
+#include "Eye.hpp"
+
 sf::Font Font::font;
+
+std::unordered_map<std::string, sf::Texture> TextureManager::textures;
+
+std::unordered_map<std::string, sf::SoundBuffer> SoundManager::buffers;
+std::unordered_map<std::string, sf::Sound> SoundManager::sounds;
 
 void loadSprite() {
     TextureManager::load("playerSprite", "Sprites/player.png");
@@ -64,6 +74,7 @@ int main() {
     loadMap(map);
 
     Player player(300, 300, 5.0f);
+    UI ui;
 
     std::vector<Enemy*> enemys;
     loadEnemy(enemys);
@@ -72,6 +83,7 @@ int main() {
     bool      isMinimized  = false;
     bool      isFullscreen = false;
     sf::View  view         = window.getView();
+    sf::View  uiView       = window.getDefaultView();
     while (window.isOpen()) {
         float dt = clock.restart().asSeconds();
         
@@ -115,6 +127,8 @@ int main() {
                     view = window.getView();
                     view.setSize(WINDOW_HEIGHT * aspectRatio, WINDOW_HEIGHT);  
                     view.setCenter(view.getSize().x / 2, view.getSize().y / 2);
+
+                    uiView = window.getDefaultView();
                 }
             }
         }
@@ -125,6 +139,7 @@ int main() {
         }
 
         player.update(dt, window, map.getCollisionRects());
+        ui.update(player);
 
         // Điều chỉnh camera theo player
         player.updateView(dt, view);
@@ -142,6 +157,9 @@ int main() {
             enemy->draw(window);
         }
         player.draw(window);
+
+        window.setView(uiView);
+        ui.draw(window);
 
         window.display();
     }

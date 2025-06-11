@@ -93,5 +93,8 @@ public:
     void draw(sf::RenderWindow& window);
 
     sf::Vector2f getPosition() const;
+    float getHealthStatus() const;
+    void getHealthPoints(sf::Text& healthPointsText) const;
+
     void updateView(const float& dt, sf::View& view) const;
 };

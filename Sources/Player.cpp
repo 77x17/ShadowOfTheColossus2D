@@ -404,6 +404,19 @@ sf::Vector2f Player::getPosition() const {
     return position;
 }
 
+float Player::getHealthStatus() const {
+    return healthPoints / maxHealthPoints;
+}
+
+void Player::getHealthPoints(sf::Text& healthPointsText) const {
+    auto format2Decimals = [](float value) -> std::string {
+        std::string str = std::to_string(value);
+        return str.substr(0, str.find('.') + 3);
+    };
+
+    healthPointsText.setString(format2Decimals(healthPoints) + '/' + format2Decimals(maxHealthPoints));
+}
+
 void Player::updateView(const float& dt, sf::View& view) const {
     sf::Vector2f currentCenter = view.getCenter();
     sf::Vector2f targetCenter  = position;

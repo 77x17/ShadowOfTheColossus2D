@@ -54,7 +54,7 @@ void Projectile::update(float dt) {
 
 void Projectile::draw(sf::RenderWindow& window) const {
     if (isAlive()) {
-        window.draw(hitbox);
+        // window.draw(hitbox);
 
         window.draw(sprite);
     }

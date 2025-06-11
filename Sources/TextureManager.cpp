@@ -1,7 +1,5 @@
 #include "TextureManager.hpp"
 
-std::unordered_map<std::string, sf::Texture> TextureManager::textures;
-
 // Tải một texture từ file và lưu bằng một ID
 void TextureManager::load(const std::string& id, const std::string& path) {
     sf::Texture texture;

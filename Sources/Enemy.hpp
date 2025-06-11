@@ -6,6 +6,7 @@
 #include "Animation.hpp"
 #include "Player.hpp"
 #include "SoundManager.hpp"
+#include "Font.hpp"
 
 class Enemy {
 protected:
