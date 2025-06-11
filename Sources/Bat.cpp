@@ -1,12 +1,12 @@
 #include "Bat.hpp"
 
-Bat::Bat(float x = 0, float y = 0) : Enemy(x, y, TILE_SIZE, TILE_SIZE) {
+Bat::Bat(const float& x = 0, const float& y = 0) : Enemy(x, y, TILE_SIZE, TILE_SIZE, 5.0f) {
     animationManager.addAnimation(static_cast<int>(BatState::IDLE_LEFT) , TextureManager::get("batSprite"), 16, 16, 2, 0, 0.5f, true );
     animationManager.addAnimation(static_cast<int>(BatState::IDLE_RIGHT), TextureManager::get("batSprite"), 16, 16, 2, 0, 0.5f, false);
     animationManager.addAnimation(static_cast<int>(BatState::DYING)     , TextureManager::get("batDead")  , 16, 16, 1, 0, 0.5f, false);
     
-    shadow = Animation(TextureManager::get("batShadow"), 12,  5, 1, 0, 0.f, false);
-    alert  = Animation(TextureManager::get("alert")    ,  8, 10, 1, 0, 0.f, false);
+    shadow = Animation(TextureManager::get("batShadow"), 12,  5, 1, 0, 0.0f, false);
+    alert  = Animation(TextureManager::get("alert")    ,  8, 10, 1, 0, 0.0f, false);
 }
 
 void Bat::updateAnimation() {

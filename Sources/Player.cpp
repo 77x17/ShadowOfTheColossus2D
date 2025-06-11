@@ -106,7 +106,7 @@ void Player::handleInput(const sf::RenderWindow& window) {
 
         projectiles.emplace_back(
             TextureManager::get("arrow"),
-            getPosition() + size / 2.f,
+            position + size / 2.f,
             projectileDirection,
             PROJECTILE_SPEED,
             PROJECTILE_LIFETIME
@@ -165,8 +165,8 @@ void Player::update(const float& dt, const sf::RenderWindow& window, const std::
         dyingCooldownTimer -= dt;
     }
     else {
-        if (state == -2) {                          // dying and end dyingCooldown
-            state                = -1;              // dead
+        if (state == static_cast<int>(PlayerState::DYING)) {            
+            state                = static_cast<int>(PlayerState::DEAD); 
             respawnCooldownTimer = RESPAWN_TIME;
             
             return;
@@ -175,7 +175,8 @@ void Player::update(const float& dt, const sf::RenderWindow& window, const std::
     if (respawnCooldownTimer > 0) {
         respawnCooldownTimer -= dt;
     }
-    if (state == static_cast<int>(PlayerState::DYING) || state == static_cast<int>(PlayerState::DEAD)) {
+
+    if (!isAlive()) {
         return;
     }
 
@@ -288,19 +289,33 @@ void Player::update(const float& dt, const sf::RenderWindow& window, const std::
     }
 }
 
-void Player::draw(sf::RenderWindow& window) const {
-    window.draw(hitbox);
-    // window.draw(loadingBox);
+void Player::draw(sf::RenderWindow& window) {
+    if (state != -1) {
+        window.draw(hitbox);
+        // window.draw(loadingBox);
 
-    shadow.draw(window);
-    
-    animationManager.draw(window);
+        shadow.draw(window);
+        
+        animationManager.draw(window);
 
-    for (auto& p : projectiles) {
-        p.draw(window);
+        for (auto& p : projectiles) {
+            p.draw(window);
+        }
+    }
+    else {
+        respawn();
     }
 }
 
 sf::Vector2f Player::getPosition() const {
     return position;
+}
+
+void Player::updateView(const float& dt, sf::View& view) const {
+    sf::Vector2f currentCenter = view.getCenter();
+    sf::Vector2f targetCenter  = position;
+    sf::Vector2f lerped        = currentCenter + VIEW_LEAP_SPEED * (targetCenter - currentCenter) * dt;
+    lerped.x = std::round(lerped.x);
+    lerped.y = std::round(lerped.y);
+    view.setCenter(lerped);
 }

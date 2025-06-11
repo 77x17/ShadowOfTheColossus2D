@@ -10,11 +10,12 @@
 class Enemy {
 protected:
     int          state           = 0;
+    float        healthPoints    = 0.0f;
     float        MOVE_SPEED      = 125.0f; 
     sf::Vector2f size            = sf::Vector2f(TILE_SIZE, TILE_SIZE);
-    sf::Vector2f basePosition    = sf::Vector2f(0.f, 0.f);
-    sf::Vector2f position        = sf::Vector2f(0.f, 0.f);
-    sf::Vector2f movingDirection = sf::Vector2f(0.f, 0.f);
+    sf::Vector2f basePosition    = sf::Vector2f(0.0f, 0.0f);
+    sf::Vector2f position        = sf::Vector2f(0.0f, 0.0f);
+    sf::Vector2f movingDirection = sf::Vector2f(0.0f, 0.0f);
     
     float DYING_TIME         = 1.0f;
     float dyingCooldownTimer = 0.0f;
@@ -37,7 +38,7 @@ protected:
     Animation          alert;
 
 public:
-    Enemy(float x, float y, float width, float height);
+    Enemy(const float& x, const float& y, const float& width, const float& height, const float& hp);
 
     virtual ~Enemy() = default;
 
@@ -55,5 +56,5 @@ public:
     virtual void updateAnimation() = 0;
     virtual void update(const float& dt, Player& player, const std::vector<sf::FloatRect>& collisionRects);
 
-    virtual void draw(sf::RenderWindow& window) const;
+    virtual void draw(sf::RenderWindow& window);
 };

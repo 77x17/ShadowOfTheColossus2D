@@ -3,8 +3,9 @@
 #include <cmath>
 #include <random>
 
-Enemy::Enemy(float x = 0, float y = 0, float width = TILE_SIZE, float height = TILE_SIZE) {
+Enemy::Enemy(const float& x = 0, const float& y = 0, const float& width = TILE_SIZE, const float& height = TILE_SIZE, const float& hp = 0) {
     state           = 0;
+    healthPoints    = hp;
     MOVE_SPEED      = 125.0f; 
     size            = sf::Vector2f(width, height);
     basePosition    = sf::Vector2f(x, y);
@@ -42,11 +43,11 @@ Enemy::Enemy(float x = 0, float y = 0, float width = TILE_SIZE, float height = T
 }
 
 bool Enemy::isAlive() const {
-    return state != -1;     // DEAD
+    return state != -1 && state != -2;     // DEAD
 }
 
 void Enemy::respawn() {
-    if (respawnCooldownTimer <= 0) {
+    if (state == -1 && respawnCooldownTimer <= 0) {
         position        = basePosition;
         movingDirection = sf::Vector2f(0.f, 0.f);
         
@@ -187,17 +188,19 @@ void Enemy::updateHitbox() {
 void Enemy::update(const float& dt, Player& player, const std::vector<sf::FloatRect>& collisionRects) {
     updateTimer(dt);
 
+    if (!isAlive()) {
+        if (state == -2) {
+            updateAnimation();
+        }
+        return;
+    }
+
     if (player.isCollisionProjectiles(hitbox.getGlobalBounds())) {
         state              = -2;
         dyingCooldownTimer = DYING_TIME;
         
         SoundManager::playSound("enemyHurt");
-    }
 
-    if (state == -2 || state == -1) {
-        if (state == -2) {
-            updateAnimation();
-        }
         return;
     }
 
@@ -210,13 +213,18 @@ void Enemy::update(const float& dt, Player& player, const std::vector<sf::FloatR
     updateAnimation();
 }
 
-void Enemy::draw(sf::RenderWindow& window) const {
-    window.draw(hitbox);
-    window.draw(detectionBox);
-    
-    shadow.draw(window);
-    animationManager.draw(window);
-    if (alertCooldownTimer > 0) {
-        alert.draw(window);
+void Enemy::draw(sf::RenderWindow& window) {
+    if (state != -1) {
+        window.draw(hitbox);
+        window.draw(detectionBox);
+        
+        shadow.draw(window);
+        animationManager.draw(window);
+        if (alertCooldownTimer > 0) {
+            alert.draw(window);
+        }
+    }
+    else {
+        respawn();
     }
 }

@@ -35,6 +35,8 @@ private:
     sf::Vector2f position        = sf::Vector2f(0.f, 0.f);
     sf::Vector2f movingDirection = sf::Vector2f(0.f, 0.f);
 
+    float VIEW_LEAP_SPEED = 2.0f;
+
     float DYING_TIME         = 1.0f;
     float dyingCooldownTimer = 0.0f;
     
@@ -75,8 +77,9 @@ public:
     sf::FloatRect getHitBox() const;
 
     void update(const float& dt, const sf::RenderWindow& window, const std::vector<sf::FloatRect>& collisionRects);
+
+    void draw(sf::RenderWindow& window);
+
     sf::Vector2f getPosition() const;
-
-    void draw(sf::RenderWindow& window) const;
-
+    void updateView(const float& dt, sf::View& view) const;
 };

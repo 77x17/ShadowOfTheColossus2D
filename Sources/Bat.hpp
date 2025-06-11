@@ -13,7 +13,7 @@ enum class BatState {
 
 class Bat : public Enemy {
 public:
-    Bat(float x, float y);
+    Bat(const float& x, const float& y);
 
     void updateAnimation() override;
 

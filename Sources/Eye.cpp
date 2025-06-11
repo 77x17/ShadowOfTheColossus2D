@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-Eye::Eye(float x = 0, float y = 0) : Enemy(x, y, TILE_SIZE, TILE_SIZE) {
+Eye::Eye(const float& x = 0, const float& y = 0) : Enemy(x, y, TILE_SIZE, TILE_SIZE, 5.0f) {
     DETECION_RANGE = 250.0f;
 
     detectionBox.setRadius(DETECION_RANGE);
@@ -119,8 +119,10 @@ void Eye::update(const float& dt, Player& player, const std::vector<sf::FloatRec
     }
 }
 
-void Eye::draw(sf::RenderWindow& window) const {
+void Eye::draw(sf::RenderWindow& window) {
     Enemy::draw(window);
-
-    projectile.draw(window);
+    
+    if (isAlive()) {
+        projectile.draw(window);
+    }
 }

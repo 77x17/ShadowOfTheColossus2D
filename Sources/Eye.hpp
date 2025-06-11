@@ -21,7 +21,7 @@ private:
     float      shootCooldownTimer  = 0.0f;
 
 public:
-    Eye(float x, float y);
+    Eye(const float& x, const float& y);
 
     void respawn() override;
 
@@ -30,6 +30,6 @@ public:
     void updateAnimation() override;
     void update(const float& dt, Player& player, const std::vector<sf::FloatRect>& collisionRects) override;
 
-    void draw(sf::RenderWindow& window) const override;
+    void draw(sf::RenderWindow& window) override;
 
 };
