@@ -2,7 +2,8 @@
 
 #include <cmath>
 
-Eye::Eye(const float& x = 0, const float& y = 0) : Enemy(x, y, TILE_SIZE, TILE_SIZE, 5.0f) {
+Eye::Eye(const float& x = 0, const float& y = 0) : Enemy(x, y, TILE_SIZE, TILE_SIZE, 5.0f, "Eye Lv.5") {
+    MOVE_SPEED     = 80.0f; 
     DETECION_RANGE = 250.0f;
 
     detectionBox.setRadius(DETECION_RANGE);

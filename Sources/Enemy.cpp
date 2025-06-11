@@ -3,15 +3,53 @@
 #include <cmath>
 #include <random>
 
-Enemy::Enemy(const float& x = 0, const float& y = 0, const float& width = TILE_SIZE, const float& height = TILE_SIZE, const float& hp = 0) {
+Enemy::Enemy(const float& x = 0, const float& y = 0, const float& width = TILE_SIZE, const float& height = TILE_SIZE, const float& hp = 0, const std::string& nameAndLevel = "") {
     state           = 0;
-    healthPoints    = hp;
-    MOVE_SPEED      = 125.0f; 
+    MOVE_SPEED      = 100.0f; 
     size            = sf::Vector2f(width, height);
     basePosition    = sf::Vector2f(x, y);
     position        = basePosition;
     movingDirection = sf::Vector2f(0.f, 0.f);
-    
+
+    {
+        TEXT_SIZE          = 10;
+        BACKGROUND_PADDING = 5.0f;
+        label.setFont(Font::font);
+        label.setString(nameAndLevel);
+        label.setCharacterSize(TEXT_SIZE);
+        label.setFillColor(sf::Color::White);
+        label.setPosition(position + sf::Vector2f(size.x / 2, 0));
+
+        labelBackground.setFillColor(sf::Color(60, 60, 60, 139));
+        labelBackground.setPosition(label.getPosition());
+        
+        // Adding BACKGROUND_PADDING two side | + BACKGROUND_PADDING / 2
+        sf::FloatRect bounds = label.getLocalBounds();
+        labelBackground.setSize(bounds.getSize() + sf::Vector2f(BACKGROUND_PADDING, BACKGROUND_PADDING));
+        // Adding extra space with sprites
+        label.setOrigin(bounds.left + bounds.width / 2, bounds.top + bounds.height / 2 + 10.0f);
+        // -2.0f for the font spacing
+        labelBackground.setOrigin(label.getOrigin() + sf::Vector2f(BACKGROUND_PADDING / 2, -2.0f + BACKGROUND_PADDING / 2));
+    }
+
+    {
+        HEALTH_POINTS_BAR_WIDTH  = 30.0f;
+        HEALTH_POINTS_BAR_HEIGHT = 5.0f;
+        maxHealthPoints          = hp;
+        healthPoints             = hp;
+        healthPointsBar.setFillColor(sf::Color::Red);
+        healthPointsBar.setPosition(position + sf::Vector2f(size.x / 2, 0));
+        healthPointsBar.setSize(sf::Vector2f(HEALTH_POINTS_BAR_WIDTH, HEALTH_POINTS_BAR_HEIGHT));
+        
+        healthPointsBarBackground.setFillColor(sf::Color(0, 0, 0, 139));
+        healthPointsBarBackground.setPosition(healthPointsBar.getPosition());
+
+        sf::FloatRect bounds = healthPointsBar.getLocalBounds();
+        healthPointsBarBackground.setSize(bounds.getSize() + sf::Vector2f(2.0f, 2.0f));
+        healthPointsBar.setOrigin(bounds.left + bounds.width / 2, bounds.top + bounds.height / 2);
+        healthPointsBarBackground.setOrigin(healthPointsBar.getOrigin() + sf::Vector2f(1.0f, 1.0f));
+    }
+
     DYING_TIME         = 1.0f;
     dyingCooldownTimer = 0.0f;
 
@@ -65,6 +103,8 @@ void Enemy::respawn() {
         );
 
         state = 0;          // ALIVE
+
+        healthPoints = maxHealthPoints;
     }
 }
 
@@ -151,6 +191,7 @@ void Enemy::updateThinking(Player& player) {
         }
 
         attackPlayer(player);
+        // moveRandomly();
 
         detectionBox.setOutlineColor(sf::Color::Yellow);
     }
@@ -169,7 +210,7 @@ void Enemy::updatePosition(const float& dt, const std::vector<sf::FloatRect>& co
         nextHitboxRect.left += velocity.x;
         for (const sf::FloatRect& rect : collisionRects) {
             while (rect.intersects(nextHitboxRect)) {
-                nextHitboxRect.left -= velocity.x / 10.0f;
+                nextHitboxRect.left -= velocity.x / 10;
             }
         }
     }
@@ -177,7 +218,7 @@ void Enemy::updatePosition(const float& dt, const std::vector<sf::FloatRect>& co
         nextHitboxRect.top += velocity.y;
         for (const sf::FloatRect& rect : collisionRects) {
             while (rect.intersects(nextHitboxRect)) {
-                nextHitboxRect.top -= velocity.y / 10.0f;
+                nextHitboxRect.top -= velocity.y / 10;
             }
         }
     }
@@ -189,9 +230,17 @@ void Enemy::updateHitbox() {
     hitbox.setPosition(position);
 
     detectionBox.setPosition(
-        hitbox.getPosition().x + hitbox.getSize().x / 2.f - DETECION_RANGE,
-        hitbox.getPosition().y + hitbox.getSize().y / 2.f - DETECION_RANGE
+        hitbox.getPosition().x + hitbox.getSize().x / 2 - DETECION_RANGE,
+        hitbox.getPosition().y + hitbox.getSize().y / 2 - DETECION_RANGE
     );
+
+    label.setPosition(position + sf::Vector2f(size.x / 2, 0));
+    labelBackground.setPosition(label.getPosition());
+
+    healthPointsBar.setPosition(position + sf::Vector2f(size.x / 2, 0));
+    healthPointsBarBackground.setPosition(healthPointsBar.getPosition());
+
+    healthPointsBar.setSize(sf::Vector2f(HEALTH_POINTS_BAR_WIDTH * (healthPoints / maxHealthPoints), HEALTH_POINTS_BAR_HEIGHT)); 
 }
 
 void Enemy::update(const float& dt, Player& player, const std::vector<sf::FloatRect>& collisionRects) {
@@ -199,6 +248,8 @@ void Enemy::update(const float& dt, Player& player, const std::vector<sf::FloatR
 
     if (!isAlive()) {
         if (state == -2) {
+            updateHitbox();
+
             updateAnimation();
         }
         else if (state == -1) {
@@ -208,7 +259,11 @@ void Enemy::update(const float& dt, Player& player, const std::vector<sf::FloatR
     }
 
     if (player.isCollisionProjectiles(hitbox.getGlobalBounds())) {
-        kill();
+        healthPoints -= 1.0f;
+
+        if (healthPoints <= 0) {
+            kill();
+        }
 
         return;
     }
@@ -223,8 +278,14 @@ void Enemy::update(const float& dt, Player& player, const std::vector<sf::FloatR
 }
 
 void Enemy::draw(sf::RenderWindow& window) {
-    window.draw(hitbox);
-    window.draw(detectionBox);
+    window.draw(labelBackground);
+    window.draw(label);
+
+    window.draw(healthPointsBarBackground);
+    window.draw(healthPointsBar);
+
+    // window.draw(hitbox);
+    // window.draw(detectionBox);
     
     shadow.draw(window);
     animationManager.draw(window);

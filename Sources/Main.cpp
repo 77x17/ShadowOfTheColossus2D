@@ -1,13 +1,14 @@
 #include <SFML/Graphics.hpp>
 
 #include "Constants.hpp"
-#include "Animation.hpp"
 #include "Player.hpp"
 #include "Enemy.hpp"
 #include "Bat.hpp"
 #include "Eye.hpp"
 #include "SoundManager.hpp"
 #include "TileMap.hpp"
+
+sf::Font Font::font;
 
 void loadSprite() {
     TextureManager::load("playerSprite", "Sprites/player.png");
@@ -53,6 +54,7 @@ int main() {
     // window.setFramerateLimit(60);
     window.setVerticalSyncEnabled(true);
 
+    Font::font.loadFromFile("Fonts/Roboto_Mono.ttf");
     loadSprite();
     loadSound();
 
@@ -125,7 +127,7 @@ int main() {
         // Điều chỉnh camera theo player
         player.updateView(dt, view);
         
-        for (Enemy* enemy : enemys) if (enemy->calculateDistance(player) <= LOADING_DISTANCE) {
+        for (Enemy* enemy : enemys) {
             enemy->update(dt, player, map.getCollisionRects());
         }
 

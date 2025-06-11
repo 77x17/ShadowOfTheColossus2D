@@ -9,27 +9,38 @@
 
 class Enemy {
 protected:
-    int          state           = 0;
-    float        healthPoints    = 0.0f;
-    float        MOVE_SPEED      = 125.0f; 
-    sf::Vector2f size            = sf::Vector2f(TILE_SIZE, TILE_SIZE);
-    sf::Vector2f basePosition    = sf::Vector2f(0.0f, 0.0f);
-    sf::Vector2f position        = sf::Vector2f(0.0f, 0.0f);
-    sf::Vector2f movingDirection = sf::Vector2f(0.0f, 0.0f);
-    
-    float DYING_TIME         = 1.0f;
-    float dyingCooldownTimer = 0.0f;
+    int          state;
+    float        MOVE_SPEED; 
+    sf::Vector2f size;
+    sf::Vector2f basePosition;
+    sf::Vector2f position;
+    sf::Vector2f movingDirection;
 
-    float RESPAWN_TIME         = 5.0f;
-    float respawnCooldownTimer = 0.0f;
+    int                TEXT_SIZE;
+    float              BACKGROUND_PADDING;
+    sf::Text           label;
+    sf::RectangleShape labelBackground;
 
-    float DETECION_RANGE     = 150.0f;
-    float ALERT_LIFETIME     = 0.5f;
-    float alertCooldownTimer = 0.0f;
+    float              HEALTH_POINTS_BAR_WIDTH;
+    float              HEALTH_POINTS_BAR_HEIGHT;
+    float              maxHealthPoints;
+    float              healthPoints;
+    sf::RectangleShape healthPointsBar;
+    sf::RectangleShape healthPointsBarBackground;
 
-    float RANDOM_TIME          = 5.0f;
-    float randomCooldownTimer  = 0.0f;
-    float stayingCooldownTimer = 0.0f;
+    float DYING_TIME;
+    float dyingCooldownTimer;
+
+    float RESPAWN_TIME;
+    float respawnCooldownTimer;
+
+    float DETECION_RANGE;
+    float ALERT_LIFETIME;
+    float alertCooldownTimer;
+
+    float RANDOM_TIME;
+    float randomCooldownTimer;
+    float stayingCooldownTimer;
 
     sf::RectangleShape hitbox;
     sf::CircleShape    detectionBox;
@@ -38,7 +49,7 @@ protected:
     Animation          alert;
 
 public:
-    Enemy(const float& x, const float& y, const float& width, const float& height, const float& hp);
+    Enemy(const float& x, const float& y, const float& width, const float& height, const float& hp, const std::string& nameAndLevel);
 
     virtual ~Enemy() = default;
 

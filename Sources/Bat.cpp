@@ -1,6 +1,13 @@
 #include "Bat.hpp"
 
-Bat::Bat(const float& x = 0, const float& y = 0) : Enemy(x, y, TILE_SIZE, TILE_SIZE, 5.0f) {
+Bat::Bat(const float& x = 0, const float& y = 0) : Enemy(x, y, TILE_SIZE, TILE_SIZE, 5.0f, "Bat Lv.1") {
+    DETECION_RANGE = 200.0f;
+
+    detectionBox.setPosition(
+        hitbox.getPosition().x + hitbox.getSize().x / 2.f - DETECION_RANGE,
+        hitbox.getPosition().y + hitbox.getSize().y / 2.f - DETECION_RANGE
+    );
+
     animationManager.addAnimation(static_cast<int>(BatState::IDLE_LEFT) , TextureManager::get("batSprite"), 16, 16, 2, 0, 0.5f, true );
     animationManager.addAnimation(static_cast<int>(BatState::IDLE_RIGHT), TextureManager::get("batSprite"), 16, 16, 2, 0, 0.5f, false);
     animationManager.addAnimation(static_cast<int>(BatState::DYING)     , TextureManager::get("batDead")  , 16, 16, 1, 0, 0.5f, false);

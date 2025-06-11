@@ -332,6 +332,8 @@ void Player::update(const float& dt, const sf::RenderWindow& window, const std::
     updateTimer(dt);
 
     if (!isAlive()) {
+        updateHitbox();
+
         updateAnimation();
         
         respawn();
