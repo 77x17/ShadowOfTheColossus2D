@@ -27,7 +27,7 @@ public:
     void kill() override;
 
     void updateTimer(const float &dt) override;
-    void attackPlayer(const Player& player) override;
+    void followPlayer(const Player& player) override;
     void updateAnimation() override;
     void updateProjectiles(const float& dt, Player& player);
     void update(const float& dt, Player& player, const std::vector<sf::FloatRect>& collisionRects) override;

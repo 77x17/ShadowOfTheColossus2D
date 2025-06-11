@@ -45,6 +45,9 @@ protected:
     float randomCooldownTimer;
     float stayingCooldownTimer;
 
+    float ATTACK_COOLDOWN_TIME;
+    float attackCooldownTimer;
+
     sf::RectangleShape hitbox;
     sf::CircleShape    detectionBox;
     AnimationManager   animationManager;
@@ -57,13 +60,15 @@ public:
     virtual ~Enemy() = default;
 
     bool isAlive() const;
+    void attack(Player& player);
+    void hurt(const float& damage);
     virtual void kill();
     virtual void respawn();
 
     float calculateDistance(const Player& player) const;
 
     virtual void updateTimer(const float &dt);
-    virtual void attackPlayer(const Player& player);
+    virtual void followPlayer(const Player& player);
     void moveRandomly();
     void updateThinking(Player& player);
     void updatePosition(const float& dt, const std::vector<sf::FloatRect>& collisionRects);

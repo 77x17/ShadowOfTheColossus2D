@@ -2,13 +2,16 @@
 
 #include <cmath>
 
-Player::Player(float x = 0, float y = 0) {
+Player::Player(const float& x = 0, const float& y = 0, const float& hp = 0.0f) {
     state      = 0;
     MOVE_SPEED = 200.0f; 
     size       = sf::Vector2f(TILE_SIZE, TILE_SIZE);
     basePosition    = sf::Vector2f(x, y);
     position        = basePosition;
     movingDirection = sf::Vector2f(0.f, 0.f);
+
+    maxHealthPoints = hp;
+    healthPoints    = hp;
 
     DYING_TIME         = 1.0f;
     dyingCooldownTimer = 0.0f;
@@ -167,13 +170,25 @@ bool Player::isAlive() const {
     return state != static_cast<int>(PlayerState::DYING) && state != static_cast<int>(PlayerState::DEAD);
 }
 
-void Player::kill() {
+void Player::hurt(const float& damage) {
     if (isAlive() && invincibleCooldownTimer <= 0) {
-        state              = static_cast<int>(PlayerState::DYING);
-        dyingCooldownTimer = DYING_TIME;
+        healthPoints -= damage;
 
         SoundManager::playSound("playerHurt");
+
+        if (healthPoints <= 0) {
+            kill();
+        }
+    }
+}
+
+void Player::kill() {
+    if (isAlive()) {
+        state              = static_cast<int>(PlayerState::DYING);
+        dyingCooldownTimer = DYING_TIME;
         
+        SoundManager::playSound("playerDie");
+
         projectiles.clear();
     }
 }
@@ -190,6 +205,8 @@ void Player::respawn() {
         );
         
         state = 0;
+
+        healthPoints = maxHealthPoints;
 
         invincibleCooldownTimer = INVINCIBLE_TIME;
     }
@@ -338,6 +355,8 @@ void Player::updateProjectiles(const float& dt) {
 
 void Player::update(const float& dt, const sf::RenderWindow& window, const std::vector<sf::FloatRect>& collisionRects) {
     updateTimer(dt);
+
+    
 
     if (!isAlive()) {
         updateHitbox();

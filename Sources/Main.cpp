@@ -30,7 +30,9 @@ void loadSound() {
     SoundManager::loadSound("arrow"     , "Sounds/arrow.wav");
     SoundManager::loadSound("roll"      , "Sounds/roll.wav");
     SoundManager::loadSound("playerHurt", "Sounds/playerHurt.wav");
+    SoundManager::loadSound("playerDie" , "Sounds/playerDie.wav");
     SoundManager::loadSound("enemyHurt" , "Sounds/enemyHurt.wav");
+    SoundManager::loadSound("enemyDie"  , "Sounds/enemyDie.wav");
 }
 
 void loadMap(TileMap& map) {
@@ -61,7 +63,7 @@ int main() {
     TileMap map;
     loadMap(map);
 
-    Player player(300, 300);
+    Player player(300, 300, 5.0f);
 
     std::vector<Enemy*> enemys;
     loadEnemy(enemys);

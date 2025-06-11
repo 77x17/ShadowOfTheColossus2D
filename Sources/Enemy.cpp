@@ -66,6 +66,9 @@ Enemy::Enemy(const float& x = 0, const float& y = 0, const float& width = TILE_S
     RANDOM_TIME          = 5.0f;
     randomCooldownTimer  = 0.0f;
     stayingCooldownTimer = 0.0f;
+    
+    ATTACK_COOLDOWN_TIME = 0.5f;
+    attackCooldownTimer  = 0.0f;
 
     hitbox.setSize(size);
     hitbox.setOutlineColor(sf::Color::Red);
@@ -85,6 +88,26 @@ Enemy::Enemy(const float& x = 0, const float& y = 0, const float& width = TILE_S
 
 bool Enemy::isAlive() const {
     return state != -1 && state != -2;     // DEAD
+}
+
+void Enemy::attack(Player& player) {
+    if (attackCooldownTimer <= 0) {
+        player.hurt(1.0f);
+
+        attackCooldownTimer = ATTACK_COOLDOWN_TIME;
+    }
+}
+
+void Enemy::hurt(const float& damage) {
+    if (isAlive() && invincibleCooldownTimer <= 0) {
+        healthPoints -= damage;
+
+        SoundManager::playSound("enemyHurt");
+
+        if (healthPoints <= 0) {
+            kill();
+        }
+    }
 }
 
 void Enemy::kill() {
@@ -144,9 +167,12 @@ void Enemy::updateTimer(const float &dt) {
     if (stayingCooldownTimer > 0) {
         stayingCooldownTimer -= dt;
     }
+    if (attackCooldownTimer > 0) {
+        attackCooldownTimer -= dt;
+    }
 }
 
-void Enemy::attackPlayer(const Player& player) {
+void Enemy::followPlayer(const Player& player) {
     sf::Vector2f normalizeDirection = player.getPosition() - position;
     float length = std::sqrt(normalizeDirection.x * normalizeDirection.x + normalizeDirection.y * normalizeDirection.y);
 
@@ -194,13 +220,11 @@ void Enemy::updateThinking(Player& player) {
     if (calculateDistance(player) <= DETECION_RANGE) {
         if (invincibleCooldownTimer <= 0) {
             if (player.isCollision(hitbox.getGlobalBounds())) {
-                player.kill();
-
-                return;
+                attack(player);
             }
         }
 
-        attackPlayer(player);
+        followPlayer(player);
         // moveRandomly();
 
         detectionBox.setOutlineColor(sf::Color::Yellow);
@@ -269,15 +293,7 @@ void Enemy::update(const float& dt, Player& player, const std::vector<sf::FloatR
     }
 
     if (player.isCollisionProjectiles(hitbox.getGlobalBounds())) {
-        if (invincibleCooldownTimer <= 0) {
-            healthPoints -= 1.0f;
-
-            if (healthPoints <= 0) {
-                kill();
-            }
-
-            return;
-        }
+        hurt(1.0f);
     }
 
     updateThinking(player);

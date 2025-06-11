@@ -41,6 +41,9 @@ private:
     float RESPAWN_TIME;
     float respawnCooldownTimer;
         
+    float maxHealthPoints;
+    float healthPoints;
+
     float INVINCIBLE_TIME;
     float invincibleCooldownTimer;
 
@@ -67,13 +70,14 @@ private:
     float shootCooldownTimer;
 
 public:
-    Player(float x, float y);
+    Player(const float& x, const float& y, const float& hp);
 
     void handleInput(const sf::RenderWindow& window);
     bool isCollisionProjectiles(const sf::FloatRect& rect);
     bool isCollision(const sf::FloatRect& rect) const;
 
     bool isAlive() const;
+    void hurt(const float& damage);
     void kill();
     void respawn();
 

@@ -42,7 +42,7 @@ void Eye::updateTimer(const float &dt) {
     }
 }
 
-void Eye::attackPlayer(const Player& player) {
+void Eye::followPlayer(const Player& player) {
     sf::Vector2f normalizeDirection = player.getPosition() - position;
     float length = std::sqrt(normalizeDirection.x * normalizeDirection.x + normalizeDirection.y * normalizeDirection.y);
 
@@ -98,7 +98,7 @@ void Eye::updateProjectiles(const float& dt, Player& player) {
 
     if (projectile.isAlive()) {
         if (projectile.isCollision(player.getHitBox())) {
-            player.kill();
+            player.hurt(1.0f);
 
             projectile = Projectile();
         }
