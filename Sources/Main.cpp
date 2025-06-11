@@ -9,8 +9,6 @@
 
 #include "Player.hpp"
 #include "UI.hpp"
-#include "Quest.hpp"
-#include "KillMonsterObjective.hpp"
 
 #include "Enemy.hpp"
 #include "Bat.hpp"
@@ -78,12 +76,6 @@ int main() {
 
     Player player(300, 300, 5.0f);
     UI ui;
-
-    Quest quest("Bat Hunt", "Help the villagers by slaying bats.", 5);
-    quest.addObjective(std::make_shared<KillMonsterObjective>("Bat Lv.1", 10));
-    quest.addObjective(std::make_shared<KillMonsterObjective>("Bat Lv.1", 0));
-
-    quest.printObjectives();
 
     std::vector<Enemy*> enemys;
     loadEnemy(enemys);

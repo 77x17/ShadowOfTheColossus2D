@@ -8,6 +8,9 @@
 #include "Projectile.hpp"
 #include "SoundManager.hpp"
 
+#include "Quest.hpp"
+#include "KillMonsterObjective.hpp"
+
 enum class PlayerState {
     DYING = -2,
     DEAD  = -1,
@@ -69,6 +72,8 @@ private:
     float PROJECTILE_LIFETIME;
     float shootCooldownTimer;
 
+    std::vector<Quest> quests;
+
 public:
     Player(const float& x, const float& y, const float& hp);
 
@@ -88,13 +93,18 @@ public:
     void updateHitbox();
     void updateAnimation();
     void updateProjectiles(const float& dt);
+    void updateQuest();
     void update(const float& dt, const sf::RenderWindow& window, const std::vector<sf::FloatRect>& collisionRects);
 
     void draw(sf::RenderWindow& window);
 
     sf::Vector2f getPosition() const;
+    void addVictim(const std::string& label);
+
+    // for UI
     float getHealthStatus() const;
-    void getHealthPoints(sf::Text& healthPointsText) const;
+    std::string getHealthPoints() const;
+    const std::vector<Quest>& getQuests() const;
 
     void updateView(const float& dt, sf::View& view) const;
 };

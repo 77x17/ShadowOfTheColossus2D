@@ -298,6 +298,10 @@ void Enemy::update(const float& dt, Player& player, const std::vector<sf::FloatR
 
     if (player.isCollisionProjectiles(hitbox.getGlobalBounds())) {
         hurt(1.0f);
+
+        if (!isAlive()) {
+            player.addVictim(label.getString());
+        }
     }
 
     updateThinking(player);

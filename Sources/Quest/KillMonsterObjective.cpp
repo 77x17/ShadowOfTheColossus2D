@@ -17,5 +17,5 @@ bool KillMonsterObjective::isCompleted() const {
 }
 
 std::string KillMonsterObjective::getDescription() const {
-    return "Defeat " + std::to_string(requiredCount) + ' ' + monsterType + '.';
+    return "Defeat " + std::to_string(currentCount) + '/' + std::to_string(requiredCount) + ' ' + monsterType;
 }

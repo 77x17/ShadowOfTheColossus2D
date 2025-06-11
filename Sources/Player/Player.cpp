@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-Player::Player(const float& x = 0, const float& y = 0, const float& hp = 0.0f) {
+Player::Player(const float& x = 0, const float& y = 0, const float& hp = 0) {
     state      = 0;
     MOVE_SPEED = 200.0f; 
     size       = sf::Vector2f(TILE_SIZE, TILE_SIZE);
@@ -69,6 +69,13 @@ Player::Player(const float& x = 0, const float& y = 0, const float& hp = 0.0f) {
     PROJECTILE_SPEED    = MOVE_SPEED * 2;
     PROJECTILE_LIFETIME = 1.0f;
     shootCooldownTimer  = 0.0f;
+
+    quests.push_back(Quest("Bat Hunt", "Help the villagers slaying bats", 5));
+    quests.back().addObjective(std::make_shared<KillMonsterObjective>("Bat Lv.1", 1));
+    quests.back().addObjective(std::make_shared<KillMonsterObjective>("Bat Lv.1", 2));
+
+    quests.push_back(Quest("Bat Hunt", "Help the villagers slaying bats", 5));
+    quests.back().addObjective(std::make_shared<KillMonsterObjective>("Bat Lv.1", 1));
 }
 
 void Player::handleInput(const sf::RenderWindow& window) {
@@ -88,6 +95,10 @@ void Player::handleInput(const sf::RenderWindow& window) {
 
     movingDirection = Projectile::normalize(movingDirection);
     
+    if (!isDashing && movingDirection != sf::Vector2f(0, 0)) {
+        dashDirection = sf::Vector2f(0, 0);
+    }
+
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift) && dashCooldownTimer <= 0.f && !isDashing) {
         isDashing         = true;
         dashTimer         = DASH_DURATION;      // Đặt thời gian lướt
@@ -95,7 +106,10 @@ void Player::handleInput(const sf::RenderWindow& window) {
 
         // Xác định hướng lướt: dựa trên hướng di chuyển hiện tại.
         // Nếu đứng yên, lướt theo hướng đang nhìn.
-        if (movingDirection.x != 0 || movingDirection.y != 0) {
+        if (dashDirection.x != 0 || dashDirection.y != 0 ) {
+            dashDirection = dashDirection;
+        }
+        else if (movingDirection.x != 0 || movingDirection.y != 0) {
             dashDirection = movingDirection;
         } 
         else if (state == static_cast<int>(PlayerState::IDLE_LEFT)     || state == static_cast<int>(PlayerState::WALK_LEFT)) {
@@ -295,7 +309,18 @@ void Player::updateAnimation() {
         // nothing
     }
     else if (isDashing) {
-        state = (movingDirection.x < 0 ? static_cast<int>(PlayerState::DASH_LEFT) : static_cast<int>(PlayerState::DASH_RIGHT));
+        state = (dashDirection.x < 0 ? static_cast<int>(PlayerState::DASH_LEFT) : static_cast<int>(PlayerState::DASH_RIGHT));
+    }
+    else if (dashDirection != sf::Vector2f(0, 0)) {
+        if (dashDirection.y < 0) {
+            state = (dashDirection.x < 0 ? static_cast<int>(PlayerState::IDLE_UP_LEFT) : static_cast<int>(PlayerState::IDLE_UP_RIGHT));
+        }
+        else if (dashDirection.x != 0) {
+            state = (dashDirection.x < 0 ? static_cast<int>(PlayerState::IDLE_LEFT) : static_cast<int>(PlayerState::IDLE_RIGHT));
+        }
+        else if (dashDirection.y > 0) {
+            state = static_cast<int>(PlayerState::IDLE_DOWN);
+        }
     }
     else if (movingDirection == sf::Vector2f(0, 0)) {
         if (state == static_cast<int>(PlayerState::WALK_LEFT)) {
@@ -321,10 +346,10 @@ void Player::updateAnimation() {
         }
     }
     else if (movingDirection.y < 0) {
-        state = (movingDirection.x > 0 ? static_cast<int>(PlayerState::WALK_UP_RIGHT) : static_cast<int>(PlayerState::WALK_UP_LEFT));
+        state = (movingDirection.x < 0 ? static_cast<int>(PlayerState::WALK_UP_LEFT) : static_cast<int>(PlayerState::WALK_UP_RIGHT));
     }
     else if (movingDirection.x != 0) {
-        state = (movingDirection.x > 0 ? static_cast<int>(PlayerState::WALK_RIGHT) : static_cast<int>(PlayerState::WALK_LEFT));
+        state = (movingDirection.x < 0 ? static_cast<int>(PlayerState::WALK_LEFT) : static_cast<int>(PlayerState::WALK_RIGHT));
     }
     else if (movingDirection.y > 0) {
         state = static_cast<int>(PlayerState::WALK_DOWN);
@@ -342,12 +367,22 @@ void Player::updateProjectiles(const float& dt) {
         p.update(dt);
     }
 
-    for (auto it = projectiles.begin(); it != projectiles.end(); /* no increment here */) {
+    for (auto it = projectiles.begin(); it != projectiles.end(); /**/) {
         if (!it->isAlive()) {
-            // Erase the element and update the iterator to the next one
             it = projectiles.erase(it);
-        } else {
-            // The element is alive, so just move to the next one
+        } 
+        else {
+            ++it;
+        }
+    }
+}
+
+void Player::updateQuest() {
+    for (auto it = quests.begin(); it != quests.end(); /**/) {
+        if (it->isCompleted()) {
+            it = quests.erase(it);
+        }
+        else {
             ++it;
         }
     }
@@ -355,8 +390,6 @@ void Player::updateProjectiles(const float& dt) {
 
 void Player::update(const float& dt, const sf::RenderWindow& window, const std::vector<sf::FloatRect>& collisionRects) {
     updateTimer(dt);
-
-    
 
     if (!isAlive()) {
         updateHitbox();
@@ -377,6 +410,8 @@ void Player::update(const float& dt, const sf::RenderWindow& window, const std::
     updateAnimation();
 
     updateProjectiles(dt);
+
+    updateQuest();
 }
 
 void Player::draw(sf::RenderWindow& window) {
@@ -404,17 +439,27 @@ sf::Vector2f Player::getPosition() const {
     return position;
 }
 
+void Player::addVictim(const std::string& label) {
+    for (Quest& quest : quests) {
+        quest.update("kill", label);
+    }
+}
+
 float Player::getHealthStatus() const {
     return healthPoints / maxHealthPoints;
 }
 
-void Player::getHealthPoints(sf::Text& healthPointsText) const {
+std::string Player::getHealthPoints() const {
     auto format2Decimals = [](float value) -> std::string {
         std::string str = std::to_string(value);
         return str.substr(0, str.find('.') + 3);
     };
 
-    healthPointsText.setString(format2Decimals(healthPoints) + '/' + format2Decimals(maxHealthPoints));
+    return format2Decimals(healthPoints) + '/' + format2Decimals(maxHealthPoints);
+}
+
+const std::vector<Quest>& Player::getQuests() const {
+    return quests;
 }
 
 void Player::updateView(const float& dt, sf::View& view) const {

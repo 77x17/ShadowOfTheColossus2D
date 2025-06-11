@@ -1,9 +1,10 @@
 #include "Quest.hpp"
 
 Quest::Quest(const std::string& _title, const std::string& _description, int exp) {
-    title       = title;
-    description = description;
+    title       = _title;
+    description = _description;
     rewardExp   = exp;
+    rewardGiven = false;
 }
 
 bool Quest::isCompleted() const {
@@ -31,10 +32,12 @@ void Quest::update(const std::string& eventType, const std::string& target) {
     }
 }
 
-void Quest::printObjectives() const {
-    std::cerr << "Quest: " << title << std::endl;
-    std::cerr << description << std::endl;
-    for (const auto& obj : objectives) {
-        std::cerr << "- " << obj->getDescription() << (obj->isCompleted() ? " (Done)" : "") << std::endl;
+std::string Quest::getObjectives(const int& idx) const {
+    std::string display = std::string();
+    display += "[" + std::to_string(idx) + "] " + title + '\n';
+    display += description + '\n';
+    for (const std::shared_ptr<QuestObjective>& objective : objectives) {
+        display += "- " + objective->getDescription() + (objective->isCompleted() ? " (Done)" : "") + '\n';
     }
+    return display;
 }

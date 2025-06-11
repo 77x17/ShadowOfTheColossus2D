@@ -23,6 +23,6 @@ public:
 
     void update(const std::string& eventType, const std::string& target);
 
-    void printObjectives() const;
+    std::string getObjectives(const int& idx) const;
 
 };
