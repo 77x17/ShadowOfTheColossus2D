@@ -83,6 +83,10 @@ private:
     float    interactCooldownTimer;
     sf::Text interactText;
 
+    float KNOCKBACK_STRENGTH;
+    float KNOCKBACK_COOLDOWN;
+    float knockbackCooldownTimer;
+
     std::vector<Quest> quests;
 
 public:
@@ -99,6 +103,7 @@ public:
 
     bool isAlive() const;
     void hurt(const float& damage);
+    void knockback(const sf::Vector2f& enemyPosition);
     void kill();
     void respawn();
 

@@ -86,13 +86,15 @@ Player::Player(const float& x, const float& y, const float& hp, std::vector<Ques
     interactText.setString("Press [F] to talk");
     interactText.setOrigin(interactText.getLocalBounds().left + interactText.getLocalBounds().width / 2, 0);
 
-    quests.clear();
+    KNOCKBACK_STRENGTH     = 100.0f;
+    KNOCKBACK_COOLDOWN     = 0.2f;
+    knockbackCooldownTimer = 0.0f;
 
+    quests.clear();
     quests = std::move(_quests);
 }
 
 void Player::handleMove(const sf::RenderWindow& window) {
-    movingDirection = sf::Vector2f(0, 0);
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
         movingDirection.x = -1.f;
     }
@@ -273,6 +275,13 @@ void Player::handleQuests(const float& dt, const sf::RenderWindow& window, std::
 }
 
 void Player::handleInput(const float& dt, const sf::RenderWindow& window, std::vector<Npc>& npcs) {
+    if (knockbackCooldownTimer <= 0) {
+        movingDirection = sf::Vector2f(0, 0);
+    }
+    else {
+        // fix here
+    }
+
     handleMove(window);
     
     handleDash(window);
@@ -310,6 +319,16 @@ void Player::hurt(const float& damage) {
         if (healthPoints <= 0) {
             kill();
         }
+    }
+}
+
+void Player::knockback(const sf::Vector2f& enemyPosition) {
+    if (isAlive() && invincibleCooldownTimer <= 0) {
+        movingDirection = (position - enemyPosition);
+
+        movingDirection = Projectile::normalize(movingDirection);
+
+        knockbackCooldownTimer = KNOCKBACK_COOLDOWN;
     }
 }
 
@@ -383,18 +402,20 @@ void Player::updateTimer(const float &dt) {
     if (interactCooldownTimer > 0) {
         interactCooldownTimer -= dt;
     }
+    if (knockbackCooldownTimer > 0) {
+        knockbackCooldownTimer -= dt;
+    }
 }
 
 void Player::updatePosition(const float& dt, const std::vector<sf::FloatRect>& collisionRects) {
     sf::Vector2f velocity(0.f, 0.f);
-    if (isDashing) {
-        // Di chuyển theo hướng dash với tốc độ dash
-        velocity.x = dashDirection.x * DASH_SPEED * dt;
-        velocity.y = dashDirection.y * DASH_SPEED * dt;
+    if (knockbackCooldownTimer > 0) {
+        velocity = movingDirection * KNOCKBACK_STRENGTH * dt;
+    }
+    else if (isDashing) {
+        velocity = dashDirection   * DASH_SPEED * dt;
     } else {
-        // Di chuyển bình thường nếu không dash
-        velocity.x = movingDirection.x * MOVE_SPEED * dt;
-        velocity.y = movingDirection.y * MOVE_SPEED * dt;
+        velocity = movingDirection * MOVE_SPEED * dt;
     }
 
     sf::FloatRect nextHitboxRect = sf::FloatRect(position, size);
@@ -427,7 +448,7 @@ void Player::updateHitbox() {
 }
 
 void Player::updateAnimation() {
-    if (!isAlive()) {
+    if (!isAlive() || knockbackCooldownTimer > 0) {
         // nothing
     }
     else if (isDashing) {

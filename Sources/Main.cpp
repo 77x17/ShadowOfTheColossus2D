@@ -126,7 +126,7 @@ int main() {
     std::vector<Quest> quests;
     loadQuests(quests);
 
-    Player player(300, 300, 5.0f, std::move(quests));
+    Player player(300, 300, 50.0f, std::move(quests));
     UI ui;
 
     sf::Clock clock;

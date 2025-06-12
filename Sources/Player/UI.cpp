@@ -97,7 +97,7 @@ UI::UI() {
         questsBoxLabel.setOrigin(questsBoxLabel.getLocalBounds().left + questsBoxLabel.getLocalBounds().width / 2, 0);
         
         questsBoxSize = questsText.getGlobalBounds().getSize();
-        questsBox.setSize(questsBoxSize + PADDING * 2.0f);
+        questsBox.setSize(questsBoxSize + PADDING * 3.0f);
         questsBox.setFillColor(sf::Color(80, 80, 80, 150));
         questsBox.setOutlineThickness(BOX_OUTLINE_THICKNESS);
         questsBox.setOutlineColor(sf::Color::Black);
@@ -147,7 +147,7 @@ void UI::updateQuests(const float& dt, const std::vector<Quest>& quests, const s
     questsPosition += (targetQuestsPosition - questsPosition) * QUESTS_BOX_LEAP_SPEED * dt;
     questsBoxSize  += (textBounds.getSize() - questsBoxSize) * QUESTS_BOX_LEAP_SPEED * dt;
  
-    questsBox.setSize(questsBoxSize + PADDING * 2.0f);
+    questsBox.setSize(questsBoxSize + PADDING * 3.0f);
     
     questsText.setPosition(questsPosition);
     questsBox.setPosition(questsPosition - PADDING);

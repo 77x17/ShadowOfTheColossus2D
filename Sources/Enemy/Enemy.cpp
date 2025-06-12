@@ -95,6 +95,7 @@ bool Enemy::isAlive() const {
 void Enemy::attack(Player& player) {
     if (attackCooldownTimer <= 0) {
         player.hurt(1.0f);
+        player.knockback(position);
 
         attackCooldownTimer = ATTACK_COOLDOWN_TIME;
     }
@@ -229,7 +230,12 @@ void Enemy::updateThinking(Player& player) {
         }
 
         if (player.isAlive()) {
-            followPlayer(player);
+            if (attackCooldownTimer <= 0) {
+                followPlayer(player);
+            }
+            else {
+                movingDirection = sf::Vector2f(0.0f, 0.0f);
+            }
         }
         else {
             moveRandomly();
