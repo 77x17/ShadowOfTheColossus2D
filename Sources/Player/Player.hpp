@@ -79,7 +79,12 @@ private:
 public:
     Player(const float& x, const float& y, const float& hp);
 
+    void handleMove(const sf::RenderWindow& window);
+    void handleDash(const sf::RenderWindow& window);
+    void handleProjectiles(const sf::RenderWindow& window);
+    void handleQuests(const sf::RenderWindow& window);
     void handleInput(const sf::RenderWindow& window);
+
     bool isCollisionProjectiles(const sf::FloatRect& rect);
     bool isCollision(const sf::FloatRect& rect) const;
 
@@ -101,7 +106,7 @@ public:
     void draw(sf::RenderWindow& window);
 
     sf::Vector2f getPosition() const;
-    
+
     void  levelUp();
     void  updateLevel();
     float XPRequired() const;
@@ -110,8 +115,9 @@ public:
 
     // for UI
     float       getHealthRatio() const;
+    std::string getHealthPointsString() const;
     float       getXPRatio() const;
-    std::string getHealthPoints() const;
+    std::string getXPString() const;
     int         getLevel() const;
     const       std::vector<Quest>& getQuests() const;
 

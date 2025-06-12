@@ -74,9 +74,16 @@ Player::Player(const float& x = 0, const float& y = 0, const float& hp = 0) {
     shootCooldownTimer  = 0.0f;
 
     quests.clear();
+
+    quests.push_back(Quest("Bat Hunt", "Slaying Bats", 10));
+    quests.back().addObjective(std::make_shared<KillMonsterObjective>("Bat Lv.1", 1));
+    quests.back().addObjective(std::make_shared<KillMonsterObjective>("Bat Lv.1", 2));
+
+    quests.push_back(Quest("Eye Hunt", "Help the villagers slaying Eyes", 200));
+    quests.back().addObjective(std::make_shared<KillMonsterObjective>("Eye Lv.5", 1));
 }
 
-void Player::handleInput(const sf::RenderWindow& window) {
+void Player::handleMove(const sf::RenderWindow& window) {
     movingDirection = sf::Vector2f(0, 0);
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
         movingDirection.x = -1.f;
@@ -92,7 +99,9 @@ void Player::handleInput(const sf::RenderWindow& window) {
     }
 
     movingDirection = Projectile::normalize(movingDirection);
-    
+}
+
+void Player::handleDash(const sf::RenderWindow& window) {
     if (!isDashing && movingDirection != sf::Vector2f(0, 0)) {
         dashDirection = sf::Vector2f(0, 0);
     }
@@ -140,6 +149,9 @@ void Player::handleInput(const sf::RenderWindow& window) {
 
         SoundManager::playSound("roll");
     }
+}
+
+void Player::handleProjectiles(const sf::RenderWindow& window) {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && shootCooldownTimer <= 0.f && !isDashing) {
         shootCooldownTimer = SHOOT_COOLDOWN; 
         
@@ -188,6 +200,30 @@ void Player::handleInput(const sf::RenderWindow& window) {
 
         SoundManager::playSound("arrow");
     }
+}
+
+void Player::handleQuests(const sf::RenderWindow& window) {
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::F)) {
+        for (Quest& quest : quests) {
+            if (quest.accept()) {
+                break;
+            }
+
+            if (quest.turnIn()) {
+                break;
+            }
+        }
+    }
+}
+
+void Player::handleInput(const sf::RenderWindow& window) {
+    handleMove(window);
+    
+    handleDash(window);
+
+    handleProjectiles(window);
+
+    handleQuests(window);
 }
 
 bool Player::isCollisionProjectiles(const sf::FloatRect& rect) {
@@ -406,23 +442,14 @@ void Player::updateProjectiles(const float& dt) {
 
 void Player::updateQuest() {
     for (auto it = quests.begin(); it != quests.end(); /**/) {
-        if (it->isCompleted()) {
+        if (it->isCompleted() && !it->isReceiveReward()) {
             updateXP(it->getRewardExp());
 
-            it = quests.erase(it);
+            // it = quests.erase(it);
         }
         else {
             ++it;
         }
-    }
-
-    if (quests.empty()) {
-        quests.push_back(Quest("Bat Hunt", "Slaying Bats", 10));
-        quests.back().addObjective(std::make_shared<KillMonsterObjective>("Bat Lv.1", 1));
-        quests.back().addObjective(std::make_shared<KillMonsterObjective>("Bat Lv.1", 2));
-
-        quests.push_back(Quest("Eye Hunt", "Help the villagers slaying Eyes", 200));
-        quests.back().addObjective(std::make_shared<KillMonsterObjective>("Eye Lv.5", 1));
     }
 }
 
@@ -513,17 +540,21 @@ float Player::getHealthRatio() const {
     return healthPoints / maxHealthPoints;
 }
 
+std::string format2Decimals(float value) {
+    std::string str = std::to_string(value);
+    return str.substr(0, str.find('.') + 3);
+}
+
+std::string Player::getHealthPointsString() const {
+    return format2Decimals(healthPoints) + '/' + format2Decimals(maxHealthPoints);
+}
+
 float Player::getXPRatio() const {
     return xp / XPRequired();
 }
 
-std::string Player::getHealthPoints() const {
-    auto format2Decimals = [](float value) -> std::string {
-        std::string str = std::to_string(value);
-        return str.substr(0, str.find('.') + 3);
-    };
-
-    return format2Decimals(healthPoints) + '/' + format2Decimals(maxHealthPoints);
+std::string Player::getXPString() const {
+    return format2Decimals(xp) + '/' + format2Decimals(XPRequired());
 }
 
 int Player::getLevel() const {

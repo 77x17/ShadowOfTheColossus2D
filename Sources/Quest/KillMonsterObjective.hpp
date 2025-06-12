@@ -13,7 +13,7 @@ public:
 
     void updateProgress(const std::string& eventType, const std::string& target) override;
 
-    bool isCompleted() const override;
+    bool isFinished() const override;
 
     std::string getDescription() const override;
 };

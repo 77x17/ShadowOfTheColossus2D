@@ -20,16 +20,18 @@ private:
     sf::Vector2f       HEALTH_BAR_POSITION;
     float              HEALTH_BAR_LEAP_SPEED;
     float              healthBarRatio;
-    sf::Text           healthPointsText;
     sf::RectangleShape healthBar;
     sf::RectangleShape healthBarBackground;
+    sf::Text           healthPointsText;
     
+    float              XP_TEXT_SIZE;
     sf::Vector2f       XP_BAR_SIZE;
     sf::Vector2f       XP_BAR_POSISION;
     float              XP_BAR_LEAP_SPEED;
     float              XPProgress;
     sf::RectangleShape XPBar;
     sf::RectangleShape XPBarBackground;
+    sf::Text           XPText;
 
     float              QUESTS_TEXT_SIZE;
     sf::Vector2f       QUESTS_PADDING;

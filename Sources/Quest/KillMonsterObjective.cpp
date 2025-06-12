@@ -7,12 +7,12 @@ KillMonsterObjective::KillMonsterObjective(const std::string& type, int count) {
 }
 
 void KillMonsterObjective::updateProgress(const std::string& eventType, const std::string& target) {
-    if (eventType == "kill" && target == monsterType && !isCompleted()) {
+    if (eventType == "kill" && target == monsterType && !isFinished()) {
         currentCount++;
     }
 }
 
-bool KillMonsterObjective::isCompleted() const {
+bool KillMonsterObjective::isFinished() const {
     return currentCount >= requiredCount;
 }
 

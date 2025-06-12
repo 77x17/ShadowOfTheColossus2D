@@ -54,11 +54,12 @@ UI::UI() {
         healthBarBackground.setOutlineColor(sf::Color::Black);
     }
     {
+        XP_TEXT_SIZE      = 10.0f;
         XP_BAR_SIZE       = sf::Vector2f(200.0f, 5.0f);
         XP_BAR_POSISION   = HEALTH_BAR_POSITION + sf::Vector2f(0.0f, HEALTH_BAR_SIZE.y + 10.0f);
         XP_BAR_LEAP_SPEED = 2.0f;
         XPProgress        = 0.0f;
-        
+
         XPBar.setSize(XP_BAR_SIZE);
         XPBar.setPosition(XP_BAR_POSISION);
         XPBar.setFillColor(sf::Color::Green);
@@ -68,6 +69,15 @@ UI::UI() {
         XPBarBackground.setFillColor(sf::Color(80, 80, 80, 150));
         XPBarBackground.setOutlineThickness(BOX_OUTLINE_THICKNESS);
         XPBarBackground.setOutlineColor(sf::Color::Black);
+
+        XPText.setFont(Font::font);
+        XPText.setCharacterSize(XP_TEXT_SIZE);
+        XPText.setFillColor(sf::Color::Black);
+        XPText.setOutlineColor(sf::Color::White);
+        XPText.setOutlineThickness(0.5f);
+        XPText.setString("0.00/0.00");
+        XPText.setPosition(XP_BAR_POSISION + sf::Vector2f(XP_BAR_SIZE.x / 2, XP_BAR_SIZE.y + PADDING.y * 2));
+        XPText.setOrigin(XPText.getLocalBounds().left + XPText.getLocalBounds().width / 2, 0.0f);
     }
     {
         QUESTS_TEXT_SIZE      = 12.5f;
@@ -95,7 +105,7 @@ UI::UI() {
 }
 
 void UI::updateHealthBar(const float& dt, const Player& player) {
-    healthPointsText.setString(player.getHealthPoints());
+    healthPointsText.setString(player.getHealthPointsString());
     
     healthBarRatio += (player.getHealthRatio() - healthBarRatio) * HEALTH_BAR_LEAP_SPEED * dt;
 
@@ -104,6 +114,9 @@ void UI::updateHealthBar(const float& dt, const Player& player) {
 
 void UI::updateLevelAndXP(const float& dt, const Player& player) {
     levelText.setString("Lv." + std::to_string(player.getLevel()));
+
+    XPText.setString(player.getXPString());
+    XPText.setOrigin(XPText.getLocalBounds().left + XPText.getLocalBounds().width / 2, 0.0f);
 
     XPProgress += (player.getXPRatio() - XPProgress) * XP_BAR_LEAP_SPEED * dt;
 
@@ -114,7 +127,7 @@ void UI::updateQuests(const float& dt, const std::vector<Quest>& quests, const s
     std::string display = "               \n\n";
     int idx = 0;
     for (const Quest& quest : quests) {
-        display += quest.getObjectives(++idx) + '\n';
+        display += quest.getQuestInformation(++idx) + '\n';
     }
     display.pop_back();
     questsText.setString(display);
@@ -149,6 +162,7 @@ void UI::draw(sf::RenderWindow& window) {
 
     window.draw(XPBarBackground);
     window.draw(XPBar);
+    window.draw(XPText);
 
     window.draw(questsBox);
     window.draw(questsBoxLabel);
