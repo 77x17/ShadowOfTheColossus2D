@@ -73,13 +73,24 @@ Player::Player(const float& x = 0, const float& y = 0, const float& hp = 0) {
     PROJECTILE_LIFETIME = 1.0f;
     shootCooldownTimer  = 0.0f;
 
+    FADE_SPEED          = 5.0f;
+    interactTextOpacity = 0.0f;
+
+    interactText.setFont(Font::font);
+    interactText.setCharacterSize(12.5f);
+    interactText.setOutlineThickness(2.0f);
+    interactText.setFillColor(sf::Color(255, 255, 255, interactTextOpacity));
+    interactText.setOutlineColor(sf::Color(0, 0, 0, interactTextOpacity));
+    interactText.setString("Press [F] to talk");
+    interactText.setOrigin(interactText.getLocalBounds().left + interactText.getLocalBounds().width / 2, 0);
+
     quests.clear();
 
-    quests.push_back(Quest("Bat Hunt", "Slaying Bats", 10));
+    quests.push_back(Quest(0, "Bat Hunt", "Slaying Bats", 10));
     quests.back().addObjective(std::make_shared<KillMonsterObjective>("Bat Lv.1", 1));
     quests.back().addObjective(std::make_shared<KillMonsterObjective>("Bat Lv.1", 2));
 
-    quests.push_back(Quest("Eye Hunt", "Help the villagers slaying Eyes", 200));
+    quests.push_back(Quest(1, "Eye Hunt", "Help the villagers slaying Eyes", 200));
     quests.back().addObjective(std::make_shared<KillMonsterObjective>("Eye Lv.5", 1));
 }
 
@@ -202,28 +213,52 @@ void Player::handleProjectiles(const sf::RenderWindow& window) {
     }
 }
 
-void Player::handleQuests(const sf::RenderWindow& window) {
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::F)) {
-        for (Quest& quest : quests) {
-            if (quest.accept()) {
-                break;
-            }
+void Player::handleQuests(const float& dt, const sf::RenderWindow& window, const std::vector<std::pair<int, sf::FloatRect>>& npcRects) {
+    bool isCollisionNPC = false;
+    for (auto& pair : npcRects) {
+        sf::FloatRect npcRect = pair.second;
+        if (isCollision(npcRect)) {
+            interactText.setPosition(npcRect.getPosition() + sf::Vector2f(npcRect.getSize().x / 2, -npcRect.getSize().y));
+            isCollisionNPC = true;
+        }
+    }
+    if (isCollisionNPC) {
+        interactTextOpacity += (255 - interactTextOpacity) * FADE_SPEED * dt;
+        interactText.setFillColor(sf::Color(255, 255, 255, interactTextOpacity));
+        interactText.setOutlineColor(sf::Color(0, 0, 0, interactTextOpacity));
+    }
+    else {
+        interactTextOpacity += (0 - interactTextOpacity) * FADE_SPEED * dt;
+        interactText.setFillColor(sf::Color(255, 255, 255, interactTextOpacity));
+        interactText.setOutlineColor(sf::Color(0, 0, 0, interactTextOpacity));
+    }
 
-            if (quest.turnIn()) {
-                break;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::F)) {
+        
+        for (auto& pair : npcRects) {
+            int id = pair.first; sf::FloatRect npcRect = pair.second;
+            if (isCollision(npcRect)) {
+
+                for (Quest& quest : quests) {
+                    if (quest.accept(id)) {
+                    }
+
+                    if (quest.turnIn(id)) {
+                    }
+                }
             }
         }
     }
 }
 
-void Player::handleInput(const sf::RenderWindow& window) {
+void Player::handleInput(const float& dt, const sf::RenderWindow& window, const std::vector<std::pair<int, sf::FloatRect>>& npcRects) {
     handleMove(window);
     
     handleDash(window);
 
     handleProjectiles(window);
 
-    handleQuests(window);
+    handleQuests(dt, window, npcRects);
 }
 
 bool Player::isCollisionProjectiles(const sf::FloatRect& rect) {
@@ -453,7 +488,11 @@ void Player::updateQuest() {
     }
 }
 
-void Player::update(const float& dt, const sf::RenderWindow& window, const std::vector<sf::FloatRect>& collisionRects) {
+void Player::update(const float& dt, 
+                    const sf::RenderWindow& window, 
+                    const std::vector<sf::FloatRect>& collisionRects, 
+                    const std::vector<std::pair<int, sf::FloatRect>>& npcRects) {
+
     updateTimer(dt);
 
     if (!isAlive()) {
@@ -466,7 +505,7 @@ void Player::update(const float& dt, const sf::RenderWindow& window, const std::
         return;
     }
     
-    handleInput(window);
+    handleInput(dt, window, npcRects);
 
     updatePosition(dt, collisionRects);
 
@@ -498,6 +537,8 @@ void Player::draw(sf::RenderWindow& window) {
         invincibleBox.setFillColor(sf::Color(200, 200, 200, 100));
         window.draw(invincibleBox);   
     }
+
+    window.draw(interactText);
 }
 
 sf::Vector2f Player::getPosition() const {

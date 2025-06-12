@@ -27,11 +27,11 @@ bool TileMap::load(const std::string& tmxPath, const std::string& tilesetPath) {
         return false;
     }
 
-    unsigned int mapWidth = mapNode.attribute("width").as_uint();
-    unsigned int mapHeight = mapNode.attribute("height").as_uint();
-    unsigned int tileWidth = mapNode.attribute("tilewidth").as_uint();
+    unsigned int mapWidth   = mapNode.attribute("width").as_uint();
+    unsigned int mapHeight  = mapNode.attribute("height").as_uint();
+    unsigned int tileWidth  = mapNode.attribute("tilewidth").as_uint();
     unsigned int tileHeight = mapNode.attribute("tileheight").as_uint();
-    int firstGid = mapNode.child("tileset").attribute("firstgid").as_int();
+    int firstGid            = mapNode.child("tileset").attribute("firstgid").as_int();
 
     // Lặp qua tất cả các layer
     for (pugi::xml_node layerNode : mapNode.children("layer")) {
@@ -90,19 +90,46 @@ bool TileMap::load(const std::string& tmxPath, const std::string& tilesetPath) {
         m_layersVertices.push_back(vertices);
     }
 
-    // Lặp qua tất cả các Object Group
-    for (pugi::xml_node objectGroupNode : mapNode.children("objectgroup")) {
-        std::string groupName = objectGroupNode.attribute("name").as_string();
-        if (groupName == "CollisionObjects") {
-            // Lặp qua tất cả các đối tượng trong group này
+    for (pugi::xml_node groupNode : mapNode.children("group")) {
+        std::string groupName = groupNode.attribute("name").as_string();
+        for (pugi::xml_node objectGroupNode : groupNode.children("objectgroup")) {
+            std::string objectGroupName = objectGroupNode.attribute("name").as_string();
             for (pugi::xml_node objectNode : objectGroupNode.children("object")) {
-                // Lấy vị trí và kích thước của đối tượng hình chữ nhật
-                float x = objectNode.attribute("x").as_float();
-                float y = objectNode.attribute("y").as_float();
-                float width = objectNode.attribute("width").as_float();
+                float x      = objectNode.attribute("x").as_float();
+                float y      = objectNode.attribute("y").as_float();
+                float width  = objectNode.attribute("width").as_float();
                 float height = objectNode.attribute("height").as_float();
-
-                m_collisionRects.emplace_back(x, y, width, height);
+                
+                if (groupName == "Collision") {
+                    if (objectGroupName == "CollisionObjects") {
+                        m_collisionRects.emplace_back(x, y, width, height);
+                    }
+                    else if (objectGroupName == "NPC") {
+                        auto prop = objectNode.child("properties").find_child_by_attribute("property", "name", "npc_id");
+                        int id = -1;
+                        if (prop) {
+                            id = prop.attribute("value").as_int();
+                        }
+                        m_NPCRects.emplace_back(id, sf::FloatRect(x, y, width, height));
+                    }
+                    else {
+                        std::cerr << "[Bug] - TileMap.cpp - load() NPC\n";
+                    }
+                }
+                else if (groupName == "Enemy") {
+                    if (objectGroupName == "Bat Lv.1") {
+                        m_enemyRects["Bat Lv.1"].emplace_back(x, y, width, height);
+                    }
+                    else if (objectGroupName == "Eye Lv.5") {
+                        m_enemyRects["Eye Lv.5"].emplace_back(x, y, width, height);
+                    }
+                    else {
+                        std::cerr << "[Bug] - TileMap.cpp - load() Enemy\n";
+                    }
+                }
+                else {
+                    std::cerr << "[Bug] - TileMap.cpp - load()\n";
+                }
             }
         }
     }
@@ -119,23 +146,57 @@ void TileMap::draw(sf::RenderTarget& target, sf::RenderStates states) const {
         target.draw(layer, states);
     }
 
-    // sf::RectangleShape hitbox;
-    // hitbox.setOutlineColor(sf::Color::Cyan);
-    // hitbox.setOutlineThickness(1.f);
-    // hitbox.setFillColor(sf::Color::Transparent);
-    // for (const sf::FloatRect& rect : m_collisionRects) {
-    //     hitbox.setSize(rect.getSize());
-    //     hitbox.setPosition(rect.getPosition());
-    //     target.draw(hitbox);
-    // }
+    sf::RectangleShape hitbox;
+    hitbox.setOutlineColor(sf::Color::Cyan);
+    hitbox.setOutlineThickness(1.f);
+    hitbox.setFillColor(sf::Color::Transparent);
+    for (const sf::FloatRect& rect : m_collisionRects) {
+        hitbox.setSize(rect.getSize());
+        hitbox.setPosition(rect.getPosition());
+        target.draw(hitbox);
+    }
+    
+    hitbox.setOutlineColor(sf::Color::Yellow);
+    for (auto& pair : m_enemyRects) {
+        for (const sf::FloatRect& rect : pair.second) {
+            hitbox.setSize(rect.getSize());
+            hitbox.setPosition(rect.getPosition());
+            target.draw(hitbox);
+        }
+    }
+
+    hitbox.setOutlineColor(sf::Color::Green);
+    for (auto& pair : m_NPCRects) {
+        hitbox.setSize(pair.second.getSize());
+        hitbox.setPosition(pair.second.getPosition());
+        target.draw(hitbox);
+    }
 }
 
-void TileMap::updateCollisionRects() {
+void TileMap::updateObjects() {
     for (sf::FloatRect& rect : m_collisionRects) {
         rect = getTransform().transformRect(rect);
+    }
+    
+    for (auto& pair : m_enemyRects) {
+        for (sf::FloatRect& rect : pair.second) {
+            rect = getTransform().transformRect(rect);
+        }
+    }
+
+    for (auto& pair : m_NPCRects) {
+        pair.second = getTransform().transformRect(pair.second);
     }
 }
 
 const std::vector<sf::FloatRect>& TileMap::getCollisionRects() const {
     return m_collisionRects;
+}
+
+const std::unordered_map<std::string, std::vector<sf::FloatRect>>& TileMap::getEnemyRects() const {
+    return m_enemyRects;
+}
+
+const std::vector<std::pair<int, sf::FloatRect>>& TileMap::getNPCRects() const {
+    return m_NPCRects;
 }

@@ -15,15 +15,17 @@ enum class QuestState {
 
 class Quest {
 private:
+    int         npcID;
     std::string title;
     std::string description;
     std::vector<std::shared_ptr<QuestObjective>> objectives;
+    
     QuestState state;
-    bool rewardGiven = false;
-    int rewardExp;
+    bool       rewardGiven;
+    int        rewardExp;
 
 public:
-    Quest(const std::string& _title, const std::string& _description, int exp);
+    Quest(int _npcID, const std::string& _title, const std::string& _description, int exp);
     
     void addObjective(const std::shared_ptr<QuestObjective>& objective);
     
@@ -33,9 +35,9 @@ public:
 
     bool isReceiveReward() const;
 
-    bool accept();
+    bool accept(const int& _npcID);
     void update(const std::string& eventType, const std::string& target);
-    bool turnIn();
+    bool turnIn(const int& _npcID);
 
     std::string getQuestInformation(const int& idx) const;
 

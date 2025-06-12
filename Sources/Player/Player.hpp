@@ -7,6 +7,7 @@
 #include "Animation.hpp"
 #include "Projectile.hpp"
 #include "SoundManager.hpp"
+#include "Font.hpp"
 
 #include "Quest.hpp"
 #include "KillMonsterObjective.hpp"
@@ -74,6 +75,10 @@ private:
     float                   PROJECTILE_LIFETIME;
     float                   shootCooldownTimer;
 
+    float    FADE_SPEED;
+    float    interactTextOpacity;
+    sf::Text interactText;
+
     std::vector<Quest> quests;
 
 public:
@@ -82,8 +87,8 @@ public:
     void handleMove(const sf::RenderWindow& window);
     void handleDash(const sf::RenderWindow& window);
     void handleProjectiles(const sf::RenderWindow& window);
-    void handleQuests(const sf::RenderWindow& window);
-    void handleInput(const sf::RenderWindow& window);
+    void handleQuests(const float& dt, const sf::RenderWindow& window, const std::vector<std::pair<int, sf::FloatRect>>& npcRects);
+    void handleInput(const float& dt, const sf::RenderWindow& window, const std::vector<std::pair<int, sf::FloatRect>>& npcRects);
 
     bool isCollisionProjectiles(const sf::FloatRect& rect);
     bool isCollision(const sf::FloatRect& rect) const;
@@ -101,7 +106,7 @@ public:
     void updateAnimation();
     void updateProjectiles(const float& dt);
     void updateQuest();
-    void update(const float& dt, const sf::RenderWindow& window, const std::vector<sf::FloatRect>& collisionRects);
+    void update(const float& dt, const sf::RenderWindow& window, const std::vector<sf::FloatRect>& collisionRects, const std::vector<std::pair<int, sf::FloatRect>>& npcRects);
 
     void draw(sf::RenderWindow& window);
 

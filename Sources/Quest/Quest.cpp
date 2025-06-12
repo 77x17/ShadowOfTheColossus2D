@@ -1,6 +1,7 @@
 #include "Quest.hpp"
 
-Quest::Quest(const std::string& _title, const std::string& _description, int exp) {
+Quest::Quest(int _npcID, const std::string& _title, const std::string& _description, int exp) {
+    npcID       = _npcID;
     title       = _title;
     description = _description;
     state       = QuestState::NOT_ACCEPTED;
@@ -30,11 +31,11 @@ void Quest::addObjective(const std::shared_ptr<QuestObjective>& objective) {
     objectives.push_back(objective);
 }
 
-bool Quest::accept() {
-    if (state == QuestState::NOT_ACCEPTED) {
+bool Quest::accept(const int& _npcID) {
+    if (state == QuestState::NOT_ACCEPTED && _npcID == npcID) {
         state = QuestState::IN_PROGRESS;
 
-        std::cerr << "Quest accepted: '" << title << "'\n";
+        //std::cerr << "Quest accepted: '" << title << "'\n";
 
         return true;
     }
@@ -54,15 +55,15 @@ void Quest::update(const std::string& eventType, const std::string& target) {
     if (isFinishedObjectives()) {
         state = QuestState::READY_TO_TURN_IN;
         
-        std::cerr << "Quest ready to turn in: '" << title << "'\n";
+        //std::cerr << "Quest ready to turn in: '" << title << "'\n";
     }
 }
 
-bool Quest::turnIn() {
-    if (state == QuestState::READY_TO_TURN_IN) {
+bool Quest::turnIn(const int& _npcID) {
+    if (state == QuestState::READY_TO_TURN_IN && _npcID == npcID) {
         state = QuestState::COMPLETED;
 
-        std::cerr << "Quest turned in: '" << title << "'\n";
+        //std::cerr << "Quest turned in: '" << title << "'\n";
         
         return true;
     }

@@ -1,5 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include <memory>
+#include <windows.h>
 
 #include "Constants.hpp"
 
@@ -50,16 +51,23 @@ void loadMap(TileMap& map) {
     map.load("Maps/test.tmx", "Maps/overworld.png");
 
     map.scale(2.f, 2.f);
-    map.updateCollisionRects();
+    map.updateObjects();
 }
 
-void loadEnemy(std::vector<Enemy*>& enemys) {
-    enemys.push_back(new Bat(950, 200));
-    enemys.push_back(new Bat(1250, 200));
-    enemys.push_back(new Bat(1550, 200));
-    enemys.push_back(new Bat(1850, 200));
-    
-    enemys.push_back(new Eye(1400, 500));
+void loadEnemy(std::vector<Enemy*>& enemys, const std::unordered_map<std::string, std::vector<sf::FloatRect>>& enemyRects) {
+    for (const auto& pair : enemyRects) {
+        for (const sf::FloatRect& rect : pair.second) {
+            if (pair.first == "Bat Lv.1") {
+                enemys.push_back(new Bat(rect.getPosition().x, rect.getPosition().y));
+            }
+            else if (pair.first == "Eye Lv.5") {
+                enemys.push_back(new Eye(rect.getPosition().x, rect.getPosition().y));
+            }
+            else {
+                std::cerr << "[Bug] - Main.cpp - loadEnemy()\n";
+            }
+        }
+    }
 }
 
 int main() {
@@ -78,7 +86,7 @@ int main() {
     UI ui;
 
     std::vector<Enemy*> enemys;
-    loadEnemy(enemys);
+    loadEnemy(enemys, map.getEnemyRects());
 
     sf::Clock clock;
     bool      isMinimized  = false;
@@ -95,6 +103,10 @@ int main() {
             }
             else if (event.type == sf::Event::LostFocus) {
                 isMinimized = true;
+
+                HWND hwnd = window.getSystemHandle(); // lấy HWND của cửa sổ
+                ShowWindow(hwnd, SW_MINIMIZE);        // minimize cửa sổ
+
             }
             else if (event.type == sf::Event::GainedFocus) {
                 isMinimized = false;
@@ -139,7 +151,7 @@ int main() {
             continue;
         }
 
-        player.update(dt, window, map.getCollisionRects());
+        player.update(dt, window, map.getCollisionRects(), map.getNPCRects());
         ui.update(dt, player, uiView.getSize());
 
         // Điều chỉnh camera theo player

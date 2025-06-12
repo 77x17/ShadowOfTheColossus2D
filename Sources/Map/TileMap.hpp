@@ -4,6 +4,8 @@
 
 #include <string>
 #include <vector>
+#include <unordered_map>
+#include <utility>
 
 #include "pugixml.hpp"
 
@@ -15,12 +17,16 @@ private:
     sf::Texture m_tilesetTexture;
 
     std::vector<sf::FloatRect> m_collisionRects;
+    std::vector<std::pair<int, sf::FloatRect>> m_NPCRects;
+    std::unordered_map<std::string, std::vector<sf::FloatRect>> m_enemyRects;
 
 public:
     bool load(const std::string& tmxPath, const std::string& tilesetPath);
 
-    void updateCollisionRects();
+    void updateObjects();
 
     const std::vector<sf::FloatRect>& getCollisionRects() const;
+    const std::vector<std::pair<int, sf::FloatRect>>& getNPCRects() const;
+    const std::unordered_map<std::string, std::vector<sf::FloatRect>>& getEnemyRects() const;
 
 };
