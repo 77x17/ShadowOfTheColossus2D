@@ -46,20 +46,22 @@ private:
         
     float maxHealthPoints;
     float healthPoints;
+    float BASE_EXPERIENCE;
+    int   level;
+    float xp;
 
     float INVINCIBLE_TIME;
     float invincibleCooldownTimer;
 
     float VIEW_LEAP_SPEED;
 
-    // Biến trạng thái cho Dash
-    sf::Vector2f dashDirection; // Hướng lướt
-    bool  isDashing;            // Có đang lướt không?
-    float DASH_SPEED;           // Tốc độ khi lướt
-    float DASH_DURATION;        // Lướt trong bao nhiêu giây
-    float dashTimer;            // Đếm thời gian lướt
-    float DASH_COOLDOWN;        // Hồi chiêu bao nhiêu giây
-    float dashCooldownTimer;    // Đếm thời gian hồi chiêu
+    sf::Vector2f dashDirection;         // Hướng lướt
+    bool         isDashing;             // Có đang lướt không?
+    float        DASH_SPEED;            // Tốc độ khi lướt
+    float        DASH_DURATION;         // Lướt trong bao nhiêu giây
+    float        dashTimer;             // Đếm thời gian lướt
+    float        DASH_COOLDOWN;         // Hồi chiêu bao nhiêu giây
+    float        dashCooldownTimer;     // Đếm thời gian hồi chiêu
 
     sf::RectangleShape hitbox;
     sf::CircleShape    loadingBox;
@@ -67,10 +69,10 @@ private:
     Animation          shadow;
 
     std::vector<Projectile> projectiles;
-    float SHOOT_COOLDOWN;
-    float PROJECTILE_SPEED;
-    float PROJECTILE_LIFETIME;
-    float shootCooldownTimer;
+    float                   SHOOT_COOLDOWN;
+    float                   PROJECTILE_SPEED;
+    float                   PROJECTILE_LIFETIME;
+    float                   shootCooldownTimer;
 
     std::vector<Quest> quests;
 
@@ -99,12 +101,19 @@ public:
     void draw(sf::RenderWindow& window);
 
     sf::Vector2f getPosition() const;
-    void addVictim(const std::string& label);
+    
+    void  levelUp();
+    void  updateLevel();
+    float XPRequired() const;
+    void  updateXP(const float& amount);
+    void  addVictim(const std::string& label);
 
     // for UI
-    float getHealthStatus() const;
+    float       getHealthRatio() const;
+    float       getXPRatio() const;
     std::string getHealthPoints() const;
-    const std::vector<Quest>& getQuests() const;
+    int         getLevel() const;
+    const       std::vector<Quest>& getQuests() const;
 
     void updateView(const float& dt, sf::View& view) const;
 };

@@ -12,6 +12,9 @@ Player::Player(const float& x = 0, const float& y = 0, const float& hp = 0) {
 
     maxHealthPoints = hp;
     healthPoints    = hp;
+    BASE_EXPERIENCE = 10.0f;
+    level           = 1;
+    xp              = 0.0;
 
     DYING_TIME         = 1.0f;
     dyingCooldownTimer = 0.0f;
@@ -70,12 +73,7 @@ Player::Player(const float& x = 0, const float& y = 0, const float& hp = 0) {
     PROJECTILE_LIFETIME = 1.0f;
     shootCooldownTimer  = 0.0f;
 
-    quests.push_back(Quest("Bat Hunt", "Help the villagers slaying bats", 5));
-    quests.back().addObjective(std::make_shared<KillMonsterObjective>("Bat Lv.1", 1));
-    quests.back().addObjective(std::make_shared<KillMonsterObjective>("Bat Lv.1", 2));
-
-    quests.push_back(Quest("Bat Hunt", "Help the villagers slaying bats", 5));
-    quests.back().addObjective(std::make_shared<KillMonsterObjective>("Bat Lv.1", 1));
+    quests.clear();
 }
 
 void Player::handleInput(const sf::RenderWindow& window) {
@@ -112,20 +110,32 @@ void Player::handleInput(const sf::RenderWindow& window) {
         else if (movingDirection.x != 0 || movingDirection.y != 0) {
             dashDirection = movingDirection;
         } 
-        else if (state == static_cast<int>(PlayerState::IDLE_LEFT)     || state == static_cast<int>(PlayerState::WALK_LEFT)) {
-            dashDirection = sf::Vector2f(-1.f,  0.f);
-        }
-        else if (state == static_cast<int>(PlayerState::IDLE_RIGHT)    || state == static_cast<int>(PlayerState::WALK_RIGHT)) {
-            dashDirection = sf::Vector2f( 1.f,  0.f);
-        }
-        else if (state == static_cast<int>(PlayerState::IDLE_UP_LEFT)  || state == static_cast<int>(PlayerState::WALK_UP_LEFT)) {
-            dashDirection = sf::Vector2f( 0.f, -1.f);
-        }
-        else if (state == static_cast<int>(PlayerState::IDLE_UP_RIGHT) || state == static_cast<int>(PlayerState::WALK_UP_RIGHT)) {
-            dashDirection = sf::Vector2f( 0.f, -1.f);
-        }
-        else if (state == static_cast<int>(PlayerState::IDLE_DOWN)     || state == static_cast<int>(PlayerState::WALK_DOWN)) {
-            dashDirection = sf::Vector2f( 0.f,  1.f);
+        else {
+            switch (state) {
+                // case static_cast<int>(PlayerState::DASH_LEFT):
+                case static_cast<int>(PlayerState::IDLE_LEFT):
+                case static_cast<int>(PlayerState::WALK_LEFT):
+                    dashDirection = sf::Vector2f(-1.0f,  0.0f); 
+                    break;
+                // case static_cast<int>(PlayerState::DASH_RIGHT):
+                case static_cast<int>(PlayerState::IDLE_RIGHT):
+                case static_cast<int>(PlayerState::WALK_RIGHT):
+                    dashDirection = sf::Vector2f( 1.0f,  0.0f); 
+                    break;
+                case static_cast<int>(PlayerState::IDLE_UP_LEFT):
+                case static_cast<int>(PlayerState::WALK_UP_LEFT): 
+                case static_cast<int>(PlayerState::IDLE_UP_RIGHT):
+                case static_cast<int>(PlayerState::WALK_UP_RIGHT): 
+                    dashDirection = sf::Vector2f( 0.0f, -1.0f);
+                    break;
+                case static_cast<int>(PlayerState::IDLE_DOWN):
+                case static_cast<int>(PlayerState::WALK_DOWN):
+                    dashDirection = sf::Vector2f( 0.0f,  1.0f);
+                    break;
+                default:
+                    std::cerr << "[Bug] - Player::handleInput() set dashDirection\n";
+                    break;
+            }
         }
 
         SoundManager::playSound("roll");
@@ -134,23 +144,38 @@ void Player::handleInput(const sf::RenderWindow& window) {
         shootCooldownTimer = SHOOT_COOLDOWN; 
         
         sf::Vector2f projectileDirection;
-        if (movingDirection.x != 0 || movingDirection.y != 0) {
+        if (dashDirection.x != 0 || dashDirection.y != 0) {
+            projectileDirection = dashDirection;
+        }
+        else if (movingDirection.x != 0 || movingDirection.y != 0) {
             projectileDirection = movingDirection;
         }
-        else if (state == static_cast<int>(PlayerState::IDLE_LEFT)     || state == static_cast<int>(PlayerState::WALK_LEFT)) {
-            projectileDirection = sf::Vector2f(-1.f,  0.f);
-        }
-        else if (state == static_cast<int>(PlayerState::IDLE_RIGHT)    || state == static_cast<int>(PlayerState::WALK_RIGHT)) {
-            projectileDirection = sf::Vector2f( 1.f,  0.f);
-        }
-        else if (state == static_cast<int>(PlayerState::IDLE_UP_LEFT)  || state == static_cast<int>(PlayerState::WALK_UP_LEFT)) {
-            projectileDirection = sf::Vector2f( 0.f, -1.f);
-        }
-        else if (state == static_cast<int>(PlayerState::IDLE_UP_RIGHT) || state == static_cast<int>(PlayerState::WALK_UP_RIGHT)) {
-            projectileDirection = sf::Vector2f( 0.f, -1.f);
-        }
-        else if (state == static_cast<int>(PlayerState::IDLE_DOWN)     || state == static_cast<int>(PlayerState::WALK_DOWN)) {
-            projectileDirection = sf::Vector2f( 0.f,  1.f);
+        else {
+            switch (state) {
+                case static_cast<int>(PlayerState::DASH_LEFT):
+                case static_cast<int>(PlayerState::IDLE_LEFT):
+                case static_cast<int>(PlayerState::WALK_LEFT):
+                    projectileDirection = sf::Vector2f(-1.0f,  0.0f); 
+                    break;
+                case static_cast<int>(PlayerState::DASH_RIGHT):
+                case static_cast<int>(PlayerState::IDLE_RIGHT):
+                case static_cast<int>(PlayerState::WALK_RIGHT):
+                    projectileDirection = sf::Vector2f( 1.0f,  0.0f); 
+                    break;
+                case static_cast<int>(PlayerState::IDLE_UP_LEFT):
+                case static_cast<int>(PlayerState::WALK_UP_LEFT): 
+                case static_cast<int>(PlayerState::IDLE_UP_RIGHT):
+                case static_cast<int>(PlayerState::WALK_UP_RIGHT): 
+                    projectileDirection = sf::Vector2f( 0.0f, -1.0f);
+                    break;
+                case static_cast<int>(PlayerState::IDLE_DOWN):
+                case static_cast<int>(PlayerState::WALK_DOWN):
+                    projectileDirection = sf::Vector2f( 0.0f,  1.0f);
+                    break;
+                default:
+                    std::cerr << "[Bug] - Player::handleInput() set projectileDirection\n";
+                    break;
+            }
         }
 
         projectiles.emplace_back(
@@ -198,6 +223,8 @@ void Player::hurt(const float& damage) {
 
 void Player::kill() {
     if (isAlive()) {
+        healthPoints       = 0;
+
         state              = static_cast<int>(PlayerState::DYING);
         dyingCooldownTimer = DYING_TIME;
         
@@ -380,11 +407,22 @@ void Player::updateProjectiles(const float& dt) {
 void Player::updateQuest() {
     for (auto it = quests.begin(); it != quests.end(); /**/) {
         if (it->isCompleted()) {
+            updateXP(it->getRewardExp());
+
             it = quests.erase(it);
         }
         else {
             ++it;
         }
+    }
+
+    if (quests.empty()) {
+        quests.push_back(Quest("Bat Hunt", "Slaying Bats", 10));
+        quests.back().addObjective(std::make_shared<KillMonsterObjective>("Bat Lv.1", 1));
+        quests.back().addObjective(std::make_shared<KillMonsterObjective>("Bat Lv.1", 2));
+
+        quests.push_back(Quest("Eye Hunt", "Help the villagers slaying Eyes", 200));
+        quests.back().addObjective(std::make_shared<KillMonsterObjective>("Eye Lv.5", 1));
     }
 }
 
@@ -409,13 +447,13 @@ void Player::update(const float& dt, const sf::RenderWindow& window, const std::
 
     updateAnimation();
 
-    updateProjectiles(dt);
+    updateProjectiles(dt); 
 
-    updateQuest();
+    updateQuest(); 
 }
 
 void Player::draw(sf::RenderWindow& window) {
-    window.draw(hitbox);
+    // window.draw(hitbox);
     // window.draw(loadingBox);
 
     shadow.draw(window);
@@ -439,14 +477,44 @@ sf::Vector2f Player::getPosition() const {
     return position;
 }
 
+void Player::levelUp() {
+    level++;
+
+    maxHealthPoints++;
+}
+
+float Player::XPRequired() const {
+    return BASE_EXPERIENCE * (level / 10 + 1) * level * level;
+}
+
+void Player::updateLevel() {
+    while (xp >= XPRequired()) {
+        xp -= XPRequired();
+        
+        levelUp();
+    }
+}
+
+void Player::updateXP(const float& amount) {
+    xp += amount;
+
+    updateLevel();
+}
+
 void Player::addVictim(const std::string& label) {
     for (Quest& quest : quests) {
         quest.update("kill", label);
     }
+
+    updateXP(1.0f);
 }
 
-float Player::getHealthStatus() const {
+float Player::getHealthRatio() const {
     return healthPoints / maxHealthPoints;
+}
+
+float Player::getXPRatio() const {
+    return xp / XPRequired();
 }
 
 std::string Player::getHealthPoints() const {
@@ -456,6 +524,10 @@ std::string Player::getHealthPoints() const {
     };
 
     return format2Decimals(healthPoints) + '/' + format2Decimals(maxHealthPoints);
+}
+
+int Player::getLevel() const {
+    return level;
 }
 
 const std::vector<Quest>& Player::getQuests() const {

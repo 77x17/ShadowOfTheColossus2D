@@ -43,6 +43,8 @@ Enemy::Enemy(const float& x = 0, const float& y = 0, const float& width = TILE_S
         
         healthPointsBarBackground.setFillColor(sf::Color(0, 0, 0, 139));
         healthPointsBarBackground.setPosition(healthPointsBar.getPosition());
+        healthPointsBarBackground.setOutlineThickness(1.0f);
+        healthPointsBarBackground.setOutlineColor(sf::Color::Black);
 
         sf::FloatRect bounds = healthPointsBar.getLocalBounds();
         healthPointsBarBackground.setSize(bounds.getSize() + sf::Vector2f(2.0f, 2.0f));
@@ -56,7 +58,7 @@ Enemy::Enemy(const float& x = 0, const float& y = 0, const float& width = TILE_S
     RESPAWN_TIME         = 5.0f;
     respawnCooldownTimer = 0.0f;
 
-    INVINCIBLE_TIME         = 5.0f;
+    INVINCIBLE_TIME         = 1.0f;
     invincibleCooldownTimer = INVINCIBLE_TIME;
 
     DETECION_RANGE     = 150.0f;
@@ -99,7 +101,7 @@ void Enemy::attack(Player& player) {
 }
 
 void Enemy::hurt(const float& damage) {
-    if (isAlive() && invincibleCooldownTimer <= 0) {
+    if (isAlive()) {
         healthPoints -= damage;
 
         SoundManager::playSound("enemyHurt");
@@ -111,6 +113,8 @@ void Enemy::hurt(const float& damage) {
 }
 
 void Enemy::kill() {
+    healthPoints       = 0;
+
     state              = -2;
     dyingCooldownTimer = DYING_TIME;
     
@@ -296,11 +300,13 @@ void Enemy::update(const float& dt, Player& player, const std::vector<sf::FloatR
         return;
     }
 
-    if (player.isCollisionProjectiles(hitbox.getGlobalBounds())) {
-        hurt(1.0f);
+    if (invincibleCooldownTimer <= 0) {
+        if (player.isCollisionProjectiles(hitbox.getGlobalBounds())) {
+            hurt(1.0f);
 
-        if (!isAlive()) {
-            player.addVictim(label.getString());
+            if (!isAlive()) {
+                player.addVictim(label.getString());
+            }
         }
     }
 

@@ -26,9 +26,8 @@ void Quest::update(const std::string& eventType, const std::string& target) {
         objective->updateProgress(eventType, target);
     }
 
-    if (isCompleted() && !rewardGiven) {
-        rewardGiven = true;
-        std::cerr << "Quest '" << title << "' completed! You earned " << rewardExp << " gold!" << '\n';
+    if (isCompleted()) {
+        std::cerr << "Quest '" << title << "' completed!\n";
     }
 }
 
@@ -40,4 +39,12 @@ std::string Quest::getObjectives(const int& idx) const {
         display += "- " + objective->getDescription() + (objective->isCompleted() ? " (Done)" : "") + '\n';
     }
     return display;
+}
+
+int Quest::getRewardExp() {
+    if (!isCompleted()) return 0;
+    
+    rewardGiven = true;
+
+    return rewardExp;
 }

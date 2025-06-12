@@ -140,7 +140,7 @@ int main() {
         }
 
         player.update(dt, window, map.getCollisionRects());
-        ui.update(player);
+        ui.update(dt, player, uiView.getSize());
 
         // Điều chỉnh camera theo player
         player.updateView(dt, view);

@@ -6,3 +6,4 @@
 - Screen Tearing: Màn hình bị xọc -> Bất đồng bộ với tần số quét của màn hình
 - Attack cooldown: Tránh trường hợp quái tấn công ngay lập tức 
 - Invincible: Bất tử khi mới respawn
+- Nên dùng switch case thay vì if quá nhiều

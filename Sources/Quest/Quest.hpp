@@ -25,4 +25,5 @@ public:
 
     std::string getObjectives(const int& idx) const;
 
+    int getRewardExp();
 };

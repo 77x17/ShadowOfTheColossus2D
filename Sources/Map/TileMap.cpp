@@ -119,15 +119,15 @@ void TileMap::draw(sf::RenderTarget& target, sf::RenderStates states) const {
         target.draw(layer, states);
     }
 
-    sf::RectangleShape hitbox;
-    hitbox.setOutlineColor(sf::Color::Cyan);
-    hitbox.setOutlineThickness(1.f);
-    hitbox.setFillColor(sf::Color::Transparent);
-    for (const sf::FloatRect& rect : m_collisionRects) {
-        hitbox.setSize(rect.getSize());
-        hitbox.setPosition(rect.getPosition());
-        target.draw(hitbox);
-    }
+    // sf::RectangleShape hitbox;
+    // hitbox.setOutlineColor(sf::Color::Cyan);
+    // hitbox.setOutlineThickness(1.f);
+    // hitbox.setFillColor(sf::Color::Transparent);
+    // for (const sf::FloatRect& rect : m_collisionRects) {
+    //     hitbox.setSize(rect.getSize());
+    //     hitbox.setPosition(rect.getPosition());
+    //     target.draw(hitbox);
+    // }
 }
 
 void TileMap::updateCollisionRects() {

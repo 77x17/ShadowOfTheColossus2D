@@ -111,7 +111,9 @@ void Eye::updateProjectiles(const float& dt, Player& player) {
 void Eye::update(const float& dt, Player& player, const std::vector<sf::FloatRect>& collisionRects) {
     Enemy::update(dt, player,collisionRects);
     
-    updateProjectiles(dt, player);
+    if (invincibleCooldownTimer <= 0) {
+        updateProjectiles(dt, player);
+    }
 }
 
 void Eye::draw(sf::RenderWindow& window) {
