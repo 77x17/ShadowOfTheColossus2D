@@ -41,6 +41,7 @@ private:
     sf::Text           questsBoxLabel;
     sf::Text           questsText;
     sf::RectangleShape questsBox;
+    bool               questsBoxVisible;
 
 public:
     UI();
@@ -52,4 +53,5 @@ public:
 
     void draw(sf::RenderWindow& window);
 
+    void updateQuestsBox();
 };

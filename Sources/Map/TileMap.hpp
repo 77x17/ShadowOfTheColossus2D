@@ -17,7 +17,7 @@ private:
     sf::Texture m_tilesetTexture;
 
     std::vector<sf::FloatRect> m_collisionRects;
-    std::vector<std::pair<int, sf::FloatRect>> m_NPCRects;
+    std::unordered_map<int, sf::FloatRect> m_NPCRects;
     std::unordered_map<std::string, std::vector<sf::FloatRect>> m_enemyRects;
 
 public:
@@ -26,7 +26,7 @@ public:
     void updateObjects();
 
     const std::vector<sf::FloatRect>& getCollisionRects() const;
-    const std::vector<std::pair<int, sf::FloatRect>>& getNPCRects() const;
+    const std::unordered_map<int, sf::FloatRect>& getNpcRects() const;
     const std::unordered_map<std::string, std::vector<sf::FloatRect>>& getEnemyRects() const;
 
 };

@@ -15,6 +15,9 @@
 #include "Bat.hpp"
 #include "Eye.hpp"
 
+#include "Quest.hpp"
+#include "Npc.hpp"
+
 sf::Font Font::font;
 
 std::unordered_map<std::string, sf::Texture> TextureManager::textures;
@@ -70,6 +73,38 @@ void loadEnemy(std::vector<Enemy*>& enemys, const std::unordered_map<std::string
     }
 }
 
+void loadNpc(std::vector<Npc>& npcs, const std::unordered_map<int, sf::FloatRect>& npcRects) {
+    npcs.emplace_back(
+        0,
+        std::vector<std::string>{
+            "A",
+            "B",
+            "C"
+        },
+        1,
+        npcRects.at(0)
+    );
+    npcs.emplace_back(
+        1,
+        std::vector<std::string>{
+            "D",
+            "E",
+            "F"
+        },
+        3,
+        npcRects.at(1)
+    );
+}
+
+void loadQuests(std::vector<Quest>& quests) {
+    quests.push_back(Quest(0, "Bat Hunt", "Slaying Bats", 40));
+    quests.back().addObjective(std::make_shared<KillMonsterObjective>("Bat Lv.1", 1));
+    quests.back().addObjective(std::make_shared<KillMonsterObjective>("Bat Lv.1", 2));
+
+    quests.push_back(Quest(1, "Eye Hunt", "Help the villagers slaying Eyes", 200));
+    quests.back().addObjective(std::make_shared<KillMonsterObjective>("Eye Lv.5", 1));
+}
+
 int main() {
     sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Shadow Of The Colossus 2D", sf::Style::Close);
     // window.setFramerateLimit(60);
@@ -82,11 +117,17 @@ int main() {
     TileMap map;
     loadMap(map);
 
-    Player player(300, 300, 5.0f);
-    UI ui;
-
     std::vector<Enemy*> enemys;
     loadEnemy(enemys, map.getEnemyRects());
+
+    std::vector<Npc> npcs;
+    loadNpc(npcs, map.getNpcRects());
+    
+    std::vector<Quest> quests;
+    loadQuests(quests);
+
+    Player player(300, 300, 5.0f, std::move(quests));
+    UI ui;
 
     sf::Clock clock;
     bool      isMinimized  = false;
@@ -143,6 +184,9 @@ int main() {
 
                     uiView = window.getDefaultView();
                 }
+                else if (event.key.code == sf::Keyboard::Q) {
+                    ui.updateQuestsBox();
+                }
             }
         }
         
@@ -151,7 +195,7 @@ int main() {
             continue;
         }
 
-        player.update(dt, window, map.getCollisionRects(), map.getNPCRects());
+        player.update(dt, window, map.getCollisionRects(), npcs);
         ui.update(dt, player, uiView.getSize());
 
         // Điều chỉnh camera theo player

@@ -12,6 +12,8 @@
 #include "Quest.hpp"
 #include "KillMonsterObjective.hpp"
 
+#include "Npc.hpp"
+
 enum class PlayerState {
     DYING = -2,
     DEAD  = -1,
@@ -77,18 +79,20 @@ private:
 
     float    FADE_SPEED;
     float    interactTextOpacity;
+    float    INTERACT_COOLDOWN;
+    float    interactCooldownTimer;
     sf::Text interactText;
 
     std::vector<Quest> quests;
 
 public:
-    Player(const float& x, const float& y, const float& hp);
+    Player(const float& x, const float& y, const float& hp, std::vector<Quest>&& _quests);
 
     void handleMove(const sf::RenderWindow& window);
     void handleDash(const sf::RenderWindow& window);
     void handleProjectiles(const sf::RenderWindow& window);
-    void handleQuests(const float& dt, const sf::RenderWindow& window, const std::vector<std::pair<int, sf::FloatRect>>& npcRects);
-    void handleInput(const float& dt, const sf::RenderWindow& window, const std::vector<std::pair<int, sf::FloatRect>>& npcRects);
+    void handleQuests(const float& dt, const sf::RenderWindow& window, std::vector<Npc>& npcs);
+    void handleInput(const float& dt, const sf::RenderWindow& window, std::vector<Npc>& npcs);
 
     bool isCollisionProjectiles(const sf::FloatRect& rect);
     bool isCollision(const sf::FloatRect& rect) const;
@@ -106,7 +110,10 @@ public:
     void updateAnimation();
     void updateProjectiles(const float& dt);
     void updateQuest();
-    void update(const float& dt, const sf::RenderWindow& window, const std::vector<sf::FloatRect>& collisionRects, const std::vector<std::pair<int, sf::FloatRect>>& npcRects);
+    void update(const float& dt, 
+                const sf::RenderWindow& window, 
+                const std::vector<sf::FloatRect>& collisionRects, 
+                std::vector<Npc>& npcs);
 
     void draw(sf::RenderWindow& window);
 

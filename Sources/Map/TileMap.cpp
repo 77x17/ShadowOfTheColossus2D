@@ -104,16 +104,16 @@ bool TileMap::load(const std::string& tmxPath, const std::string& tilesetPath) {
                     if (objectGroupName == "CollisionObjects") {
                         m_collisionRects.emplace_back(x, y, width, height);
                     }
-                    else if (objectGroupName == "NPC") {
+                    else if (objectGroupName == "Npc") {
                         auto prop = objectNode.child("properties").find_child_by_attribute("property", "name", "npc_id");
                         int id = -1;
                         if (prop) {
                             id = prop.attribute("value").as_int();
                         }
-                        m_NPCRects.emplace_back(id, sf::FloatRect(x, y, width, height));
+                        m_NPCRects[id] = sf::FloatRect(x, y, width, height);
                     }
                     else {
-                        std::cerr << "[Bug] - TileMap.cpp - load() NPC\n";
+                        std::cerr << "[Bug] - TileMap.cpp - load() Npc\n";
                     }
                 }
                 else if (groupName == "Enemy") {
@@ -193,10 +193,10 @@ const std::vector<sf::FloatRect>& TileMap::getCollisionRects() const {
     return m_collisionRects;
 }
 
-const std::unordered_map<std::string, std::vector<sf::FloatRect>>& TileMap::getEnemyRects() const {
-    return m_enemyRects;
+const std::unordered_map<int, sf::FloatRect>& TileMap::getNpcRects() const {
+    return m_NPCRects;
 }
 
-const std::vector<std::pair<int, sf::FloatRect>>& TileMap::getNPCRects() const {
-    return m_NPCRects;
+const std::unordered_map<std::string, std::vector<sf::FloatRect>>& TileMap::getEnemyRects() const {
+    return m_enemyRects;
 }

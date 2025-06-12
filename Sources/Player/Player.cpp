@@ -2,10 +2,10 @@
 
 #include <cmath>
 
-Player::Player(const float& x = 0, const float& y = 0, const float& hp = 0) {
-    state      = 0;
-    MOVE_SPEED = 200.0f; 
-    size       = sf::Vector2f(TILE_SIZE, TILE_SIZE);
+Player::Player(const float& x, const float& y, const float& hp, std::vector<Quest>&& _quests) {
+    state           = 0;
+    MOVE_SPEED      = 200.0f; 
+    size            = sf::Vector2f(TILE_SIZE, TILE_SIZE);
     basePosition    = sf::Vector2f(x, y);
     position        = basePosition;
     movingDirection = sf::Vector2f(0.f, 0.f);
@@ -73,8 +73,10 @@ Player::Player(const float& x = 0, const float& y = 0, const float& hp = 0) {
     PROJECTILE_LIFETIME = 1.0f;
     shootCooldownTimer  = 0.0f;
 
-    FADE_SPEED          = 5.0f;
-    interactTextOpacity = 0.0f;
+    FADE_SPEED            = 5.0f;
+    interactTextOpacity   = 0.0f;
+    INTERACT_COOLDOWN     = 0.5f;
+    interactCooldownTimer = 0.0f;
 
     interactText.setFont(Font::font);
     interactText.setCharacterSize(12.5f);
@@ -86,12 +88,7 @@ Player::Player(const float& x = 0, const float& y = 0, const float& hp = 0) {
 
     quests.clear();
 
-    quests.push_back(Quest(0, "Bat Hunt", "Slaying Bats", 10));
-    quests.back().addObjective(std::make_shared<KillMonsterObjective>("Bat Lv.1", 1));
-    quests.back().addObjective(std::make_shared<KillMonsterObjective>("Bat Lv.1", 2));
-
-    quests.push_back(Quest(1, "Eye Hunt", "Help the villagers slaying Eyes", 200));
-    quests.back().addObjective(std::make_shared<KillMonsterObjective>("Eye Lv.5", 1));
+    quests = std::move(_quests);
 }
 
 void Player::handleMove(const sf::RenderWindow& window) {
@@ -213,52 +210,76 @@ void Player::handleProjectiles(const sf::RenderWindow& window) {
     }
 }
 
-void Player::handleQuests(const float& dt, const sf::RenderWindow& window, const std::vector<std::pair<int, sf::FloatRect>>& npcRects) {
+void Player::handleQuests(const float& dt, const sf::RenderWindow& window, std::vector<Npc>& npcs) {
     bool isCollisionNPC = false;
-    for (auto& pair : npcRects) {
-        sf::FloatRect npcRect = pair.second;
+    for (const Npc& npc : npcs) {
+        sf::FloatRect npcRect = npc.getHitbox();
         if (isCollision(npcRect)) {
             interactText.setPosition(npcRect.getPosition() + sf::Vector2f(npcRect.getSize().x / 2, -npcRect.getSize().y));
             isCollisionNPC = true;
         }
     }
-    if (isCollisionNPC) {
-        interactTextOpacity += (255 - interactTextOpacity) * FADE_SPEED * dt;
-        interactText.setFillColor(sf::Color(255, 255, 255, interactTextOpacity));
-        interactText.setOutlineColor(sf::Color(0, 0, 0, interactTextOpacity));
-    }
-    else {
-        interactTextOpacity += (0 - interactTextOpacity) * FADE_SPEED * dt;
-        interactText.setFillColor(sf::Color(255, 255, 255, interactTextOpacity));
-        interactText.setOutlineColor(sf::Color(0, 0, 0, interactTextOpacity));
-    }
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::F)) {
-        
-        for (auto& pair : npcRects) {
-            int id = pair.first; sf::FloatRect npcRect = pair.second;
-            if (isCollision(npcRect)) {
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::F) && interactCooldownTimer <= 0) {
+        interactCooldownTimer = INTERACT_COOLDOWN;
+        for (Npc& npc : npcs) {
+            if (isCollision(npc.getHitbox())) {
+                interactText.setString(npc.getDialogue());
 
-                for (Quest& quest : quests) {
-                    if (quest.accept(id)) {
-                    }
+                if (npc.isSuitableForGivingQuest(getLevel())) {
+                    npc.givingQuest();
+                }
+                else {
+                    npc.setRequired();
+                }
 
-                    if (quest.turnIn(id)) {
+                if (npc.isFinishedTalk()) {
+                    for (Quest& quest : quests) {
+                        if (quest.accept(npc.getID())) {
+                            // nothing
+                        }
+
+                        if (quest.turnIn(npc.getID())) {
+                            npc.completedQuest();
+                            interactText.setString(npc.getDialogue());
+                        }
                     }
                 }
+
+                interactText.setOrigin(interactText.getLocalBounds().left + interactText.getLocalBounds().width / 2, 
+                                       interactText.getLocalBounds().top + interactText.getLocalBounds().height / 2);
             }
         }
     }
+
+    if (isCollisionNPC) {
+        interactTextOpacity += (255 - interactTextOpacity) * FADE_SPEED * dt;
+    }
+    else {
+        interactTextOpacity += (0   - interactTextOpacity) * FADE_SPEED * dt;
+
+        if (40 < interactTextOpacity && interactTextOpacity < 50) {
+            interactText.setString("Press [F] to talk");
+            interactText.setOrigin(interactText.getLocalBounds().left + interactText.getLocalBounds().width / 2, 0);
+            
+            for (Npc& npc : npcs) {
+                npc.isInterruptedGivingQuest();
+            } 
+        }
+    }
+
+    interactText.setFillColor(sf::Color(255, 255, 255, interactTextOpacity));
+    interactText.setOutlineColor(sf::Color(0, 0, 0, interactTextOpacity));
 }
 
-void Player::handleInput(const float& dt, const sf::RenderWindow& window, const std::vector<std::pair<int, sf::FloatRect>>& npcRects) {
+void Player::handleInput(const float& dt, const sf::RenderWindow& window, std::vector<Npc>& npcs) {
     handleMove(window);
     
     handleDash(window);
 
     handleProjectiles(window);
 
-    handleQuests(dt, window, npcRects);
+    handleQuests(dt, window, npcs);
 }
 
 bool Player::isCollisionProjectiles(const sf::FloatRect& rect) {
@@ -358,6 +379,9 @@ void Player::updateTimer(const float &dt) {
     }
     if (shootCooldownTimer > 0) { 
         shootCooldownTimer -= dt;
+    }
+    if (interactCooldownTimer > 0) {
+        interactCooldownTimer -= dt;
     }
 }
 
@@ -491,7 +515,7 @@ void Player::updateQuest() {
 void Player::update(const float& dt, 
                     const sf::RenderWindow& window, 
                     const std::vector<sf::FloatRect>& collisionRects, 
-                    const std::vector<std::pair<int, sf::FloatRect>>& npcRects) {
+                    std::vector<Npc>& npcs) {
 
     updateTimer(dt);
 
@@ -505,7 +529,7 @@ void Player::update(const float& dt,
         return;
     }
     
-    handleInput(dt, window, npcRects);
+    handleInput(dt, window, npcs);
 
     updatePosition(dt, collisionRects);
 

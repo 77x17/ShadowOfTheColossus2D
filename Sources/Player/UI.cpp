@@ -101,6 +101,7 @@ UI::UI() {
         questsBox.setFillColor(sf::Color(80, 80, 80, 150));
         questsBox.setOutlineThickness(BOX_OUTLINE_THICKNESS);
         questsBox.setOutlineColor(sf::Color::Black);
+        questsBoxVisible = true;
     }
 }
 
@@ -124,12 +125,21 @@ void UI::updateLevelAndXP(const float& dt, const Player& player) {
 }
 
 void UI::updateQuests(const float& dt, const std::vector<Quest>& quests, const sf::Vector2f& uiSize) {
-    std::string display = "               \n\n";
-    int idx = 0;
-    for (const Quest& quest : quests) {
-        display += quest.getQuestInformation(++idx) + '\n';
+    std::string display = "               \n";
+
+    if (questsBoxVisible) {
+        int idx = 0;
+        for (const Quest& quest : quests) {
+            display += quest.getQuestInformation(++idx) + '\n';
+        }
+        display.pop_back();
+
+        questsBoxLabel.setFillColor(sf::Color::Yellow);
     }
-    display.pop_back();
+    else {
+        questsBoxLabel.setFillColor(sf::Color::White);
+    }
+
     questsText.setString(display);
     
     sf::FloatRect textBounds = questsText.getGlobalBounds();
@@ -168,7 +178,11 @@ void UI::draw(sf::RenderWindow& window) {
     window.draw(questsBoxLabel);
     
     sf::Vector2f targetQuestsBoxSize = questsText.getLocalBounds().getSize();
-    if (questsBoxSize.x >= targetQuestsBoxSize.y - PADDING.x * 2 && questsBoxSize.y >= targetQuestsBoxSize.y - PADDING.y * 2) {
+    if (questsBoxSize.x >= targetQuestsBoxSize.x - PADDING.x * 2 && questsBoxSize.y >= targetQuestsBoxSize.y - PADDING.y * 2) {
         window.draw(questsText);
     }
+}
+
+void UI::updateQuestsBox() {
+    questsBoxVisible = !questsBoxVisible;
 }

@@ -10,6 +10,7 @@ INCLUDES = -I"./Sources" \
 		   -I"./Sources/Configuration" \
 		   -I"./Sources/Enemy" \
 		   -I"./Sources/Map" \
+		   -I"./Sources/Npc" \
 		   -I"./Sources/Player" \
 		   -I"./Sources/Projectile" \
 		   -I"./Sources/Quest" \
@@ -26,6 +27,7 @@ SRCS := $(wildcard $(SRC_DIR)/*.cpp) \
         $(wildcard $(SRC_DIR)/Configuration/*.cpp) \
         $(wildcard $(SRC_DIR)/Enemy/*.cpp) \
         $(wildcard $(SRC_DIR)/Map/*.cpp) \
+        $(wildcard $(SRC_DIR)/Npc/*.cpp) \
         $(wildcard $(SRC_DIR)/Player/*.cpp) \
         $(wildcard $(SRC_DIR)/Projectile/*.cpp) \
         $(wildcard $(SRC_DIR)/Quest/*.cpp) \

@@ -138,7 +138,7 @@
 </data>
  </layer>
  <group id="11" name="Collision">
-  <objectgroup id="13" name="NPC">
+  <objectgroup id="13" name="Npc">
    <object id="113" x="224" y="96" width="16" height="16">
     <properties>
      <property name="npc_id" type="int" value="0"/>
