@@ -49,7 +49,7 @@ public:
     void updateHealthBar(const float& dt, const Player& player);
     void updateLevelAndXP(const float& dt, const Player& player);
     void updateQuests(const float& dt, const std::vector<Quest>& quests, const sf::Vector2f& uiSize);
-    void update(const float& dt, const Player& player, const sf::Vector2f& uiSize);
+    void update(const float& dt, Player& player, const sf::Vector2f& uiSize);
 
     void draw(sf::RenderWindow& window);
 

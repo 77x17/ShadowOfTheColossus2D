@@ -3,4 +3,5 @@ Build/Player/Player.o: Sources/Player/Player.cpp \
  Sources/Animation/Animation.hpp Sources/Projectile/Projectile.hpp \
  Sources/SoundManager/SoundManager.hpp Sources/Configuration/Font.hpp \
  Sources/Quest/Quest.hpp Sources/Quest/QuestObjective.hpp \
- Sources/Quest/KillMonsterObjective.hpp Sources/Npc/Npc.hpp
+ Sources/Quest/KillMonsterObjective.hpp Sources/Npc/Npc.hpp \
+ Sources/Animation/ShaderManager.hpp

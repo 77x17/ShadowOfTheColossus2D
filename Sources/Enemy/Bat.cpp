@@ -17,7 +17,7 @@ Bat::Bat(const float& x = 0, const float& y = 0) : Enemy(x, y, TILE_SIZE, TILE_S
 }
 
 void Bat::updateAnimation() {
-    if (!isAlive()) {
+    if (!isAlive() || knockbackCooldownTimer > 0) {
         // nothing
     }
     else if (movingDirection.x < 0) {

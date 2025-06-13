@@ -67,3 +67,7 @@ bool Projectile::isAlive() const {
 void Projectile::kill() {
     lifetime = 0;
 }
+
+sf::Vector2f Projectile::getPosition() const {
+    return hitbox.getPosition();
+}

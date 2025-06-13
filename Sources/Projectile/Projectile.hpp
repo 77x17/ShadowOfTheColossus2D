@@ -23,4 +23,6 @@ public:
     bool isAlive() const;  
     void kill();
 
+    sf::Vector2f getPosition() const;
+
 };

@@ -18,12 +18,16 @@
 #include "Quest.hpp"
 #include "Npc.hpp"
 
+#include "ShaderManager.hpp"
+
 sf::Font Font::font;
 
 std::unordered_map<std::string, sf::Texture> TextureManager::textures;
 
 std::unordered_map<std::string, sf::SoundBuffer> SoundManager::buffers;
 std::unordered_map<std::string, sf::Sound> SoundManager::sounds;
+
+std::unordered_map<std::string, std::unique_ptr<sf::Shader>> ShaderManager::shaders;
 
 void loadSprite() {
     TextureManager::load("playerSprite", "Sprites/player.png");
@@ -39,6 +43,18 @@ void loadSprite() {
     TextureManager::load("eyeShadow", "Sprites/eyeShadow.png");
     TextureManager::load("eyeDead"  , "Sprites/eyeDead.png");
     TextureManager::load("fireball" , "Sprites/fireball.png");
+}
+
+void loadShader() {
+    ShaderManager::load("invincible", "Shaders/effect.frag", {
+        {"invincibleAmount", 0.2f},
+        {"flashAmount", 0.5f}
+    });
+
+    ShaderManager::load("flash", "Shaders/effect.frag", {
+        {"invincibleAmount", 0.2f},
+        {"flashAmount", 1.0f}
+    });
 }
 
 void loadSound() {
@@ -112,6 +128,7 @@ int main() {
 
     Font::font.loadFromFile("Fonts/Roboto_Mono.ttf");
     loadSprite();
+    loadShader();
     loadSound();
 
     TileMap map;

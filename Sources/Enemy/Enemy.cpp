@@ -1,4 +1,5 @@
 #include "Enemy.hpp"
+#include "ShaderManager.hpp"
 
 #include <cmath>
 #include <random>
@@ -86,6 +87,10 @@ Enemy::Enemy(const float& x = 0, const float& y = 0, const float& width = TILE_S
         hitbox.getPosition().x + hitbox.getSize().x / 2.f - DETECION_RANGE,
         hitbox.getPosition().y + hitbox.getSize().y / 2.f - DETECION_RANGE
     );
+
+    KNOCKBACK_STRENGTH     = 200.0f;
+    KNOCKBACK_COOLDOWN     = 0.2f;
+    knockbackCooldownTimer = 0.0f;
 }
 
 bool Enemy::isAlive() const {
@@ -102,7 +107,7 @@ void Enemy::attack(Player& player) {
 }
 
 void Enemy::hurt(const float& damage) {
-    if (isAlive()) {
+    if (isAlive() && invincibleCooldownTimer <= 0) {
         healthPoints -= damage;
 
         SoundManager::playSound("enemyHurt");
@@ -110,6 +115,16 @@ void Enemy::hurt(const float& damage) {
         if (healthPoints <= 0) {
             kill();
         }
+    }
+}
+
+void Enemy::knockback(const sf::Vector2f& playerPosition) {
+    if (isAlive() && invincibleCooldownTimer <= 0) {
+        movingDirection = (position - playerPosition);
+
+        movingDirection = Projectile::normalize(movingDirection);
+
+        knockbackCooldownTimer = KNOCKBACK_COOLDOWN;
     }
 }
 
@@ -175,6 +190,9 @@ void Enemy::updateTimer(const float &dt) {
     if (attackCooldownTimer > 0) {
         attackCooldownTimer -= dt;
     }
+    if (knockbackCooldownTimer > 0) {
+        knockbackCooldownTimer -= dt;
+    }
 }
 
 void Enemy::followPlayer(const Player& player) {
@@ -222,6 +240,14 @@ void Enemy::moveRandomly() {
 }
 
 void Enemy::updateThinking(Player& player) {
+    if (knockbackCooldownTimer <= 0) {
+        movingDirection = sf::Vector2f(0, 0);
+    }
+    else {
+        // fix here
+        return;
+    }
+
     if (calculateDistance(player) <= DETECION_RANGE) {
         if (invincibleCooldownTimer <= 0) {
             if (player.isCollision(hitbox.getGlobalBounds())) {
@@ -251,7 +277,14 @@ void Enemy::updateThinking(Player& player) {
 }
 
 void Enemy::updatePosition(const float& dt, const std::vector<sf::FloatRect>& collisionRects) {
-    sf::Vector2f velocity = movingDirection * MOVE_SPEED * dt;
+    sf::Vector2f velocity;
+
+    if (knockbackCooldownTimer > 0) {
+        velocity = movingDirection * KNOCKBACK_STRENGTH * dt;
+    }
+    else {
+        velocity = movingDirection * MOVE_SPEED * dt;
+    }
 
     sf::FloatRect nextHitboxRect = sf::FloatRect(position, size);
     if (velocity.x != 0) {
@@ -306,13 +339,12 @@ void Enemy::update(const float& dt, Player& player, const std::vector<sf::FloatR
         return;
     }
 
-    if (invincibleCooldownTimer <= 0) {
-        if (player.isCollisionProjectiles(hitbox.getGlobalBounds())) {
-            hurt(1.0f);
+    if (player.isCollisionProjectiles(hitbox.getGlobalBounds())) {
+        hurt(1.0f);
+        knockback(player.getPosition());
 
-            if (!isAlive()) {
-                player.addVictim(label.getString());
-            }
+        if (!isAlive()) {
+            player.addVictim(label.getString());
         }
     }
 
@@ -336,16 +368,18 @@ void Enemy::draw(sf::RenderWindow& window) {
     // window.draw(detectionBox);
     
     shadow.draw(window);
-    animationManager.draw(window);
-    if (alertCooldownTimer > 0) {
-        alert.draw(window);
-    }
 
     if (invincibleCooldownTimer > 0) {
-        sf::RectangleShape invincibleBox;
-        invincibleBox.setSize(size);
-        invincibleBox.setPosition(position);
-        invincibleBox.setFillColor(sf::Color(200, 200, 200, 100));
-        window.draw(invincibleBox);   
+        animationManager.draw(window, ShaderManager::get("invincible"));
+    }
+    else if (knockbackCooldownTimer > 0) {
+        animationManager.draw(window, ShaderManager::get("flash"));   
+    }
+    else {
+        animationManager.draw(window);
+    }
+
+    if (alertCooldownTimer > 0) {
+        alert.draw(window);
     }
 }

@@ -38,8 +38,12 @@ void Animation::setPosition(sf::Vector2f position) {
     sprite.setPosition(position);
 }
 
-void Animation::draw(sf::RenderWindow& window) const {
-    window.draw(sprite);
+void Animation::draw(sf::RenderWindow& window, sf::Shader* shader) const {
+    window.draw(sprite, shader);
+}
+
+sf::Sprite Animation::getSprite() const {
+    return sprite;
 }
 
 AnimationManager::AnimationManager() : currentState(0) {
@@ -77,6 +81,10 @@ void AnimationManager::update() {
     animations[currentState].update();
 }
 
-void AnimationManager::draw(sf::RenderWindow& window) const {
-    animations.at(currentState).draw(window);
+void AnimationManager::draw(sf::RenderWindow& window, sf::Shader* shader) const {
+    animations.at(currentState).draw(window, shader);
+}
+
+sf::Sprite AnimationManager::getSprite() const {
+    return animations.at(currentState).getSprite();
 }

@@ -101,7 +101,7 @@ UI::UI() {
         questsBox.setFillColor(sf::Color(80, 80, 80, 150));
         questsBox.setOutlineThickness(BOX_OUTLINE_THICKNESS);
         questsBox.setOutlineColor(sf::Color::Black);
-        questsBoxVisible = true;
+        questsBoxVisible = false;
     }
 }
 
@@ -154,11 +154,14 @@ void UI::updateQuests(const float& dt, const std::vector<Quest>& quests, const s
     questsBoxLabel.setPosition(questsPosition + sf::Vector2f(questsBoxSize.x / 2, 0));
 }
 
-void UI::update(const float& dt, const Player& player, const sf::Vector2f& uiSize) {
+void UI::update(const float& dt, Player& player, const sf::Vector2f& uiSize) {
     updateHealthBar(dt, player);
 
     updateLevelAndXP(dt, player);
 
+    if (player.isUpdateQuest()) {
+        questsBoxVisible = true;
+    }
     updateQuests(dt, player.getQuests(), uiSize);
 }
 

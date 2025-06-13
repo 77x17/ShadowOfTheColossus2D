@@ -75,7 +75,7 @@ void Eye::followPlayer(const Player& player) {
 }
 
 void Eye::updateAnimation() {
-    if (!isAlive()) {
+    if (!isAlive() || knockbackCooldownTimer > 0) {
         // nothing
     }
     else if (movingDirection.x < 0) {
@@ -99,6 +99,7 @@ void Eye::updateProjectiles(const float& dt, Player& player) {
     if (projectile.isAlive()) {
         if (projectile.isCollision(player.getHitBox())) {
             player.hurt(1.0f);
+            player.knockback(projectile.getPosition());
 
             projectile = Projectile();
         }

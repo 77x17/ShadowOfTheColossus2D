@@ -6,4 +6,4 @@ Build/Main.o: Sources/Main.cpp Sources/Configuration/Constants.hpp \
  Sources/Quest/Quest.hpp Sources/Quest/QuestObjective.hpp \
  Sources/Quest/KillMonsterObjective.hpp Sources/Npc/Npc.hpp \
  Sources/Player/UI.hpp Sources/Enemy/Enemy.hpp Sources/Enemy/Bat.hpp \
- Sources/Enemy/Eye.hpp
+ Sources/Enemy/Eye.hpp Sources/Animation/ShaderManager.hpp

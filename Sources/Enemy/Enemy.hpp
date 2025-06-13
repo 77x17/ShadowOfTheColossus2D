@@ -55,6 +55,10 @@ protected:
     Animation          shadow;
     Animation          alert;
 
+    float KNOCKBACK_STRENGTH;
+    float KNOCKBACK_COOLDOWN;
+    float knockbackCooldownTimer;
+
 public:
     Enemy(const float& x, const float& y, const float& width, const float& height, const float& hp, const std::string& nameAndLevel);
 
@@ -63,6 +67,7 @@ public:
     bool isAlive() const;
     void attack(Player& player);
     void hurt(const float& damage);
+    void knockback(const sf::Vector2f& playerPosition);
     virtual void kill();
     virtual void respawn();
 

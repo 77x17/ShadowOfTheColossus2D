@@ -1,4 +1,5 @@
 #include "Player.hpp"
+#include "ShaderManager.hpp"
 
 #include <cmath>
 
@@ -91,7 +92,8 @@ Player::Player(const float& x, const float& y, const float& hp, std::vector<Ques
     knockbackCooldownTimer = 0.0f;
 
     quests.clear();
-    quests = std::move(_quests);
+    quests        = std::move(_quests);
+    updateQuest   = false;
 }
 
 void Player::handleMove(const sf::RenderWindow& window) {
@@ -166,10 +168,7 @@ void Player::handleProjectiles(const sf::RenderWindow& window) {
         shootCooldownTimer = SHOOT_COOLDOWN; 
         
         sf::Vector2f projectileDirection;
-        if (dashDirection.x != 0 || dashDirection.y != 0) {
-            projectileDirection = dashDirection;
-        }
-        else if (movingDirection.x != 0 || movingDirection.y != 0) {
+        if (movingDirection.x != 0 || movingDirection.y != 0) {
             projectileDirection = movingDirection;
         }
         else {
@@ -238,12 +237,14 @@ void Player::handleQuests(const float& dt, const sf::RenderWindow& window, std::
                 if (npc.isFinishedTalk()) {
                     for (Quest& quest : quests) {
                         if (quest.accept(npc.getID())) {
-                            // nothing
+                            updateQuest = true;
                         }
 
                         if (quest.turnIn(npc.getID())) {
                             npc.completedQuest();
                             interactText.setString(npc.getDialogue());
+
+                            updateQuest = true;
                         }
                     }
                 }
@@ -279,7 +280,9 @@ void Player::handleInput(const float& dt, const sf::RenderWindow& window, std::v
         movingDirection = sf::Vector2f(0, 0);
     }
     else {
+        dashDirection = sf::Vector2f(0, 0);
         // fix here
+        return;
     }
 
     handleMove(window);
@@ -333,16 +336,14 @@ void Player::knockback(const sf::Vector2f& enemyPosition) {
 }
 
 void Player::kill() {
-    if (isAlive()) {
-        healthPoints       = 0;
+    healthPoints       = 0;
 
-        state              = static_cast<int>(PlayerState::DYING);
-        dyingCooldownTimer = DYING_TIME;
-        
-        SoundManager::playSound("playerDie");
+    state              = static_cast<int>(PlayerState::DYING);
+    dyingCooldownTimer = DYING_TIME;
+    
+    SoundManager::playSound("playerDie");
 
-        projectiles.clear();
-    }
+    projectiles.clear();
 }
 
 void Player::respawn() {
@@ -520,7 +521,7 @@ void Player::updateProjectiles(const float& dt) {
     }
 }
 
-void Player::updateQuest() {
+void Player::updateQuests() {
     for (auto it = quests.begin(); it != quests.end(); /**/) {
         if (it->isCompleted() && !it->isReceiveReward()) {
             updateXP(it->getRewardExp());
@@ -560,7 +561,7 @@ void Player::update(const float& dt,
 
     updateProjectiles(dt); 
 
-    updateQuest(); 
+    updateQuests(); 
 }
 
 void Player::draw(sf::RenderWindow& window) {
@@ -568,19 +569,19 @@ void Player::draw(sf::RenderWindow& window) {
     // window.draw(loadingBox);
 
     shadow.draw(window);
-    
-    animationManager.draw(window);
+
+    if (invincibleCooldownTimer > 0) {
+        animationManager.draw(window, ShaderManager::get("invincible"));
+    }
+    else if (knockbackCooldownTimer > 0) {
+        animationManager.draw(window, ShaderManager::get("flash"));   
+    }
+    else {
+        animationManager.draw(window);
+    }
 
     for (auto& p : projectiles) {
         p.draw(window);
-    }
-
-    if (invincibleCooldownTimer > 0) {
-        sf::RectangleShape invincibleBox;
-        invincibleBox.setSize(size);
-        invincibleBox.setPosition(position);
-        invincibleBox.setFillColor(sf::Color(200, 200, 200, 100));
-        window.draw(invincibleBox);   
     }
 
     window.draw(interactText);
@@ -649,6 +650,16 @@ int Player::getLevel() const {
 
 const std::vector<Quest>& Player::getQuests() const {
     return quests;
+}
+
+bool Player::isUpdateQuest() {
+    if (updateQuest) {
+        updateQuest = false;
+    
+        return true;
+    }
+
+    return false;
 }
 
 void Player::updateView(const float& dt, sf::View& view) const {

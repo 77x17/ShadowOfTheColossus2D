@@ -39,7 +39,9 @@ public:
     void reset();
     void setPosition(sf::Vector2f position);
 
-    void draw(sf::RenderWindow& window) const;
+    void draw(sf::RenderWindow& window, sf::Shader* shader = nullptr) const;
+
+    sf::Sprite getSprite() const;
 };
 
 class AnimationManager {
@@ -55,5 +57,7 @@ public:
     void setPosition(sf::Vector2f position);
     void update();
 
-    void draw(sf::RenderWindow& window) const;
+    void draw(sf::RenderWindow& window, sf::Shader* shader = nullptr) const;
+
+    sf::Sprite getSprite() const;
 };
