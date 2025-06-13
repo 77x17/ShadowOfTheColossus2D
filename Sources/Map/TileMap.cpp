@@ -137,7 +137,22 @@ bool TileMap::load(const std::string& tmxPath, const std::string& tilesetPath) {
     return true;
 }
 
-// hàm draw() không thay đổi
+void TileMap::updateObjects() {
+    for (sf::FloatRect& rect : m_collisionRects) {
+        rect = getTransform().transformRect(rect);
+    }
+    
+    for (auto& pair : m_enemyRects) {
+        for (sf::FloatRect& rect : pair.second) {
+            rect = getTransform().transformRect(rect);
+        }
+    }
+
+    for (auto& pair : m_NPCRects) {
+        pair.second = getTransform().transformRect(pair.second);
+    }
+}
+
 void TileMap::draw(sf::RenderTarget& target, sf::RenderStates states) const {
     states.transform *= getTransform();
     states.texture = &m_tilesetTexture;
@@ -173,19 +188,12 @@ void TileMap::draw(sf::RenderTarget& target, sf::RenderStates states) const {
     }
 }
 
-void TileMap::updateObjects() {
-    for (sf::FloatRect& rect : m_collisionRects) {
-        rect = getTransform().transformRect(rect);
-    }
-    
-    for (auto& pair : m_enemyRects) {
-        for (sf::FloatRect& rect : pair.second) {
-            rect = getTransform().transformRect(rect);
-        }
-    }
+void TileMap::drawMinimap(sf::RenderTarget& target, sf::RenderStates states) const {
+    states.transform *= getTransform();
+    states.texture = &m_tilesetTexture;
 
-    for (auto& pair : m_NPCRects) {
-        pair.second = getTransform().transformRect(pair.second);
+    for (const auto& layer : m_layersVertices) {
+        target.draw(layer, states);
     }
 }
 

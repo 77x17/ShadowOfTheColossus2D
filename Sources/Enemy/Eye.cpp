@@ -18,6 +18,11 @@ Eye::Eye(const float& x = 0, const float& y = 0) : Enemy(x, y, TILE_SIZE, TILE_S
 
     shadow = Animation(TextureManager::get("eyeShadow"), 12,  5, 1, 0, 0.f, false);
     alert  = Animation(TextureManager::get("alert")    ,  8, 10, 1, 0, 0.f, false);
+
+    SHOOT_COOLDOWN      = 2.0f;
+    PROJECTILE_SPEED    = MOVE_SPEED * 1.5;
+    PROJECTILE_LIFETIME = 1.0f;
+    shootCooldownTimer  = 0.0f;
 }
 
 void Eye::respawn() {

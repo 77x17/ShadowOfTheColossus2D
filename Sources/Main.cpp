@@ -204,6 +204,15 @@ int main() {
                 else if (event.key.code == sf::Keyboard::Q) {
                     ui.updateQuestsBox();
                 }
+                else if (event.key.code == sf::Keyboard::Hyphen) {
+                    ui.updateMinimapBoxSize(false);
+                }
+                else if (event.key.code == sf::Keyboard::Equal) {
+                    ui.updateMinimapBoxSize(true);
+                }
+                else if (event.key.code == sf::Keyboard::M) {
+                    ui.openMap(uiView.getSize());
+                }
             }
         }
         
@@ -213,7 +222,7 @@ int main() {
         }
 
         player.update(dt, window, map.getCollisionRects(), npcs);
-        ui.update(dt, player, uiView.getSize());
+        ui.update(dt, player, uiView.getSize(), map);
 
         // Điều chỉnh camera theo player
         player.updateView(dt, view);

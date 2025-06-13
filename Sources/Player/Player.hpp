@@ -132,13 +132,14 @@ public:
     void  addVictim(const std::string& label);
 
     // for UI
-    float       getHealthRatio() const;
-    std::string getHealthPointsString() const;
-    float       getXPRatio() const;
-    std::string getXPString() const;
-    int         getLevel() const;
-    const       std::vector<Quest>& getQuests() const;
-    bool        isUpdateQuest();
+    float        getHealthRatio() const;
+    std::string  getHealthPointsString() const;
+    float        getXPRatio() const;
+    std::string  getXPString() const;
+    int          getLevel() const;
+    const        std::vector<Quest>& getQuests() const;
+    bool         isUpdateQuest();
+    sf::Vector2f getCenterPosition() const;
 
     void updateView(const float& dt, sf::View& view) const;
 };

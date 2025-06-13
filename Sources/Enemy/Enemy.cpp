@@ -88,7 +88,7 @@ Enemy::Enemy(const float& x = 0, const float& y = 0, const float& width = TILE_S
         hitbox.getPosition().y + hitbox.getSize().y / 2.f - DETECION_RANGE
     );
 
-    KNOCKBACK_STRENGTH     = 200.0f;
+    KNOCKBACK_STRENGTH     = 100.0f;
     KNOCKBACK_COOLDOWN     = 0.2f;
     knockbackCooldownTimer = 0.0f;
 }

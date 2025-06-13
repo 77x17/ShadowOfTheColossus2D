@@ -662,6 +662,10 @@ bool Player::isUpdateQuest() {
     return false;
 }
 
+sf::Vector2f Player::getCenterPosition() const {
+    return position + size / 2.0f;
+}
+
 void Player::updateView(const float& dt, sf::View& view) const {
     sf::Vector2f currentCenter = view.getCenter();
     sf::Vector2f targetCenter  = position;

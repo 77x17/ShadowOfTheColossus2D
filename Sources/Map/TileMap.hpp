@@ -25,8 +25,9 @@ public:
 
     void updateObjects();
 
+    void drawMinimap(sf::RenderTarget& target, sf::RenderStates states = sf::RenderStates::Default) const;
+
     const std::vector<sf::FloatRect>& getCollisionRects() const;
     const std::unordered_map<int, sf::FloatRect>& getNpcRects() const;
     const std::unordered_map<std::string, std::vector<sf::FloatRect>>& getEnemyRects() const;
-
 };

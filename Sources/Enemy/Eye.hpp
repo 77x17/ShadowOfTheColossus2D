@@ -15,10 +15,10 @@ enum class EyeState {
 class Eye : public Enemy {
 private:
     Projectile projectile;
-    float      SHOOT_COOLDOWN      = 2.0f;
-    float      PROJECTILE_SPEED    = MOVE_SPEED * 2;
-    float      PROJECTILE_LIFETIME = 1.0f;
-    float      shootCooldownTimer  = 0.0f;
+    float      SHOOT_COOLDOWN;
+    float      PROJECTILE_SPEED;
+    float      PROJECTILE_LIFETIME;
+    float      shootCooldownTimer;
 
 public:
     Eye(const float& x, const float& y);
