@@ -27,11 +27,11 @@ bool TileMap::load(const std::string& tmxPath, const std::string& tilesetPath) {
         return false;
     }
 
-    unsigned int mapWidth   = mapNode.attribute("width").as_uint();
-    unsigned int mapHeight  = mapNode.attribute("height").as_uint();
-    unsigned int tileWidth  = mapNode.attribute("tilewidth").as_uint();
-    unsigned int tileHeight = mapNode.attribute("tileheight").as_uint();
-    int firstGid            = mapNode.child("tileset").attribute("firstgid").as_int();
+    mapWidth     = mapNode.attribute("width").as_uint();
+    mapHeight    = mapNode.attribute("height").as_uint();
+    tileWidth    = mapNode.attribute("tilewidth").as_uint();
+    tileHeight   = mapNode.attribute("tileheight").as_uint();
+    int firstGid = mapNode.child("tileset").attribute("firstgid").as_int();
 
     // Lặp qua tất cả các layer
     for (pugi::xml_node layerNode : mapNode.children("layer")) {
@@ -186,6 +186,12 @@ void TileMap::draw(sf::RenderTarget& target, sf::RenderStates states) const {
         hitbox.setPosition(pair.second.getPosition());
         target.draw(hitbox);
     }
+}
+
+sf::Vector2u TileMap::getPixelSize() const {
+    unsigned int width  = mapWidth  * tileWidth  * 2;
+    unsigned int height = mapHeight * tileHeight * 2;
+    return sf::Vector2u(width, height);
 }
 
 void TileMap::drawMinimap(sf::RenderTarget& target, sf::RenderStates states) const {

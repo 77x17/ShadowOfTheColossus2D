@@ -11,6 +11,11 @@
 
 class TileMap : public sf::Drawable, public sf::Transformable {
 private:
+    unsigned int mapWidth;
+    unsigned int mapHeight;
+    unsigned int tileWidth;
+    unsigned int tileHeight;
+
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
     std::vector<sf::VertexArray> m_layersVertices; 
@@ -25,6 +30,7 @@ public:
 
     void updateObjects();
 
+    sf::Vector2u getPixelSize() const;
     void drawMinimap(sf::RenderTarget& target, sf::RenderStates states = sf::RenderStates::Default) const;
 
     const std::vector<sf::FloatRect>& getCollisionRects() const;

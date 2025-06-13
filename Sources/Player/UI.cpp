@@ -109,23 +109,23 @@ UI::UI() {
     }
     {
         MINIMAP_PADDING        = sf::Vector2f(20.0f, 20.0f);
-        MINIMAP_LEAP_SPEED     = 2.0f;
-        MINIMAP_SIZE           = sf::Vector2f(200, 200);
-        minimapSize            = sf::Vector2f(200, 200);
-        lastMinimapTextureSize = sf::Vector2u(200, 200);
-        minimapViewRatio       = 3.0f;
+        MINIMAP_LEAP_SPEED     = 3.0f;
+        MINIMAP_SIZE           = sf::Vector2f(150, 150);
+        minimapSize            = sf::Vector2f(150, 150);
+        minimapViewRatio       = 6.0f;
         minimapPosition        = sf::Vector2f(WINDOW_WIDTH, 0);
         lastMinimapPosition    = sf::Vector2f(WINDOW_WIDTH, 0);
 
-        minimapTexture.create(static_cast<unsigned int>(minimapSize.x), static_cast<unsigned int>(minimapSize.y));
         minimapSprite.setTexture(minimapTexture.getTexture());
-        minimapView.setSize(minimapSize * minimapViewRatio);
-        minimapView.setCenter(0.0f, 0.0f);
 
         minimapBox.setSize(sf::Vector2f(minimapSize) + PADDING * 2.0f);
         minimapBox.setFillColor(sf::Color(80, 80, 80, 150));
         minimapBox.setOutlineThickness(BOX_OUTLINE_THICKNESS);
         minimapBox.setOutlineColor(sf::Color::Black);
+
+        minimapPlayerDot.setRadius(5.0f);
+        minimapPlayerDot.setFillColor(sf::Color(255, 0, 0, 150));
+        minimapPlayerDot.setOrigin(minimapPlayerDot.getRadius(), minimapPlayerDot.getRadius());
 
         fullMinimapActive = false;
     }
@@ -180,81 +180,68 @@ void UI::updateQuests(const float& dt, const std::vector<Quest>& quests, const s
     questsBoxLabel.setPosition(questsPosition + sf::Vector2f(questsBoxSize.x / 2, 0));
 }
 
-void UI::updateMinimap(const float& dt, const Player& player, const sf::Vector2f& uiSize, const TileMap& map) {
-    sf::Vector2f targetSize, targetPosition;
+void UI::updateMinimap(const float& dt, const Player& player, const sf::Vector2f& uiSize) {
+    sf::Vector2f targetSize;
+    sf::Vector2f targetPosition;
     if (!fullMinimapActive) {
-        targetSize     = sf::Vector2f(MINIMAP_SIZE);
-        targetPosition = sf::Vector2f(uiSize.x - MINIMAP_SIZE.x - MINIMAP_PADDING.x, MINIMAP_PADDING.y);
+        targetPosition = sf::Vector2f(uiSize.x - minimapSize.x - MINIMAP_PADDING.x, MINIMAP_PADDING.y);
+        targetSize     = MINIMAP_SIZE;
+        minimapSprite.setColor(sf::Color(255, 255, 255, 150)); 
     }
     else {
-        targetSize     = sf::Vector2f(uiSize - MINIMAP_PADDING * 2.0f);
-        targetPosition = sf::Vector2f(MINIMAP_PADDING.x, MINIMAP_PADDING.y);
+        targetPosition = MINIMAP_PADDING;
+        targetSize     = uiSize - MINIMAP_PADDING * 2.0f;
+        minimapSprite.setColor(sf::Color(255, 255, 255, 250)); 
     }
 
-    float SNAP_THRESHOLD = 5.0f;
-    sf::Vector2f distToTarget = targetPosition - minimapPosition;
-    if (distToTarget != sf::Vector2f(0, 0) && std::abs(distToTarget.x) < SNAP_THRESHOLD && std::abs(distToTarget.y) < SNAP_THRESHOLD) {
-        minimapSize     = targetSize;
-        minimapPosition = targetPosition;
-    }
-    else {
-        minimapSize     += (targetSize     - minimapSize)     * MINIMAP_LEAP_SPEED * dt;
-        minimapPosition += (targetPosition - minimapPosition) * MINIMAP_LEAP_SPEED * dt;
-    }
+    minimapSize     += (targetSize     - minimapSize)     * MINIMAP_LEAP_SPEED * dt;
+    minimapPosition += (targetPosition - minimapPosition) * MINIMAP_LEAP_SPEED * dt;
 
-    sf::Vector2u newTextureSize = {
-        static_cast<unsigned int>(std::round(minimapSize.x)),
-        static_cast<unsigned int>(std::round(minimapSize.y))
-    };
+    sf::Vector2u mapPixelSize = minimapTexture.getSize();
+    sf::Vector2f playerPos = player.getCenterPosition(); // world coordinates
+    sf::Vector2f viewSize(minimapSize * minimapViewRatio);
+    sf::IntRect viewRect;
+    viewRect.width  = std::min(static_cast<int>(viewSize.x), static_cast<int>(mapPixelSize.x));
+    viewRect.height = std::min(static_cast<int>(viewSize.y), static_cast<int>(mapPixelSize.y));
 
-    if (newTextureSize != lastMinimapTextureSize && newTextureSize.x > 0 && newTextureSize.y > 0) {
-        minimapTexture.create(newTextureSize.x, newTextureSize.y);
-        minimapTexture.setSmooth(false); 
-        lastMinimapTextureSize = newTextureSize;
+    viewRect.left   = static_cast<int>(playerPos.x - viewRect.width / 2.f);
+    viewRect.top    = static_cast<int>(playerPos.y - viewRect.height / 2.f);
+    if (viewRect.left < 0) viewRect.left = 0;
+    if (viewRect.left + viewRect.width > static_cast<int>(mapPixelSize.x)) {
+        viewRect.left = mapPixelSize.x - viewRect.width;
     }
-
-    if (lastMinimapTextureSize.x == 0 || lastMinimapTextureSize.y == 0) {
-        return;
+    if (viewRect.top < 0) viewRect.top = 0;
+    if (viewRect.top + viewRect.height > static_cast<int>(mapPixelSize.y)) {
+        viewRect.top = mapPixelSize.y - viewRect.height;
     }
 
-    minimapSprite.setTexture(minimapTexture.getTexture(), true);
-
-    minimapView.setSize(sf::Vector2f(lastMinimapTextureSize) * minimapViewRatio);
-    sf::Vector2f center = player.getCenterPosition();
-    center.x = std::floor(center.x);
-    center.y = std::floor(center.y);
-    minimapView.setCenter(center);
-
-    minimapTexture.clear(sf::Color(80, 80, 80, 150));
-    minimapTexture.setView(minimapView);
-    map.drawMinimap(minimapTexture);
-    
-    minimapTexture.setView(minimapTexture.getDefaultView());
-
-    sf::Vector2i pixelPos = minimapTexture.mapCoordsToPixel(player.getCenterPosition(), minimapView);
-    sf::Vector2f dotPos(static_cast<float>(pixelPos.x), static_cast<float>(pixelPos.y));
-
-    sf::CircleShape playerDot(5.0f);
-    playerDot.setFillColor(sf::Color(255, 0, 0, 150));
-    playerDot.setOrigin(5.0f, 5.0f);
-    playerDot.setPosition(dotPos);
-    minimapTexture.draw(playerDot);
-
-    minimapTexture.display();
+    minimapSprite.setTexture(minimapTexture.getTexture());
+    minimapSprite.setTextureRect(viewRect);
+    sf::Vector2f scale = sf::Vector2f(minimapSize.x / viewRect.width, minimapSize.y / viewRect.height);
+    minimapSprite.setScale(scale);
 
     minimapSprite.setPosition(minimapPosition);
     minimapBox.setPosition(minimapPosition - PADDING);
-    minimapBox.setSize(minimapSize + PADDING * 2.0f);
+    minimapBox.setSize(sf::Vector2f(minimapSize) + PADDING * 2.0f);
 
-    sf::Vector2f scaleCorrection(1.0f, 1.0f);
-    if (lastMinimapTextureSize.x > 0 && lastMinimapTextureSize.y > 0) {
-        scaleCorrection.x = minimapSize.x / lastMinimapTextureSize.x;
-        scaleCorrection.y = minimapSize.y / lastMinimapTextureSize.y;
-    }
-    minimapSprite.setScale(scaleCorrection);
+    sf::Vector2f localPlayerPos(
+        playerPos.x - static_cast<float>(viewRect.left),
+        playerPos.y - static_cast<float>(viewRect.top)
+    );
+
+    std::cerr << localPlayerPos.x << ' ' << localPlayerPos.y << '\n';
+
+    sf::Vector2f scaledPlayerPos(
+        localPlayerPos.x * scale.x,
+        localPlayerPos.y * scale.y
+    );
+
+    sf::Vector2f dotPosition = minimapPosition + scaledPlayerPos;
+
+    minimapPlayerDot.setPosition(dotPosition);
 }
 
-void UI::update(const float& dt, Player& player, const sf::Vector2f& uiSize, const TileMap& map) {
+void UI::update(const float& dt, Player& player, const sf::Vector2f& uiSize) {
     updateHealthBar(dt, player);
 
     updateLevelAndXP(dt, player);
@@ -264,7 +251,7 @@ void UI::update(const float& dt, Player& player, const sf::Vector2f& uiSize, con
     }
     updateQuests(dt, player.getQuests(), uiSize);
 
-    updateMinimap(dt, player, uiSize, map);
+    updateMinimap(dt, player, uiSize);
 }
 
 void UI::draw(sf::RenderWindow& window) {
@@ -289,10 +276,23 @@ void UI::draw(sf::RenderWindow& window) {
 
     window.draw(minimapBox);
     window.draw(minimapSprite);
+    window.draw(minimapPlayerDot);
 }
 
 void UI::updateQuestsBox() {
     questsBoxVisible = !questsBoxVisible;
+}
+
+void UI::generateMinimapTexture(const TileMap& map) {
+    sf::Vector2u mapSize = map.getPixelSize();
+
+    minimapTexture.create(mapSize.x, mapSize.y);
+    minimapTexture.clear(sf::Color::Transparent);
+    
+    map.drawMinimap(minimapTexture);
+    
+    minimapTexture.setSmooth(false);
+    minimapTexture.display();
 }
 
 void UI::updateMinimapBoxSize(bool minimize) {
@@ -302,6 +302,15 @@ void UI::updateMinimapBoxSize(bool minimize) {
     else {
         minimapViewRatio *= 1.2;
     }
+
+    if (minimapViewRatio >= 8) {
+        minimapViewRatio = 8;
+    }
+    else if (minimapViewRatio <= 0.75) {
+        minimapViewRatio = 0.75;
+    }
+
+    std::cerr << minimapViewRatio << '\n';
 }
 
 void UI::openMap(const sf::Vector2f& uiSize) {    

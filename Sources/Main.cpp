@@ -143,13 +143,16 @@ int main() {
     std::vector<Quest> quests;
     loadQuests(quests);
 
-    Player player(300, 300, 50.0f, std::move(quests));
+    Player player(108 * TILE_SIZE, 108 * TILE_SIZE, 50.0f, std::move(quests));
     UI ui;
+
+    ui.generateMinimapTexture(map);
 
     sf::Clock clock;
     bool      isMinimized  = false;
     bool      isFullscreen = false;
     sf::View  view         = window.getView();
+    view.setCenter(108 * TILE_SIZE, 108 * TILE_SIZE);
     sf::View  uiView       = window.getDefaultView();
     while (window.isOpen()) {
         float dt = clock.restart().asSeconds();
@@ -222,7 +225,7 @@ int main() {
         }
 
         player.update(dt, window, map.getCollisionRects(), npcs);
-        ui.update(dt, player, uiView.getSize(), map);
+        ui.update(dt, player, uiView.getSize());
 
         // Điều chỉnh camera theo player
         player.updateView(dt, view);

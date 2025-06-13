@@ -48,14 +48,13 @@ private:
     float              MINIMAP_LEAP_SPEED;
     sf::Vector2f       MINIMAP_SIZE;
     sf::Vector2f       minimapSize;
-    sf::Vector2u       lastMinimapTextureSize;
     float              minimapViewRatio;
     sf::Vector2f       minimapPosition;
     sf::Vector2f       lastMinimapPosition;
     sf::RenderTexture  minimapTexture;
     sf::Sprite         minimapSprite;
-    sf::View           minimapView;
     sf::RectangleShape minimapBox;
+    sf::CircleShape    minimapPlayerDot;
     bool               fullMinimapActive;
 public:
     UI();
@@ -63,14 +62,14 @@ public:
     void updateHealthBar(const float& dt, const Player& player);
     void updateLevelAndXP(const float& dt, const Player& player);
     void updateQuests(const float& dt, const std::vector<Quest>& quests, const sf::Vector2f& uiSize);
-    void updateMinimap(const float& dt, const Player& player, const sf::Vector2f& uiSize, const TileMap& map);
-    void update(const float& dt, Player& player, const sf::Vector2f& uiSize, const TileMap& map);
+    void updateMinimap(const float& dt, const Player& player, const sf::Vector2f& uiSize);
+    void update(const float& dt, Player& player, const sf::Vector2f& uiSize);
 
     void draw(sf::RenderWindow& window);
 
     void updateQuestsBox();
 
-    // void generateMinimapTexture(const TileMap &map);
+    void generateMinimapTexture(const TileMap &map);
     void updateMinimapBoxSize(bool minimize);
     void openMap(const sf::Vector2f& uiSize);
 
