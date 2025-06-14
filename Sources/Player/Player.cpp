@@ -233,7 +233,6 @@ void Player::handleQuests(const float& dt, const sf::RenderWindow& window, std::
 
                     if (npc.getID() == quest.getID()) {
                         if (quest.isSuitableForGivingQuest(getLevel())) {
-                            finishedQuest:
                             if (quest.isCompleted()) {
                                 interactText.setString("Thanks for your help!");
                                 continue;
@@ -243,16 +242,6 @@ void Player::handleQuests(const float& dt, const sf::RenderWindow& window, std::
                                     updateQuest = true;
                                     
                                     quest.update(QuestEventData());
-                                }
-                                if (quest.turnIn()) {
-                                    updateQuest = true;
-
-                                    if (npc.getID() == quest.getID()) {
-                                        goto finishedQuest;
-                                    }
-                                    else {
-                                        interactText.setString("I'm very appreciated!");
-                                    }
                                 }
                                 else {
                                     interactText.setString("I need your support");
@@ -271,28 +260,6 @@ void Player::handleQuests(const float& dt, const sf::RenderWindow& window, std::
                         break;
                     }
                 }
-
-                // if (npc.isSuitableForGivingQuest(getLevel())) {
-                //     npc.givingQuest();
-                // }
-                // else {
-                //     npc.setRequired();
-                // }
-
-                // if (npc.isFinishedTalk()) {
-                //     for (Quest& quest : quests) {
-                //         if (quest.accept(npc.getID())) {
-                //             updateQuest = true;
-                //         }
-
-                //         if (quest.turnIn(npc.getID())) {
-                //             npc.completedQuest();
-                //             interactText.setString(npc.getDialogue());
-
-                //             updateQuest = true;
-                //         }
-                //     }
-                // }
 
                 interactText.setOrigin(interactText.getLocalBounds().left + interactText.getLocalBounds().width / 2, 
                                        interactText.getLocalBounds().top + interactText.getLocalBounds().height / 2);
@@ -570,8 +537,13 @@ void Player::updateProjectiles(const float& dt) {
 
 void Player::updateQuests() {
     for (auto it = quests.begin(); it != quests.end(); /**/) {
-        if (it->isReadyToTurnIn()) {
+        if (it->isUpdateStage()) {
             updateQuest = true;
+        }
+        else if (it->getID() == -1) {
+            it->accept();
+
+            ++it;
         }
         else if (it->isCompleted() && !it->isReceiveReward()) {
             updateXP(it->getRewardExp());

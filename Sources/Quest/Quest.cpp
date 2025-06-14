@@ -12,9 +12,9 @@ Quest::Quest(const std::string& _title, int exp) {
     rewardExp   = exp;
     rewardGiven = false;
 
-    stage              = 0;
-    dialogueIndex      = 0;
-    turnInNotification = false;
+    stage         = 0;
+    dialogueIndex = 0;
+    updateStage   = false;
 }
 
 void Quest::addRequiredLevel(int level) {
@@ -25,8 +25,8 @@ void Quest::addNpcID(int _stage, int ID) {
     npcIDs.push_back(ID);
 }
 
-void Quest::addDialogue(int _stage, const std::string& dialogue, bool create) {
-    if (create) {
+void Quest::addDialogue(int _stage, const std::string& dialogue) {
+    if (_stage >= static_cast<int>(dialogues.size())) {
         dialogues.push_back(std::vector<std::string>());
     }
     
@@ -37,16 +37,12 @@ void Quest::addDescription(int _stage, const std::string& description) {
     descriptions.push_back(description);
 }
 
-void Quest::addObjective(int _stage, const std::shared_ptr<QuestObjective>& objective, bool create) {
-    if (create) {
+void Quest::addObjective(int _stage, const std::shared_ptr<QuestObjective>& objective) {
+    if (_stage >= static_cast<int>(objectives.size())) {
         objectives.push_back(std::vector<std::shared_ptr<QuestObjective>>());
     }
 
     objectives[_stage].push_back(objective);
-}
-
-void Quest::setTurnIn(int _stage, bool turnIn) {
-    needToTurnIn.push_back(turnIn);
 }
 
 bool Quest::isSuitableForGivingQuest(int playerLevel) {
@@ -72,12 +68,16 @@ bool Quest::isReceiveReward() const {
 }
 
 bool Quest::isFinishedDialogue() const {
-    return state != QuestState::NOT_ACCEPTED || dialogueIndex >= static_cast<int>(dialogues[stage].size());
+    if (npcIDs[stage] == -1) {
+        return true;
+    }
+    return dialogueIndex >= static_cast<int>(dialogues[stage].size());
 }
 
-bool Quest::isReadyToTurnIn() {
-    if (turnInNotification) {
-        turnInNotification = false;
+bool Quest::isUpdateStage() {
+    if (updateStage) {
+        updateStage = false;
+
         return true;
     }
     
@@ -98,12 +98,15 @@ bool Quest::accept() {
 
 void Quest::nextStage() {
     stage++;
+    
     if (stage == static_cast<int>(npcIDs.size())) {
         state = QuestState::COMPLETED;
     }
     else {
-        state = QuestState::NOT_ACCEPTED;
+        dialogueIndex = 0;
     }
+
+    updateStage = true;
 }
 
 void Quest::update(const QuestEventData& data) {
@@ -115,28 +118,9 @@ void Quest::update(const QuestEventData& data) {
         objective->updateProgress(data);
     }
 
-    if (state == QuestState::IN_PROGRESS && isFinishedObjectives()) {
-        if (needToTurnIn[stage]) {
-            state = QuestState::READY_TO_TURN_IN;
-            turnInNotification = true;
-            std::cerr << "Quest ready to turn in: '" << title << "' " << "stage: " << stage << "\n";
-        }
-        else {
-            nextStage();
-        }
-    }
-}
-
-bool Quest::turnIn() {
-    if (state == QuestState::READY_TO_TURN_IN) {
-        std::cerr << "Quest turned in: '" << title << "' " << "stage: " << stage << "\n";
-
+    if (state == QuestState::IN_PROGRESS && isFinishedDialogue() && isFinishedObjectives()) {
         nextStage();
-        
-        return true;
     }
-
-    return false;
 }
 
 std::string Quest::getQuestInformation(const int& idx) const {
@@ -150,15 +134,15 @@ std::string Quest::getQuestInformation(const int& idx) const {
         }
         case QuestState::IN_PROGRESS: {
             display += "[In progress]\n";
-            display += descriptions[stage] + '\n';
-            for (const std::shared_ptr<QuestObjective>& objective : objectives[stage]) {
-                display += "- " + objective->getDescription() + (objective->isFinished() ? " (Done)" : "") + '\n';
+            if (descriptions[stage] != std::string()) {
+                display += "    " + descriptions[stage] + "\n";
             }
-
-            break;
-        }
-        case QuestState::READY_TO_TURN_IN: {
-            display += "[Ready to turn in]\n";
+            for (const std::shared_ptr<QuestObjective>& objective : objectives[stage]) {
+                std::string str = objective->getDescription();
+                if (str != std::string()) {
+                    display += "- " + str + (objective->isFinished() ? " (Done)" : "") + "\n";
+                }
+            }
 
             break;
         }
@@ -195,7 +179,7 @@ std::string Quest::getDialogue() {
         return dialogues[stage][dialogueIndex++];
     }
     else {
-        return "I need your support";
+        return "[Bug] - Quest.cpp - getDialogue()";
     }
 }
 
@@ -204,5 +188,7 @@ std::string Quest::getRequired() const {
 }
 
 void Quest::isInterruptedGivingQuest() {
-    dialogueIndex = 0;
+    if (!isFinishedDialogue()) {
+        dialogueIndex = 0;
+    }
 }

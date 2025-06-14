@@ -16,5 +16,5 @@ bool TalkingObjective::isFinished() const {
 }
 
 std::string TalkingObjective::getDescription() const {
-    return "";
+    return std::string();
 }

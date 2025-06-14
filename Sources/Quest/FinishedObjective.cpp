@@ -8,5 +8,5 @@ bool FinishedObjective::isFinished() const {
 }
 
 std::string FinishedObjective::getDescription() const {
-    return "";
+    return std::string();
 }

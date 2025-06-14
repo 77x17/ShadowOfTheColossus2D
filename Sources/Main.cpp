@@ -111,60 +111,71 @@ void loadNpc(std::vector<Npc>& npcs, const std::unordered_map<int, sf::FloatRect
 
 void loadQuests(std::vector<Quest>& quests) {
     {
-        // quests.push_back(Quest("...", exp));
-        // quests.back().addRequiredLevel(playerLevel);
-
-        // quests.back().addNpcID(stage, npcID);
-        // quests.back().addDialogue(stage, "...", true);
-        // quests.back().addDialogue(stage, "...");
-        // quests.back().addDescription(stage, "...");
-
-        // quests.back().addObjective(stage, objective, true);
-        // quests.back().addObjective(stage, objective);
-
-        // quests.back().setLastStage(stage + 1);
-    }
-    {
         quests.push_back(Quest("Explore strange paths", 40));
         quests.back().addRequiredLevel(1);
 
-        quests.back().addNpcID(0, 0);
-        quests.back().addDialogue(0, "[1/4] The forest has changed. It no longer feels safe", true);
-        quests.back().addDialogue(0, "[2/4] Long ago, we sealed something deep beyond those hills");
-        quests.back().addDialogue(0, "[3/4] But now... whispers return, and beasts creep closer each night");
-        quests.back().addDialogue(0, "[4/4] You must go, find the truth. We're counting on you");
+        quests.back().addNpcID      (0, 0);
+        quests.back().addDialogue   (0, "[1/4] The forest has changed. It no longer feels safe");
+        quests.back().addDialogue   (0, "[2/4] Long ago, we sealed something deep beyond those hills");
+        quests.back().addDialogue   (0, "[3/4] But now... whispers return, and beasts creep closer each night");
+        quests.back().addDialogue   (0, "[4/4] You must go, find the truth. We're counting on you");
         quests.back().addDescription(0, "Come see the road behind the wooden bridge");
-        quests.back().addObjective(0, std::make_shared<KillMonsterObjective>("Bat Lv.1", 2), true);
-        quests.back().addObjective(0, std::make_shared<KillMonsterObjective>("Bat Lv.1", 2));
-        quests.back().setTurnIn(0, true);
+        quests.back().addObjective  (0, std::make_shared<KillMonsterObjective>("Bat Lv.1", 2));
+        quests.back().addObjective  (0, std::make_shared<KillMonsterObjective>("Bat Lv.1", 2));
         
-        quests.back().addNpcID(1, 0);
-        quests.back().addDialogue(1, "[1/3] Oh, you are back", true);
-        quests.back().addDialogue(1, "[2/3] This place used to be very peaceful");
-        quests.back().addDialogue(1, "[3/3] Talk to Torren to prepare for the journey");
-        quests.back().addDescription(1, "Find Torren");
-        quests.back().addObjective(1, std::make_shared<TalkingObjective>(1), true);
-        quests.back().setTurnIn(1, false);
+        quests.back().addNpcID      (1, -1);
+        quests.back().addDialogue   (1, std::string());
+        quests.back().addDescription(1, "Return back to Elder Throne");
+        quests.back().addObjective  (1, std::make_shared<TalkingObjective>(0));
+
+        quests.back().addNpcID      (2, 0);
+        quests.back().addDialogue   (2, "[1/3] Oh, you are back");
+        quests.back().addDialogue   (2, "[2/3] This place used to be very peaceful");
+        quests.back().addDialogue   (2, "[3/3] Talk to Torren to prepare for the journey");
+        quests.back().addDescription(2, "Return back to Elder Throne");
+        quests.back().addObjective  (2, std::make_shared<TalkingObjective>(0));
+
+        quests.back().addNpcID      (3, -1);
+        quests.back().addDialogue   (3, std::string());
+        quests.back().addDescription(3, "Find Torren");
+        quests.back().addObjective  (3, std::make_shared<TalkingObjective>(1));
         
-        quests.back().addNpcID(2, 1);
-        quests.back().addDialogue(2, "[1/1] Oh, Elder Thorne told you to come here?", true);
-        quests.back().addDescription(2, "");
-        quests.back().addObjective(2, std::make_shared<FinishedObjective>(), true);
-        quests.back().setTurnIn(2, false);
+        quests.back().addNpcID      (4, 1);
+        quests.back().addDialogue   (4, "[1/6] Oh, Elder Thorne told you to come here?");
+        quests.back().addDialogue   (4, "[2/6] You sure about leaving? It's dangerous out there");
+        quests.back().addDialogue   (4, "[3/6] I've seen strange tracks near the river, not animal ones");
+        quests.back().addDialogue   (4, "[4/6] If you're going, take this bow. Just in case");
+        quests.back().addDialogue   (4, "[5/6] Press [Space] to use that bow");
+        quests.back().addDialogue   (4, "[6/6] Now, as an archer, help us defeat the monsters around here");
+        quests.back().addDescription(4, "Find Torren");
+        quests.back().addObjective  (4, std::make_shared<TalkingObjective>(1));
+        
+        quests.back().addNpcID      (5, 1);
+        quests.back().addDialogue   (5, std::string());
+        quests.back().addDescription(5, "Help the villages defeat the monsters");
+        quests.back().addObjective  (5, std::make_shared<KillMonsterObjective>("Bat Lv.1", 5));
+        quests.back().addObjective  (5, std::make_shared<KillMonsterObjective>("Eye Lv.5", 2));
+
+        quests.back().addNpcID      (6, -1);
+        quests.back().addDialogue   (6, std::string());
+        quests.back().addDescription(6, "Return back to Torren");
+        quests.back().addObjective  (6, std::make_shared<TalkingObjective>(1));
+
+        quests.back().addNpcID      (7, 1);
+        quests.back().addDialogue   (7, "[1/3] Oh, you are back");
+        quests.back().addDialogue   (7, "[2/3] You like the bow I gave you, no problem");
+        quests.back().addDialogue   (7, "[3/3] I see, you are strong enough to write your journey");
+        quests.back().addDescription(7, "Return back to Torren");
+        quests.back().addObjective  (7, std::make_shared<TalkingObjective>(1));
     }
     {
-        quests.push_back(Quest("Kill eyes", 1000));
-        quests.back().addRequiredLevel(2);
+        // quests.push_back(Quest("...", exp));
+        // quests.back().addRequiredLevel(playerLevel);
 
-        quests.back().addNpcID(0, 1);
-        quests.back().addDialogue(0, "[1/5] You sure about leaving, kid? It's dangerous out there", true);
-        quests.back().addDialogue(0, "[2/5] I've seen strange tracks near the river, not animal ones");
-        quests.back().addDialogue(0, "[3/5] If you're going, take this bow. Just in case");
-        quests.back().addDialogue(0, "[4/5] Press [Space] to use that bow");
-        quests.back().addDialogue(0, "[5/5] Now, as an archer, help us defeat the eyes");
-        quests.back().addDescription(0, "Help the villages defeat the eyes");
-        quests.back().addObjective(0, std::make_shared<KillMonsterObjective>("Eye Lv.5", 2), true);
-        quests.back().setTurnIn(0, false);
+        // quests.back().addNpcID      (stage, npcID);
+        // quests.back().addDialogue   (stage, "...");
+        // quests.back().addDescription(stage, "...");
+        // quests.back().addObjective  (stage, objective);
     }
 }
 
