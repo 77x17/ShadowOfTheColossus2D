@@ -101,11 +101,23 @@ void loadEnemy(std::vector<Enemy*>& enemys, const std::unordered_map<std::string
 void loadNpc(std::vector<Npc>& npcs, const std::unordered_map<int, sf::FloatRect>& npcRects) {
     npcs.emplace_back(
         0,
+        // Elder Thorne
         npcRects.at(0)
     );
     npcs.emplace_back(
         1,
+        // Torren 
         npcRects.at(1)
+    );
+    npcs.emplace_back(
+        2,
+        // Mira 
+        npcRects.at(2)
+    );
+    npcs.emplace_back(
+        3,
+        // Bren 
+        npcRects.at(3)
     );
 }
 
@@ -168,6 +180,15 @@ void loadQuests(std::vector<Quest>& quests) {
         quests.back().addDescription(7, "Return back to Torren");
         quests.back().addObjective  (7, std::make_shared<TalkingObjective>(1));
     }
+    // {
+    //     quests.push_back(Quest("Help the children", 100));
+    //     quests.back().addRequiredLevel(2);
+
+    //     quests.back().addNpcID      (stage, npcID);
+    //     quests.back().addDialogue   (stage, "...");
+    //     quests.back().addDescription(stage, "...");
+    //     quests.back().addObjective  (stage, objective);
+    // }
     {
         // quests.push_back(Quest("...", exp));
         // quests.back().addRequiredLevel(playerLevel);
