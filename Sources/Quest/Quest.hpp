@@ -15,31 +15,48 @@ enum class QuestState {
 
 class Quest {
 private:
-    int         npcID;
-    std::string title;
-    std::string description;
-    std::vector<std::shared_ptr<QuestObjective>> objectives;
-    
+    std::string      title;
+    std::vector<int> npcIDs;
+    std::vector<std::vector<std::string>> dialogues;
+    std::vector<std::string> descriptions;
+    std::vector<std::vector<std::shared_ptr<QuestObjective>>> objectives;
+    int requiredLevel;
+
     QuestState state;
-    bool       rewardGiven;
-    int        rewardExp;
+    bool rewardGiven;
+    int  rewardExp;
+
+    int  stage;
+    int  dialogueIndex;
+    bool turnInNotification;
 
 public:
-    Quest(int _npcID, const std::string& _title, const std::string& _description, int exp);
+    Quest(const std::string& _title, int exp);
     
-    void addObjective(const std::shared_ptr<QuestObjective>& objective);
+    void addRequiredLevel(int level);
+    void addNpcID(int _stage, int ID);
+    void addDialogue(int _stage, const std::string& dialogue, bool create = false);
+    void addDescription(int _stage, const std::string& description);
+    void addObjective(int _stage, const std::shared_ptr<QuestObjective>& objective, bool create = false);
     
+    bool isSuitableForGivingQuest(int playerLevel);
     bool isCompleted() const;
-
     bool isFinishedObjectives() const;
-
     bool isReceiveReward() const;
+    bool isFinishedDialogue() const;
+    bool isReadyToTurnIn();
 
-    bool accept(const int& _npcID);
+    bool accept();
     void update(const std::string& eventType, const std::string& target);
-    bool turnIn(const int& _npcID);
+    bool turnIn();
 
     std::string getQuestInformation(const int& idx) const;
 
     int getRewardExp();
+
+    int getID() const;
+    std::string getDialogue();
+    std::string getRequired() const;
+
+    void isInterruptedGivingQuest();
 };

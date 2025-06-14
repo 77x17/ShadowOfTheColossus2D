@@ -2,20 +2,15 @@
 
 #include <iostream>
 
-Npc::Npc(int _ID, std::vector<std::string>&& _dialogue, int _requiredLevel, const sf::FloatRect& _hitbox) {
-    state         = NPCState::IDLE;
-    ID            = _ID;
-    dialogue      = std::move(_dialogue);
-    requiredLevel = _requiredLevel;
-    hitbox        = _hitbox;
+Npc::Npc(int _ID, const sf::FloatRect& _hitbox) {
+    state  = NPCState::IDLE;
+    ID     = _ID;
+    hitbox = _hitbox;
 
     dialogueIndex  = 0;
     finishedTalk   = false;
 }
 
-bool Npc::isSuitableForGivingQuest(int playerLevel) {
-    return playerLevel >= requiredLevel;
-}
 void Npc::setRequired() {
     state = NPCState::REQUIRED;
 }
@@ -54,7 +49,7 @@ std::string Npc::getDialogue() {
             }
         }
         case NPCState::REQUIRED: {
-            return "You must be at least Lv." + std::to_string(requiredLevel) + "\nto accept this quest";
+            return "You must be at least Lv." + std::to_string(1) + "\nto accept this quest";
         }
         case NPCState::COMPLETED_QUEST: {
             return "I'm very appreciated";

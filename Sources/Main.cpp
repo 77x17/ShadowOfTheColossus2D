@@ -67,7 +67,6 @@ void loadSound() {
 }
 
 void loadMap(TileMap& map) {
-    // map.load("Maps/test.tmx", "Maps/overworld.png");
     map.load("Maps/test.tmx", {
         {"overworld", "Maps/overworld.png"},
         {"CastleWalls", "Maps/CastleWalls.png"},
@@ -99,37 +98,72 @@ void loadEnemy(std::vector<Enemy*>& enemys, const std::unordered_map<std::string
 void loadNpc(std::vector<Npc>& npcs, const std::unordered_map<int, sf::FloatRect>& npcRects) {
     npcs.emplace_back(
         0,
-        std::vector<std::string>{
-            "A",
-            "B",
-            "C"
-        },
-        1,
         npcRects.at(0)
     );
     npcs.emplace_back(
         1,
-        std::vector<std::string>{
-            "D",
-            "E",
-            "F"
-        },
-        3,
         npcRects.at(1)
     );
 }
 
 void loadQuests(std::vector<Quest>& quests) {
-    quests.push_back(Quest(0, "Bat Hunt", "Slaying Bats", 40));
-    quests.back().addObjective(std::make_shared<KillMonsterObjective>("Bat Lv.1", 1));
-    quests.back().addObjective(std::make_shared<KillMonsterObjective>("Bat Lv.1", 2));
+    {
+        // quests.push_back(Quest("...", exp));
+        // quests.back().addRequiredLevel(playerLevel);
 
-    quests.push_back(Quest(1, "Eye Hunt", "Help the villagers slaying Eyes", 200));
-    quests.back().addObjective(std::make_shared<KillMonsterObjective>("Eye Lv.5", 1));
+        // quests.back().addNpcID(stage, npcID);
+        // quests.back().addDialogue(stage, "...", true);
+        // quests.back().addDialogue(stage, "...");
+        // quests.back().addDescription(stage, "...");
+
+        // quests.back().addObjective(stage, objective, true);
+        // quests.back().addObjective(stage, objective);
+    }
+    {
+        quests.push_back(Quest("Explore strange paths", 40));
+        quests.back().addRequiredLevel(1);
+
+        quests.back().addNpcID(0, 0);
+        quests.back().addDialogue(0, "[1/4] The forest has changed. It no longer feels safe", true);
+        quests.back().addDialogue(0, "[2/4] Long ago, we sealed something deep beyond those hills");
+        quests.back().addDialogue(0, "[3/4] But now... whispers return, and beasts creep closer each night");
+        quests.back().addDialogue(0, "[4/4] You must go, find the truth. We're counting on you");
+        quests.back().addDescription(0, "Come see the road behind the wooden bridge");
+
+        quests.back().addObjective(0, std::make_shared<KillMonsterObjective>("Bat Lv.1", 2), true);
+        quests.back().addObjective(0, std::make_shared<KillMonsterObjective>("Bat Lv.1", 2));
+        
+        quests.back().addNpcID(1, 0);
+        quests.back().addDialogue(1, "[1/3] Oh, you are back", true);
+        quests.back().addDialogue(1, "[2/3] This place used to be very peaceful");
+        quests.back().addDialogue(1, "[3/3] Talk to Toren to prepare for the journey.");
+        quests.back().addDescription(1, "...");
+        quests.back().addObjective(1, std::make_shared<KillMonsterObjective>("Bat Lv.1", 0), true);
+
+        // quests.back().addNpcID(2, 1);
+        // quests.back().addDialogue(2, "D", true);
+        // quests.back().addDialogue(2, "E");
+        // quests.back().addDescription(2, "Help the villages defeat the eyes");
+
+        // quests.back().addObjective(1, std::make_shared<KillMonsterObjective>("Eye Lv.5", 2), true);
+    }
+    {
+        quests.push_back(Quest("Kill eyes", 1000));
+        quests.back().addRequiredLevel(2);
+
+        quests.back().addNpcID(0, 1);
+        quests.back().addDialogue(0, "[1/4] You sure about leaving, kid? It's dangerous out there", true);
+        quests.back().addDialogue(0, "[2/4] I've seen strange tracks near the river, not animal ones");
+        quests.back().addDialogue(0, "[3/4] If you're going, take this bow. Just in case");
+        quests.back().addDialogue(0, "[4/4] Press [Space] to use that bow.");
+        quests.back().addDescription(0, "Help the villages defeat the eyes");
+
+        quests.back().addObjective(0, std::make_shared<KillMonsterObjective>("Eye Lv.5", 2), true);
+    }
 }
 
 int main() {
-    sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Shadow Of The Colossus 2D", sf::Style::Close);
+    sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Project_H", sf::Style::Close);
     // window.setFramerateLimit(60);
     window.setVerticalSyncEnabled(true);
 
@@ -158,6 +192,8 @@ int main() {
     UI ui;
 
     ui.generateMinimapTexture(map);
+
+    std::cerr << "Finished loading\n";
 
     sf::Clock clock;
     bool      isMinimized  = false;
@@ -199,9 +235,9 @@ int main() {
 
                     window.close();
                     if (isFullscreen) {
-                        window.create(sf::VideoMode::getDesktopMode(), "Shadow Of The Colossus 2D", sf::Style::Fullscreen);
+                        window.create(sf::VideoMode::getDesktopMode(), "Project_H", sf::Style::Fullscreen);
                     } else {
-                        window.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Shadow Of The Colossus 2D", sf::Style::Close);
+                        window.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Project_H", sf::Style::Close);
                     }
                     // window.setFramerateLimit(60);
                     window.setVerticalSyncEnabled(true);

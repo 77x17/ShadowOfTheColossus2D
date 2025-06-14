@@ -16,16 +16,14 @@ private:
     NPCState                 state;
     int                      ID;
     std::vector<std::string> dialogue;
-    int                      requiredLevel;
     sf::FloatRect            hitbox;
     
     int  dialogueIndex;
     bool finishedTalk;
 
 public:
-    Npc(int _id, std::vector<std::string>&& _dialogue, int _requiredLevel, const sf::FloatRect& _hitbox);
+    Npc(int _id, const sf::FloatRect& _hitbox);
 
-    bool isSuitableForGivingQuest(int playerLevel);
     void setRequired();
 
     void givingQuest();

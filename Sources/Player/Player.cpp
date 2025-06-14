@@ -77,7 +77,7 @@ Player::Player(const float& x, const float& y, const float& hp, std::vector<Ques
     FADE_SPEED            = 5.0f;
     interactTextOpacity   = 0.0f;
     INTERACT_COOLDOWN     = 0.5f;
-    interactCooldownTimer = 0.0f;
+    interactCooldownTimer = -100.0f;
 
     interactText.setFont(Font::font);
     interactText.setCharacterSize(12.5f);
@@ -85,7 +85,8 @@ Player::Player(const float& x, const float& y, const float& hp, std::vector<Ques
     interactText.setFillColor(sf::Color(255, 255, 255, interactTextOpacity));
     interactText.setOutlineColor(sf::Color(0, 0, 0, interactTextOpacity));
     interactText.setString("Press [F] to talk");
-    interactText.setOrigin(interactText.getLocalBounds().left + interactText.getLocalBounds().width / 2, 0);
+    interactText.setOrigin(interactText.getLocalBounds().left + interactText.getLocalBounds().width / 2, 
+                           interactText.getLocalBounds().top + interactText.getLocalBounds().height / 2);
 
     KNOCKBACK_STRENGTH     = 100.0f;
     KNOCKBACK_COOLDOWN     = 0.2f;
@@ -212,50 +213,84 @@ void Player::handleProjectiles(const sf::RenderWindow& window) {
 }
 
 void Player::handleQuests(const float& dt, const sf::RenderWindow& window, std::vector<Npc>& npcs) {
-    bool isCollisionNPC = false;
+    bool isCollisionNpc = false;
     for (const Npc& npc : npcs) {
         sf::FloatRect npcRect = npc.getHitbox();
         if (isCollision(npcRect)) {
             interactText.setPosition(npcRect.getPosition() + sf::Vector2f(npcRect.getSize().x / 2, -npcRect.getSize().y));
-            isCollisionNPC = true;
+            isCollisionNpc = true;
         }
     }
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::F) && interactCooldownTimer <= 0) {
-        interactCooldownTimer = INTERACT_COOLDOWN;
         for (Npc& npc : npcs) {
             if (isCollision(npc.getHitbox())) {
-                interactText.setString(npc.getDialogue());
-
-                if (npc.isSuitableForGivingQuest(getLevel())) {
-                    npc.givingQuest();
+                if (interactCooldownTimer == -100.0f) {
+                    interactText.setString(npc.getDialogue());
                 }
                 else {
-                    npc.setRequired();
-                }
+                    for (Quest& quest : quests) if (npc.getID() == quest.getID()) {
+                        if (quest.isSuitableForGivingQuest(getLevel())) {
+                            if (quest.isCompleted()) {
+                                interactText.setString("Thanks for your help!");
+                                continue;
+                            }
+                            else if (quest.isFinishedDialogue()) {
+                                if (quest.accept()) {
+                                    updateQuest = true;
+                                }
+                                else if (quest.turnIn()) {
+                                    updateQuest = true;
+                                    interactText.setString("I'm very appreciated!");
+                                }
+                                else {
+                                    interactText.setString("I need your support");
 
-                if (npc.isFinishedTalk()) {
-                    for (Quest& quest : quests) {
-                        if (quest.accept(npc.getID())) {
-                            updateQuest = true;
+                                    continue;
+                                }
+                            }
+                            else {
+                                interactText.setString(quest.getDialogue());
+                            }
+                        }
+                        else {
+                            interactText.setString(quest.getRequired());
                         }
 
-                        if (quest.turnIn(npc.getID())) {
-                            npc.completedQuest();
-                            interactText.setString(npc.getDialogue());
-
-                            updateQuest = true;
-                        }
+                        break;
                     }
                 }
+
+                // if (npc.isSuitableForGivingQuest(getLevel())) {
+                //     npc.givingQuest();
+                // }
+                // else {
+                //     npc.setRequired();
+                // }
+
+                // if (npc.isFinishedTalk()) {
+                //     for (Quest& quest : quests) {
+                //         if (quest.accept(npc.getID())) {
+                //             updateQuest = true;
+                //         }
+
+                //         if (quest.turnIn(npc.getID())) {
+                //             npc.completedQuest();
+                //             interactText.setString(npc.getDialogue());
+
+                //             updateQuest = true;
+                //         }
+                //     }
+                // }
 
                 interactText.setOrigin(interactText.getLocalBounds().left + interactText.getLocalBounds().width / 2, 
                                        interactText.getLocalBounds().top + interactText.getLocalBounds().height / 2);
             }
         }
+        interactCooldownTimer = INTERACT_COOLDOWN;
     }
 
-    if (isCollisionNPC) {
+    if (isCollisionNpc) {
         interactTextOpacity += (255 - interactTextOpacity) * FADE_SPEED * dt;
     }
     else {
@@ -263,11 +298,14 @@ void Player::handleQuests(const float& dt, const sf::RenderWindow& window, std::
 
         if (40 < interactTextOpacity && interactTextOpacity < 50) {
             interactText.setString("Press [F] to talk");
-            interactText.setOrigin(interactText.getLocalBounds().left + interactText.getLocalBounds().width / 2, 0);
+            interactText.setOrigin(interactText.getLocalBounds().left + interactText.getLocalBounds().width / 2, 
+                                   interactText.getLocalBounds().top + interactText.getLocalBounds().height / 2);
             
-            for (Npc& npc : npcs) {
-                npc.isInterruptedGivingQuest();
-            } 
+            interactCooldownTimer = -100.0f;
+
+            for (Quest& quest : quests) {
+                quest.isInterruptedGivingQuest();
+            }
         }
     }
 
@@ -523,7 +561,10 @@ void Player::updateProjectiles(const float& dt) {
 
 void Player::updateQuests() {
     for (auto it = quests.begin(); it != quests.end(); /**/) {
-        if (it->isCompleted() && !it->isReceiveReward()) {
+        if (it->isReadyToTurnIn()) {
+            updateQuest = true;
+        }
+        else if (it->isCompleted() && !it->isReceiveReward()) {
             updateXP(it->getRewardExp());
 
             // it = quests.erase(it);

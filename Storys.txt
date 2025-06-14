@@ -1,0 +1,39 @@
+1. Xuất phát điểm:
+Một thanh niên vừa đủ tuổi rời khỏi làng → bắt đầu cuộc hành trình.
+
+2. Mục tiêu ban đầu:
+Tìm hiểu nguồn gốc vì sao thế giới lại có quái vật.
+
+3. Sự thật dần hé lộ:
+Có một nhân vật phản diện trong quá khứ đã mở một cánh cổng bị nguyền rủa → khiến quái vật tràn vào.
+
+4. Cao trào:
+Chạm trán và chiến đấu với nhân vật đó.
+
+Giai đoạn   Tên gọi	                Diễn giải/Quest chính
+1	        Làng Bình Yên	        Làm nhiệm vụ nhỏ trong làng, gặp NPC già làng gợi ý “thế giới ngoài kia không còn như xưa”
+2	        Vùng Đồi Cấm	        NPC yêu cầu điều tra những con quái vật xuất hiện gần làng → phát hiện tàn tích cổ
+3	        Học viện Lưu Trữ	    Tìm thư viện cũ / tu viện có sách sử → NPC học giả kể chuyện “Cánh cổng bị nguyền”
+4	        Thành Phố Đổ Nát	    Làm nhiệm vụ liên quan phe phản kháng, tìm được người biết về nhân vật phản diện xưa
+5	        Hành trình truy dấu	    Thu thập các mảnh thông tin cổ / manh mối → từng bước xác định vị trí của cánh cổng
+6	        Cánh Cổng Hắc Ám	    Cốt truyện đẩy nhanh, sinh vật hắc ám tràn ra, nhiều vùng đất bị ảnh hưởng
+7	        Đối đầu quá khứ	Vào     chiều không gian nơi nhân vật phản diện trú ngụ, chiến đấu cuối cùng
+
+🔹 Làng khởi đầu
+NPC 1 - Già làng     : "Ngày trước, bọn quái vật đâu có lang thang thế này..."
+NPC 2 - Bạn thân     :  Giao quest đi lấy đồ, giúp bạn quen hệ thống di chuyển/chọn đồ.
+NPC 3 - Lính gác cổng: Không cho ra khỏi làng trừ khi làm vài nhiệm vụ đơn giản → tutorial combat.
+
+🔹 Khu vực ngoài làng
+NPC 4 - Nông dân hoảng loạn: "Có gì đó lạ ở khu rừng Đen... nó không yên ả nữa rồi."
+NPC 5 - Người sống sót: Nằm thoi thóp, cảnh báo bạn trước khi chết.
+
+🔹 Nơi chứa lịch sử
+NPC 6 - Thầy tu / học giả: "Có ghi chép về một 'Kẻ Không Tên' đã phá bỏ phong ấn cách đây nhiều thế hệ..."
+
+→ Cung cấp quest đi lấy bản thảo hoặc mảnh di tích cổ.
+
+🔹 Vùng nguy hiểm
+NPC 7 - Cựu chiến binh: "Ta đã chiến đấu ở trận chiến phong ấn đó… hắn không phải là con người nữa."
+
+→ Mở ra phần sâu về phản diện.
