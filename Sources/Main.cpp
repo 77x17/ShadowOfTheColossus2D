@@ -67,7 +67,14 @@ void loadSound() {
 }
 
 void loadMap(TileMap& map) {
-    map.load("Maps/test.tmx", "Maps/overworld.png");
+    // map.load("Maps/test.tmx", "Maps/overworld.png");
+    map.load("Maps/test.tmx", {
+        {"overworld", "Maps/overworld.png"},
+        {"CastleWalls", "Maps/CastleWalls.png"},
+        {"medium_oak_tree_static", "Maps/medium_oak_tree_static.png"},
+        {"big_oak_tree_static", "Maps/big_oak_tree_static.png"}
+    });
+
 
     map.scale(2.f, 2.f);
     map.updateObjects();
@@ -143,7 +150,11 @@ int main() {
     std::vector<Quest> quests;
     loadQuests(quests);
 
-    Player player(108 * TILE_SIZE, 108 * TILE_SIZE, 50.0f, std::move(quests));
+    sf::Vector2f PlayerTiles = sf::Vector2f(
+        78, 
+        110
+    );
+    Player player(PlayerTiles.x * TILE_SIZE, PlayerTiles.y * TILE_SIZE, 50.0f, std::move(quests));
     UI ui;
 
     ui.generateMinimapTexture(map);
@@ -152,7 +163,7 @@ int main() {
     bool      isMinimized  = false;
     bool      isFullscreen = false;
     sf::View  view         = window.getView();
-    view.setCenter(108 * TILE_SIZE, 108 * TILE_SIZE);
+    view.setCenter(PlayerTiles.x * TILE_SIZE, PlayerTiles.y * TILE_SIZE);
     sf::View  uiView       = window.getDefaultView();
     while (window.isOpen()) {
         float dt = clock.restart().asSeconds();

@@ -229,7 +229,7 @@ void UI::updateMinimap(const float& dt, const Player& player, const sf::Vector2f
         playerPos.y - static_cast<float>(viewRect.top)
     );
 
-    std::cerr << localPlayerPos.x << ' ' << localPlayerPos.y << '\n';
+    // std::cerr << localPlayerPos.x << ' ' << localPlayerPos.y << '\n';
 
     sf::Vector2f scaledPlayerPos(
         localPlayerPos.x * scale.x,
