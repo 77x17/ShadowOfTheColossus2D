@@ -6,8 +6,8 @@ KillMonsterObjective::KillMonsterObjective(const std::string& type, int count) {
     currentCount  = 0;
 }
 
-void KillMonsterObjective::updateProgress(const std::string& eventType, const std::string& target) {
-    if (eventType == "kill" && target == monsterType && !isFinished()) {
+void KillMonsterObjective::updateProgress(const QuestEventData& data) {
+    if (data.eventType == "kill" && data.targetName == monsterType && !isFinished()) {
         currentCount++;
     }
 }

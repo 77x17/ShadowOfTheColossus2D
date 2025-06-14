@@ -45,6 +45,9 @@ void Quest::addObjective(int _stage, const std::shared_ptr<QuestObjective>& obje
     objectives[_stage].push_back(objective);
 }
 
+void Quest::setTurnIn(int _stage, bool turnIn) {
+    needToTurnIn.push_back(turnIn);
+}
 
 bool Quest::isSuitableForGivingQuest(int playerLevel) {
     return playerLevel >= requiredLevel;
@@ -93,19 +96,34 @@ bool Quest::accept() {
     return false;
 }
 
-void Quest::update(const std::string& eventType, const std::string& target) {
+void Quest::nextStage() {
+    stage++;
+    if (stage == static_cast<int>(npcIDs.size())) {
+        state = QuestState::COMPLETED;
+    }
+    else {
+        state = QuestState::NOT_ACCEPTED;
+    }
+}
+
+void Quest::update(const QuestEventData& data) {
     if (state != QuestState::IN_PROGRESS) {
         return;
     }
 
     for (std::shared_ptr<QuestObjective>& objective : objectives[stage]) {
-        objective->updateProgress(eventType, target);
+        objective->updateProgress(data);
     }
 
     if (state == QuestState::IN_PROGRESS && isFinishedObjectives()) {
-        state = QuestState::READY_TO_TURN_IN;
-        turnInNotification = true;
-        std::cerr << "Quest ready to turn in: '" << title << "' " << "stage: " << stage << "\n";
+        if (needToTurnIn[stage]) {
+            state = QuestState::READY_TO_TURN_IN;
+            turnInNotification = true;
+            std::cerr << "Quest ready to turn in: '" << title << "' " << "stage: " << stage << "\n";
+        }
+        else {
+            nextStage();
+        }
     }
 }
 
@@ -113,13 +131,7 @@ bool Quest::turnIn() {
     if (state == QuestState::READY_TO_TURN_IN) {
         std::cerr << "Quest turned in: '" << title << "' " << "stage: " << stage << "\n";
 
-        stage++;
-        if (stage == static_cast<int>(npcIDs.size())) {
-            state = QuestState::COMPLETED;
-        }
-        else {
-            state = QuestState::NOT_ACCEPTED;
-        }
+        nextStage();
         
         return true;
     }

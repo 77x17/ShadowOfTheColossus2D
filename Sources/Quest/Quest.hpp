@@ -20,6 +20,7 @@ private:
     std::vector<std::vector<std::string>> dialogues;
     std::vector<std::string> descriptions;
     std::vector<std::vector<std::shared_ptr<QuestObjective>>> objectives;
+    std::vector<bool> needToTurnIn;
     int requiredLevel;
 
     QuestState state;
@@ -34,11 +35,12 @@ public:
     Quest(const std::string& _title, int exp);
     
     void addRequiredLevel(int level);
-    void addNpcID(int _stage, int ID);
-    void addDialogue(int _stage, const std::string& dialogue, bool create = false);
+    void addNpcID      (int _stage, int ID);
+    void addDialogue   (int _stage, const std::string& dialogue, bool create = false);
     void addDescription(int _stage, const std::string& description);
-    void addObjective(int _stage, const std::shared_ptr<QuestObjective>& objective, bool create = false);
-    
+    void addObjective  (int _stage, const std::shared_ptr<QuestObjective>& objective, bool create = false);
+    void setTurnIn     (int _stage, bool turnIn);
+
     bool isSuitableForGivingQuest(int playerLevel);
     bool isCompleted() const;
     bool isFinishedObjectives() const;
@@ -47,7 +49,8 @@ public:
     bool isReadyToTurnIn();
 
     bool accept();
-    void update(const std::string& eventType, const std::string& target);
+    void nextStage();
+    void update(const QuestEventData& data);
     bool turnIn();
 
     std::string getQuestInformation(const int& idx) const;

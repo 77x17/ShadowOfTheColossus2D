@@ -4,6 +4,8 @@ Build/Main.o: Sources/Main.cpp Sources/Configuration/Constants.hpp \
  Sources/Configuration/pugiconfig.hpp Sources/Player/Player.hpp \
  Sources/Animation/Animation.hpp Sources/Projectile/Projectile.hpp \
  Sources/Quest/Quest.hpp Sources/Quest/QuestObjective.hpp \
- Sources/Quest/KillMonsterObjective.hpp Sources/Npc/Npc.hpp \
- Sources/Player/UI.hpp Sources/Enemy/Enemy.hpp Sources/Enemy/Bat.hpp \
- Sources/Enemy/Eye.hpp Sources/Animation/ShaderManager.hpp
+ Sources/Npc/Npc.hpp Sources/Player/UI.hpp Sources/Enemy/Enemy.hpp \
+ Sources/Enemy/Bat.hpp Sources/Enemy/Eye.hpp \
+ Sources/Quest/KillMonsterObjective.hpp \
+ Sources/Quest/FinishedObjective.hpp Sources/Quest/TalkingObjective.hpp \
+ Sources/Animation/ShaderManager.hpp

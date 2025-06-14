@@ -10,7 +10,6 @@
 #include "Font.hpp"
 
 #include "Quest.hpp"
-#include "KillMonsterObjective.hpp"
 
 #include "Npc.hpp"
 

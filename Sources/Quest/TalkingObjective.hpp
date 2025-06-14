@@ -2,14 +2,11 @@
 
 #include "QuestObjective.hpp"
 
-class KillMonsterObjective : public QuestObjective {
-private:
-    std::string monsterType;
-    int requiredCount;
-    int currentCount;
-
+class TalkingObjective : public QuestObjective {
+    int npcID;
+    bool met;
 public:
-    KillMonsterObjective(const std::string& type, int count);
+    TalkingObjective(int _npcID);
 
     void updateProgress(const QuestEventData& data) override;
 

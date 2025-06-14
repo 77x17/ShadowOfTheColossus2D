@@ -77,7 +77,7 @@ Player::Player(const float& x, const float& y, const float& hp, std::vector<Ques
     FADE_SPEED            = 5.0f;
     interactTextOpacity   = 0.0f;
     INTERACT_COOLDOWN     = 0.5f;
-    interactCooldownTimer = -100.0f;
+    interactCooldownTimer = 0.0f;
 
     interactText.setFont(Font::font);
     interactText.setCharacterSize(12.5f);
@@ -225,12 +225,15 @@ void Player::handleQuests(const float& dt, const sf::RenderWindow& window, std::
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::F) && interactCooldownTimer <= 0) {
         for (Npc& npc : npcs) {
             if (isCollision(npc.getHitbox())) {
-                if (interactCooldownTimer == -100.0f) {
-                    interactText.setString(npc.getDialogue());
-                }
-                else {
-                    for (Quest& quest : quests) if (npc.getID() == quest.getID()) {
+                for (Quest& quest : quests) {
+                    QuestEventData dataPack;
+                    dataPack.eventType   = "talk";
+                    dataPack.targetNpcID = npc.getID();
+                    quest.update(dataPack);
+
+                    if (npc.getID() == quest.getID()) {
                         if (quest.isSuitableForGivingQuest(getLevel())) {
+                            finishedQuest:
                             if (quest.isCompleted()) {
                                 interactText.setString("Thanks for your help!");
                                 continue;
@@ -238,10 +241,18 @@ void Player::handleQuests(const float& dt, const sf::RenderWindow& window, std::
                             else if (quest.isFinishedDialogue()) {
                                 if (quest.accept()) {
                                     updateQuest = true;
+                                    
+                                    quest.update(QuestEventData());
                                 }
-                                else if (quest.turnIn()) {
+                                if (quest.turnIn()) {
                                     updateQuest = true;
-                                    interactText.setString("I'm very appreciated!");
+
+                                    if (npc.getID() == quest.getID()) {
+                                        goto finishedQuest;
+                                    }
+                                    else {
+                                        interactText.setString("I'm very appreciated!");
+                                    }
                                 }
                                 else {
                                     interactText.setString("I need your support");
@@ -300,8 +311,6 @@ void Player::handleQuests(const float& dt, const sf::RenderWindow& window, std::
             interactText.setString("Press [F] to talk");
             interactText.setOrigin(interactText.getLocalBounds().left + interactText.getLocalBounds().width / 2, 
                                    interactText.getLocalBounds().top + interactText.getLocalBounds().height / 2);
-            
-            interactCooldownTimer = -100.0f;
 
             for (Quest& quest : quests) {
                 quest.isInterruptedGivingQuest();
@@ -658,7 +667,10 @@ void Player::updateXP(const float& amount) {
 
 void Player::addVictim(const std::string& label) {
     for (Quest& quest : quests) {
-        quest.update("kill", label);
+        QuestEventData dataPack;
+        dataPack.eventType  = "kill";
+        dataPack.targetName = label;
+        quest.update(dataPack);
     }
 
     updateXP(1.0f);
