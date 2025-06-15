@@ -5,7 +5,8 @@
 struct QuestEventData {
     std::string eventType;              
     std::string targetName;             
-    int         targetNpcID = -1;               
+    int         npcID    = -1;     
+    int         regionID = -1;          
 };
 
 class QuestObjective {

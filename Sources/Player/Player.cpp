@@ -1,5 +1,7 @@
 #include "Player.hpp"
+
 #include "ShaderManager.hpp"
+#include "Region.hpp"
 
 #include <cmath>
 
@@ -93,8 +95,9 @@ Player::Player(const float& x, const float& y, const float& hp, std::vector<Ques
     knockbackCooldownTimer = 0.0f;
 
     quests.clear();
-    quests        = std::move(_quests);
-    updateQuest   = false;
+    quests              = std::move(_quests);
+    updateQuest         = false;
+    collisionRegionName = "Unknown Area";
 }
 
 void Player::handleMove(const sf::RenderWindow& window) {
@@ -213,22 +216,13 @@ void Player::handleProjectiles(const sf::RenderWindow& window) {
 }
 
 void Player::handleQuests(const float& dt, const sf::RenderWindow& window, std::vector<Npc>& npcs) {
-    bool isCollisionNpc = false;
-    for (const Npc& npc : npcs) {
-        sf::FloatRect npcRect = npc.getHitbox();
-        if (isCollision(npcRect)) {
-            interactText.setPosition(npcRect.getPosition() + sf::Vector2f(npcRect.getSize().x / 2, -npcRect.getSize().y));
-            isCollisionNpc = true;
-        }
-    }
-
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::F) && interactCooldownTimer <= 0) {
         for (Npc& npc : npcs) {
             if (isCollision(npc.getHitbox())) {
                 for (Quest& quest : quests) {
                     QuestEventData dataPack;
-                    dataPack.eventType   = "talk";
-                    dataPack.targetNpcID = npc.getID();
+                    dataPack.eventType = "talk";
+                    dataPack.npcID     = npc.getID();
                     quest.update(dataPack);
 
                     if (npc.getID() == quest.getID()) {
@@ -240,8 +234,6 @@ void Player::handleQuests(const float& dt, const sf::RenderWindow& window, std::
                             else if (quest.isFinishedDialogue()) {
                                 if (quest.accept()) {
                                     updateQuest = true;
-                                    
-                                    quest.update(QuestEventData());
                                 }
                                 else {
                                     interactText.setString("I need your support");
@@ -263,30 +255,13 @@ void Player::handleQuests(const float& dt, const sf::RenderWindow& window, std::
 
                 interactText.setOrigin(interactText.getLocalBounds().left + interactText.getLocalBounds().width / 2, 
                                        interactText.getLocalBounds().top + interactText.getLocalBounds().height / 2);
+
+                SoundManager::playSound("talk");
             }
         }
+
         interactCooldownTimer = INTERACT_COOLDOWN;
     }
-
-    if (isCollisionNpc) {
-        interactTextOpacity += (255 - interactTextOpacity) * FADE_SPEED * dt;
-    }
-    else {
-        interactTextOpacity += (0   - interactTextOpacity) * FADE_SPEED * dt;
-
-        if (40 < interactTextOpacity && interactTextOpacity < 50) {
-            interactText.setString("Press [F] to talk");
-            interactText.setOrigin(interactText.getLocalBounds().left + interactText.getLocalBounds().width / 2, 
-                                   interactText.getLocalBounds().top + interactText.getLocalBounds().height / 2);
-
-            for (Quest& quest : quests) {
-                quest.isInterruptedGivingQuest();
-            }
-        }
-    }
-
-    interactText.setFillColor(sf::Color(255, 255, 255, interactTextOpacity));
-    interactText.setOutlineColor(sf::Color(0, 0, 0, interactTextOpacity));
 }
 
 void Player::handleInput(const float& dt, const sf::RenderWindow& window, std::vector<Npc>& npcs) {
@@ -422,6 +397,52 @@ void Player::updateTimer(const float &dt) {
     }
 }
 
+void Player::updateCollisionArea(const float& dt, const std::vector<Npc>& npcs, const std::unordered_map<int, sf::FloatRect>& regionRects) {
+    bool isCollisionNpc = false;
+    for (const Npc& npc : npcs) {
+        sf::FloatRect npcRect = npc.getHitbox();
+        if (isCollision(npcRect)) {
+            interactText.setPosition(npcRect.getPosition() + sf::Vector2f(npcRect.getSize().x / 2, -npcRect.getSize().y));
+            isCollisionNpc = true;
+        }
+    }
+
+    if (isCollisionNpc) {
+        interactTextOpacity += (255 - interactTextOpacity) * FADE_SPEED * dt;
+    }
+    else {
+        interactTextOpacity += (0   - interactTextOpacity) * FADE_SPEED * dt;
+
+        if (40 < interactTextOpacity && interactTextOpacity < 50) {
+            interactText.setString("Press [F] to talk");
+            interactText.setOrigin(interactText.getLocalBounds().left + interactText.getLocalBounds().width / 2, 
+                                   interactText.getLocalBounds().top + interactText.getLocalBounds().height / 2);
+
+            for (Quest& quest : quests) {
+                quest.isInterruptedGivingQuest();
+            }
+        }
+    }
+
+    interactText.setFillColor(sf::Color(255, 255, 255, interactTextOpacity));
+    interactText.setOutlineColor(sf::Color(0, 0, 0, interactTextOpacity));
+
+    for (auto& regionRect : regionRects) {
+        if (isCollision(regionRect.second)) {
+            for (Quest& quest : quests) {
+                QuestEventData dataPack;
+                dataPack.eventType = "explore";
+                dataPack.regionID  = regionRect.first;
+                quest.update(dataPack);
+            }
+
+            collisionRegionName = Region::getName(regionRect.first);
+
+            // SoundManager::resumeMusic(dt, "region" + std::to_string(regionRect.first));
+        }
+    }
+}
+
 void Player::updatePosition(const float& dt, const std::vector<sf::FloatRect>& collisionRects) {
     sf::Vector2f velocity(0.f, 0.f);
     if (knockbackCooldownTimer > 0) {
@@ -540,17 +561,20 @@ void Player::updateQuests() {
         if (it->isUpdateStage()) {
             updateQuest = true;
         }
-        else if (it->getID() == -1) {
-            it->accept();
+        if (it->getID() == -1) {
+            if (it->accept()) {
 
+            }
+            else {
+                it->update(QuestEventData());
+            }
             ++it;
         }
         else if (it->isCompleted() && !it->isReceiveReward()) {
             updateXP(it->getRewardExp());
-
-            // it = quests.erase(it);
         }
         else {
+            it->update(QuestEventData());
             ++it;
         }
     }
@@ -559,6 +583,7 @@ void Player::updateQuests() {
 void Player::update(const float& dt, 
                     const sf::RenderWindow& window, 
                     const std::vector<sf::FloatRect>& collisionRects, 
+                    const std::unordered_map<int, sf::FloatRect>& npcRects,
                     std::vector<Npc>& npcs) {
 
     updateTimer(dt);
@@ -573,6 +598,8 @@ void Player::update(const float& dt,
         return;
     }
     
+    updateCollisionArea(dt, npcs, npcRects);
+
     handleInput(dt, window, npcs);
 
     updatePosition(dt, collisionRects);
@@ -617,6 +644,8 @@ void Player::levelUp() {
     level++;
 
     maxHealthPoints++;
+
+    SoundManager::playSound("levelUp");
 }
 
 float Player::XPRequired() const {
@@ -681,6 +710,7 @@ bool Player::isUpdateQuest() {
     if (updateQuest) {
         updateQuest = false;
     
+        SoundManager::playSound("menuOpen");
         return true;
     }
 
@@ -698,4 +728,8 @@ void Player::updateView(const float& dt, sf::View& view) const {
     lerped.x = std::round(lerped.x);
     lerped.y = std::round(lerped.y);
     view.setCenter(lerped);
+}
+
+const std::string& Player::getCollisionRegionName() const {
+    return collisionRegionName;
 }

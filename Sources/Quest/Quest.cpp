@@ -53,7 +53,7 @@ bool Quest::isCompleted() const {
     return state == QuestState::COMPLETED;
 }
 
-bool Quest::isFinishedObjectives() const {
+bool Quest::isFinishObjectives() const {
     for (const std::shared_ptr<QuestObjective>& objective : objectives[stage]) {
         if (!objective->isFinished()) {
             return false;
@@ -118,7 +118,7 @@ void Quest::update(const QuestEventData& data) {
         objective->updateProgress(data);
     }
 
-    if (state == QuestState::IN_PROGRESS && isFinishedDialogue() && isFinishedObjectives()) {
+    if (state == QuestState::IN_PROGRESS && isFinishedDialogue() && isFinishObjectives()) {
         nextStage();
     }
 }

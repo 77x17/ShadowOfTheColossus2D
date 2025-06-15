@@ -88,6 +88,7 @@ private:
 
     std::vector<Quest> quests;
     bool               updateQuest;
+    std::string        collisionRegionName;
 
 public:
     Player(const float& x, const float& y, const float& hp, std::vector<Quest>&& _quests);
@@ -110,6 +111,7 @@ public:
     sf::FloatRect getHitBox() const;
 
     void updateTimer(const float &dt);
+    void updateCollisionArea(const float& dt, const std::vector<Npc>& npcs, const std::unordered_map<int, sf::FloatRect>& regionRects);
     void updatePosition(const float& dt, const std::vector<sf::FloatRect>& collisionRects);
     void updateHitbox();
     void updateAnimation();
@@ -118,6 +120,7 @@ public:
     void update(const float& dt, 
                 const sf::RenderWindow& window, 
                 const std::vector<sf::FloatRect>& collisionRects, 
+                const std::unordered_map<int, sf::FloatRect>& regionRects, 
                 std::vector<Npc>& npcs);
 
     void draw(sf::RenderWindow& window);
@@ -131,14 +134,15 @@ public:
     void  addVictim(const std::string& label);
 
     // for UI
-    float        getHealthRatio() const;
-    std::string  getHealthPointsString() const;
-    float        getXPRatio() const;
-    std::string  getXPString() const;
-    int          getLevel() const;
-    const        std::vector<Quest>& getQuests() const;
-    bool         isUpdateQuest();
-    sf::Vector2f getCenterPosition() const;
+    float                     getHealthRatio() const;
+    std::string               getHealthPointsString() const;
+    float                     getXPRatio() const;
+    std::string               getXPString() const;
+    int                       getLevel() const;
+    const std::vector<Quest>& getQuests() const;
+    bool                      isUpdateQuest();
+    sf::Vector2f              getCenterPosition() const;
+    const std::string&        getCollisionRegionName() const;
 
     void updateView(const float& dt, sf::View& view) const;
 };

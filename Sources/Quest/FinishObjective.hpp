@@ -2,7 +2,7 @@
 
 #include "QuestObjective.hpp"
 
-class FinishedObjective : public QuestObjective {
+class FinishObjective : public QuestObjective {
 public:
     void updateProgress(const QuestEventData& data) override;
 

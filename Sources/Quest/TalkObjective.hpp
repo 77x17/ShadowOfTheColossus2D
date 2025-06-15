@@ -2,11 +2,11 @@
 
 #include "QuestObjective.hpp"
 
-class TalkingObjective : public QuestObjective {
-    int npcID;
+class TalkObjective : public QuestObjective {
+    int  npcID;
     bool met;
 public:
-    TalkingObjective(int _npcID);
+    TalkObjective(int _npcID);
 
     void updateProgress(const QuestEventData& data) override;
 

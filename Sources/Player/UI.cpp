@@ -128,6 +128,15 @@ UI::UI() {
         minimapPlayerDot.setOrigin(minimapPlayerDot.getRadius(), minimapPlayerDot.getRadius());
 
         fullMinimapActive = false;
+
+        REGION_NAME_MINIMUM_SIZE = 12.5f;
+        REGION_NAME_MAXIMUM_SIZE = 30.0f;
+        regionNameSize           = REGION_NAME_MINIMUM_SIZE;
+        regionName.setFont(Font::font);
+        regionName.setCharacterSize(regionNameSize);
+        regionName.setFillColor(sf::Color::White);
+        regionName.setOutlineThickness(1.0f);
+        regionName.setOutlineColor(sf::Color::Black);
     }
 }
 
@@ -183,19 +192,23 @@ void UI::updateQuests(const float& dt, const std::vector<Quest>& quests, const s
 void UI::updateMinimap(const float& dt, const Player& player, const sf::Vector2f& uiSize) {
     sf::Vector2f targetSize;
     sf::Vector2f targetPosition;
+    float        targetTextSize;
     if (!fullMinimapActive) {
         targetPosition = sf::Vector2f(uiSize.x - minimapSize.x - MINIMAP_PADDING.x, MINIMAP_PADDING.y);
         targetSize     = MINIMAP_SIZE;
-        minimapSprite.setColor(sf::Color(255, 255, 255, 150)); 
+        minimapSprite.setColor(sf::Color(255, 255, 255, 150));
+        targetTextSize = REGION_NAME_MINIMUM_SIZE;
     }
     else {
         targetPosition = MINIMAP_PADDING;
         targetSize     = uiSize - MINIMAP_PADDING * 2.0f;
         minimapSprite.setColor(sf::Color(255, 255, 255, 250)); 
+        targetTextSize = REGION_NAME_MAXIMUM_SIZE;
     }
 
     minimapSize     += (targetSize     - minimapSize)     * MINIMAP_LEAP_SPEED * dt;
     minimapPosition += (targetPosition - minimapPosition) * MINIMAP_LEAP_SPEED * dt;
+    regionNameSize  += (targetTextSize - regionNameSize)  * MINIMAP_LEAP_SPEED * dt;
 
     sf::Vector2u mapPixelSize = minimapTexture.getSize();
     sf::Vector2f playerPos = player.getCenterPosition(); // world coordinates
@@ -239,6 +252,12 @@ void UI::updateMinimap(const float& dt, const Player& player, const sf::Vector2f
     sf::Vector2f dotPosition = minimapPosition + scaledPlayerPos;
 
     minimapPlayerDot.setPosition(dotPosition);
+
+    regionName.setCharacterSize(regionNameSize);
+    regionName.setString(player.getCollisionRegionName());
+    regionName.setOrigin(regionName.getLocalBounds().left + regionName.getLocalBounds().width / 2, 0);
+                        //  regionName.getLocalBounds().top + regionName.getLocalBounds().height / 2);
+    regionName.setPosition(minimapPosition + sf::Vector2f(minimapSize.x / 2, PADDING.y * 2));
 }
 
 void UI::update(const float& dt, Player& player, const sf::Vector2f& uiSize) {
@@ -277,10 +296,18 @@ void UI::draw(sf::RenderWindow& window) {
     window.draw(minimapBox);
     window.draw(minimapSprite);
     window.draw(minimapPlayerDot);
+    window.draw(regionName);
 }
 
 void UI::updateQuestsBox() {
     questsBoxVisible = !questsBoxVisible;
+
+    if (questsBoxVisible) {
+        SoundManager::playSound("menuOpen");
+    }
+    else {
+        SoundManager::playSound("menuClose");
+    }
 }
 
 void UI::generateMinimapTexture(const TileMap& map) {
@@ -310,9 +337,16 @@ void UI::updateMinimapBoxSize(bool minimize) {
         minimapViewRatio = 0.75;
     }
 
-    std::cerr << minimapViewRatio << '\n';
+    // std::cerr << minimapViewRatio << '\n';
 }
 
-void UI::openMap(const sf::Vector2f& uiSize) {    
+void UI::openMap(const sf::Vector2f& uiSize) {
     fullMinimapActive = !fullMinimapActive;
+
+    if (fullMinimapActive) {
+        SoundManager::playSound("menuOpen");
+    }
+    else {
+        SoundManager::playSound("menuClose");
+    }
 }

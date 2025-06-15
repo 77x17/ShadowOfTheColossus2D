@@ -56,6 +56,11 @@ private:
     sf::RectangleShape minimapBox;
     sf::CircleShape    minimapPlayerDot;
     bool               fullMinimapActive;
+    float              REGION_NAME_MINIMUM_SIZE;
+    float              REGION_NAME_MAXIMUM_SIZE;
+    float              regionNameSize;
+    sf::Text           regionName;
+
 public:
     UI();
 

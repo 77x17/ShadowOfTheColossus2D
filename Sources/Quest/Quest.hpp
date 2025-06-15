@@ -40,7 +40,7 @@ public:
 
     bool isSuitableForGivingQuest(int playerLevel);
     bool isCompleted() const;
-    bool isFinishedObjectives() const;
+    bool isFinishObjectives() const;
     bool isReceiveReward() const;
     bool isFinishedDialogue() const;
     bool isUpdateStage();

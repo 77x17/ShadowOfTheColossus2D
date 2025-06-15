@@ -17,8 +17,9 @@
 
 #include "Quest.hpp"
 #include "KillMonsterObjective.hpp"
-#include "FinishedObjective.hpp"
-#include "TalkingObjective.hpp"
+#include "FinishObjective.hpp"
+#include "TalkObjective.hpp"
+#include "ExploreObjective.hpp"
 #include "Npc.hpp"
 
 #include "ShaderManager.hpp"
@@ -29,6 +30,10 @@ std::unordered_map<std::string, sf::Texture> TextureManager::textures;
 
 std::unordered_map<std::string, sf::SoundBuffer> SoundManager::buffers;
 std::unordered_map<std::string, sf::Sound> SoundManager::sounds;
+std::unordered_map<std::string, std::unique_ptr<sf::Music>> SoundManager::regionMusic;
+std::string SoundManager::oldRegionMusic = std::string();
+float SoundManager::normalVolume = 50.0f;
+float SoundManager::fadeVolume   = 50.0f;
 
 std::unordered_map<std::string, std::unique_ptr<sf::Shader>> ShaderManager::shaders;
 
@@ -67,16 +72,26 @@ void loadSound() {
     SoundManager::loadSound("playerDie" , "Sounds/playerDie.wav");
     SoundManager::loadSound("enemyHurt" , "Sounds/enemyHurt.wav");
     SoundManager::loadSound("enemyDie"  , "Sounds/enemyDie.wav");
+    SoundManager::loadSound("talk"      , "Sounds/talk.wav");
+    SoundManager::loadSound("menuOpen"  , "Sounds/menu-open.wav");
+    SoundManager::loadSound("menuClose" , "Sounds/menu-close.wav");
+    SoundManager::loadSound("levelUp"   , "Sounds/levelUp.mp3");
+    SoundManager::loadMusic("region0"   , "Sounds/Salted - Wynn OST - 05 Detlas Suburb.ogg");
+    SoundManager::loadMusic("region1"   , "Sounds/Salted - Wynn OST - 04 Gavel Journey.ogg");
+    SoundManager::setMusicVolume("region0", 50.0f);
+    SoundManager::setMusicVolume("region1", 50.0f);
+
+    // SoundManager::loadMusic("regionSong", "E:/Code/TestingSFML/Wynn OST ogg/Salted - Wynn OST - 01 Introduction.ogg");
 }
 
 void loadMap(TileMap& map) {
     map.load("Maps/test.tmx", {
         {"overworld", "Maps/overworld.png"},
+        {"overworld_grass", "Maps/overworld_grass.png"},
         {"CastleWalls", "Maps/CastleWalls.png"},
         {"medium_oak_tree_static", "Maps/medium_oak_tree_static.png"},
         {"big_oak_tree_static", "Maps/big_oak_tree_static.png"}
     });
-
 
     map.scale(2.f, 2.f);
     map.updateObjects();
@@ -132,25 +147,24 @@ void loadQuests(std::vector<Quest>& quests) {
         quests.back().addDialogue   (0, "[3/4] But now... whispers return, and beasts creep closer each night");
         quests.back().addDialogue   (0, "[4/4] You must go, find the truth. We're counting on you");
         quests.back().addDescription(0, "Come see the road behind the wooden bridge");
-        quests.back().addObjective  (0, std::make_shared<KillMonsterObjective>("Bat Lv.1", 2));
-        quests.back().addObjective  (0, std::make_shared<KillMonsterObjective>("Bat Lv.1", 2));
+        quests.back().addObjective  (0, std::make_shared<ExploreObjective>(1));
         
         quests.back().addNpcID      (1, -1);
         quests.back().addDialogue   (1, std::string());
         quests.back().addDescription(1, "Return back to Elder Throne");
-        quests.back().addObjective  (1, std::make_shared<TalkingObjective>(0));
+        quests.back().addObjective  (1, std::make_shared<TalkObjective>(0));
 
         quests.back().addNpcID      (2, 0);
         quests.back().addDialogue   (2, "[1/3] Oh, you are back");
         quests.back().addDialogue   (2, "[2/3] This place used to be very peaceful");
         quests.back().addDialogue   (2, "[3/3] Talk to Torren to prepare for the journey");
         quests.back().addDescription(2, "Return back to Elder Throne");
-        quests.back().addObjective  (2, std::make_shared<TalkingObjective>(0));
+        quests.back().addObjective  (2, std::make_shared<TalkObjective>(0));
 
         quests.back().addNpcID      (3, -1);
         quests.back().addDialogue   (3, std::string());
         quests.back().addDescription(3, "Find Torren");
-        quests.back().addObjective  (3, std::make_shared<TalkingObjective>(1));
+        quests.back().addObjective  (3, std::make_shared<TalkObjective>(1));
         
         quests.back().addNpcID      (4, 1);
         quests.back().addDialogue   (4, "[1/6] Oh, Elder Thorne told you to come here?");
@@ -160,9 +174,9 @@ void loadQuests(std::vector<Quest>& quests) {
         quests.back().addDialogue   (4, "[5/6] Press [Space] to use that bow");
         quests.back().addDialogue   (4, "[6/6] Now, as an archer, help us defeat the monsters around here");
         quests.back().addDescription(4, "Find Torren");
-        quests.back().addObjective  (4, std::make_shared<TalkingObjective>(1));
+        quests.back().addObjective  (4, std::make_shared<TalkObjective>(1));
         
-        quests.back().addNpcID      (5, 1);
+        quests.back().addNpcID      (5, -1);
         quests.back().addDialogue   (5, std::string());
         quests.back().addDescription(5, "Help the villages defeat the monsters");
         quests.back().addObjective  (5, std::make_shared<KillMonsterObjective>("Bat Lv.1", 5));
@@ -171,14 +185,14 @@ void loadQuests(std::vector<Quest>& quests) {
         quests.back().addNpcID      (6, -1);
         quests.back().addDialogue   (6, std::string());
         quests.back().addDescription(6, "Return back to Torren");
-        quests.back().addObjective  (6, std::make_shared<TalkingObjective>(1));
+        quests.back().addObjective  (6, std::make_shared<TalkObjective>(1));
 
         quests.back().addNpcID      (7, 1);
         quests.back().addDialogue   (7, "[1/3] Oh, you are back");
         quests.back().addDialogue   (7, "[2/3] You like the bow I gave you, no problem");
         quests.back().addDialogue   (7, "[3/3] I see, you are strong enough to write your journey");
         quests.back().addDescription(7, "Return back to Torren");
-        quests.back().addObjective  (7, std::make_shared<TalkingObjective>(1));
+        quests.back().addObjective  (7, std::make_shared<TalkObjective>(1));
     }
     // {
     //     quests.push_back(Quest("Help the children", 100));
@@ -239,6 +253,7 @@ int main() {
     sf::View  view         = window.getView();
     view.setCenter(PlayerTiles.x * TILE_SIZE, PlayerTiles.y * TILE_SIZE);
     sf::View  uiView       = window.getDefaultView();
+    
     while (window.isOpen()) {
         float dt = clock.restart().asSeconds();
         
@@ -250,9 +265,10 @@ int main() {
             else if (event.type == sf::Event::LostFocus) {
                 isMinimized = true;
 
-                HWND hwnd = window.getSystemHandle(); // lấy HWND của cửa sổ
-                ShowWindow(hwnd, SW_MINIMIZE);        // minimize cửa sổ
-
+                if (isFullscreen) {
+                    HWND hwnd = window.getSystemHandle(); // lấy HWND của cửa sổ
+                    ShowWindow(hwnd, SW_MINIMIZE);        // minimize cửa sổ
+                }
             }
             else if (event.type == sf::Event::GainedFocus) {
                 isMinimized = false;
@@ -309,7 +325,7 @@ int main() {
             continue;
         }
 
-        player.update(dt, window, map.getCollisionRects(), npcs);
+        player.update(dt, window, map.getCollisionRects(), map.getRegionRects(), npcs);
         ui.update(dt, player, uiView.getSize());
 
         // Điều chỉnh camera theo player
@@ -318,6 +334,8 @@ int main() {
         for (Enemy* enemy : enemys) {
             enemy->update(dt, player, map.getCollisionRects());
         }
+
+        map.update(dt);
 
         window.clear(sf::Color::White);
         window.setView(view);
