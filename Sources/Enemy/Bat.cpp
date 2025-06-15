@@ -1,8 +1,9 @@
 #include "Bat.hpp"
 
 Bat::Bat(const float& x = 0, const float& y = 0) : Enemy(x, y, TILE_SIZE, TILE_SIZE, 5.0f, "Bat Lv.1") {
-    DETECION_RANGE = 200.0f;
+    DETECION_RANGE = 150.0f;
 
+    detectionBox.setRadius(DETECION_RANGE);
     detectionBox.setPosition(
         hitbox.getPosition().x + hitbox.getSize().x / 2.f - DETECION_RANGE,
         hitbox.getPosition().y + hitbox.getSize().y / 2.f - DETECION_RANGE
@@ -14,6 +15,16 @@ Bat::Bat(const float& x = 0, const float& y = 0) : Enemy(x, y, TILE_SIZE, TILE_S
     
     shadow = Animation(TextureManager::get("batShadow"), 12,  5, 1, 0, 0.0f, false);
     alert  = Animation(TextureManager::get("alert")    ,  8, 10, 1, 0, 0.0f, false);
+
+    ATTACK_RANGE = 60.0f;
+}
+
+void Bat::followPlayer(const Player& player) {
+    Enemy::followPlayer(player);
+
+    if (calculateDistance(player) <= ATTACK_RANGE) {
+        movingDirection *= 3.0f;
+    }
 }
 
 void Bat::updateAnimation() {

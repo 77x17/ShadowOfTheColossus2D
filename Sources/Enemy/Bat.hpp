@@ -12,8 +12,13 @@ enum class BatState {
 };
 
 class Bat : public Enemy {
+private:
+    float ATTACK_RANGE;
+    
 public:
     Bat(const float& x, const float& y);
+
+    void followPlayer(const Player& player) override;
 
     void updateAnimation() override;
 

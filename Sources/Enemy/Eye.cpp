@@ -78,7 +78,7 @@ void Eye::followPlayer(const Player& player) {
         alertCooldownTimer = ALERT_LIFETIME;
     }   
 
-    movingDirection = normalizeDirection;
+    // movingDirection = normalizeDirection;
 
     Enemy::moveRandomly();
 }

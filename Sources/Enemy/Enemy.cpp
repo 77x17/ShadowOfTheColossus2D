@@ -67,7 +67,7 @@ Enemy::Enemy(const float& x = 0, const float& y = 0, const float& width = TILE_S
     alertCooldownTimer = 0.0f;
 
     RANDOM_TIME          = 5.0f;
-    randomCooldownTimer  = 0.0f;
+    randomCooldownTimer  = 5.0f;
     stayingCooldownTimer = 0.0f;
     
     ATTACK_COOLDOWN_TIME = 0.5f;
@@ -221,7 +221,9 @@ void Enemy::moveRandomly() {
         // stayingCooldownTimer được chỉnh để bằng 3/4 thời gian của ramdomCooldownTimer
         // mục đích để quái di chuyển 1/4 và 3/4 thời gian còn lại đứng yên tại chỗ
         if (stayingCooldownTimer <= 0) {
-            movingDirection = sf::Vector2f(rand() % 3 - 1.f, rand() % 3 - 1.f);
+            movingDirection = sf::Vector2f(rand() % 4 - 2.f, rand() % 4 - 2.f);
+            
+            // std::cerr << movingDirection.x << ' ' << movingDirection.y << '\n';
 
             // normalize
             float length = std::sqrt(movingDirection.x * movingDirection.x + movingDirection.y * movingDirection.y);
@@ -239,18 +241,14 @@ void Enemy::moveRandomly() {
     }
     else {
         randomCooldownTimer  = RANDOM_TIME;
-        stayingCooldownTimer = 3 * RANDOM_TIME / 4;
+        stayingCooldownTimer = 1 * RANDOM_TIME / 4.0f;
 
         movingDirection = sf::Vector2f(0.f, 0.f);
     }
 }
 
 void Enemy::updateThinking(Player& player) {
-    if (knockbackCooldownTimer <= 0) {
-        movingDirection = sf::Vector2f(0, 0);
-    }
-    else {
-        // fix here
+    if (knockbackCooldownTimer > 0) {
         return;
     }
 
@@ -297,7 +295,7 @@ void Enemy::updatePosition(const float& dt, const std::vector<sf::FloatRect>& co
         nextHitboxRect.left += velocity.x;
         for (const sf::FloatRect& rect : collisionRects) {
             while (rect.intersects(nextHitboxRect)) {
-                nextHitboxRect.left -= velocity.x / 10;
+                nextHitboxRect.left -= velocity.x / 10.0f;
             }
         }
     }
@@ -305,7 +303,7 @@ void Enemy::updatePosition(const float& dt, const std::vector<sf::FloatRect>& co
         nextHitboxRect.top += velocity.y;
         for (const sf::FloatRect& rect : collisionRects) {
             while (rect.intersects(nextHitboxRect)) {
-                nextHitboxRect.top -= velocity.y / 10;
+                nextHitboxRect.top -= velocity.y / 10.0f;
             }
         }
     }
@@ -355,9 +353,11 @@ void Enemy::update(const float& dt, Player& player, const std::vector<sf::FloatR
     }
 
     updateThinking(player);
+    
+    // std::cerr << randomCooldownTimer << ' ' << stayingCooldownTimer << '\n';
 
     updatePosition(dt, collisionRects);
-
+    
     updateHitbox();
 
     updateAnimation();
@@ -370,8 +370,8 @@ void Enemy::draw(sf::RenderTarget& target) {
     target.draw(healthPointsBarBackground);
     target.draw(healthPointsBar);
 
-    // target.draw(hitbox);
-    // target.draw(detectionBox);
+    target.draw(hitbox);
+    target.draw(detectionBox);
     
     shadow.draw(target);
 
