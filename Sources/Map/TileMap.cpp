@@ -219,6 +219,11 @@ bool TileMap::load(const std::string& tmxPath, const std::vector<std::pair<std::
                     TilesetInfo frameTsInfo = getTilesetInfoForGid(initialFrameTileGid); 
                     int localTileId = initialFrameTileGid - frameTsInfo.firstGid;
                     int tilesPerRow = tex.getSize().x / tileWidth;
+
+                    // if (tilesPerRow != 0) {
+                    //     std::cerr << "[Bug] - TileMap.cpp load() 3\n";
+                    //     return false;
+                    // }
                     int tu = localTileId % tilesPerRow;
                     int tv = localTileId / tilesPerRow;
                     
@@ -244,7 +249,16 @@ bool TileMap::load(const std::string& tmxPath, const std::vector<std::pair<std::
                     // int firstGidForTileset = tilesetNameToFirstGid.at(tilesetName);
 
                     int localTileId = tileGid - tsInfo.firstGid;
+                    // if (tileWidth == 0) {
+                    //     std::cerr << "[Bug] - TileMap.cpp load() 1\n";
+                    //     return false;
+                    // }
                     int tilesPerRow = tex.getSize().x / tileWidth;
+
+                    // if (tilesPerRow != 0) {
+                    //     std::cerr << "[Bug] - TileMap.cpp load() 2\n";
+                    //     return false;
+                    // }
                     int tu = localTileId % tilesPerRow;
                     int tv = localTileId / tilesPerRow;
 
@@ -513,6 +527,10 @@ void TileMap::update(const float& dt) {
             tile.elapsedTime -= frames[tile.currentFrame].duration;
             
             // Chuyển sang frame tiếp theo, quay vòng lại nếu hết
+            if (frames.empty()) {
+                std::cerr << "[Bug] - TileMap.cpp - update()\n";
+                return;
+            }
             tile.currentFrame = (tile.currentFrame + 1) % frames.size();
 
             // Cập nhật texture coordinates cho frame mới
@@ -528,8 +546,16 @@ void TileMap::update(const float& dt) {
             // Cần có cách map Tên tileset -> firstGid hiệu quả
             int localTileId = nextFrameGid - tsInfo.firstGid;
             int tilesPerRow = tex.getSize().x / tileWidth;
-            int tu = localTileId % tilesPerRow;
-            int tv = localTileId / tilesPerRow;
+
+            int tu = 0, tv = 0;
+
+            if (tilesPerRow != 0) {
+                tu = localTileId % tilesPerRow;
+                tv = localTileId / tilesPerRow;
+            }
+            else {
+                std::cerr << "[Bug] - TileMap.cpp - update()\n";
+            }
 
             // Cập nhật texCoords cho 4 đỉnh của tile
             tile.vertices[0].texCoords = sf::Vector2f(tu * tileWidth, tv * tileHeight);

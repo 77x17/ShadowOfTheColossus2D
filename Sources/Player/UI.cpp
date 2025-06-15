@@ -3,6 +3,7 @@
 #include "Font.hpp"
 #include "Quest.hpp"
 #include "Constants.hpp"
+#include "Region.hpp"
 
 #include <cmath>
 
@@ -230,6 +231,10 @@ void UI::updateMinimap(const float& dt, const Player& player, const sf::Vector2f
 
     minimapSprite.setTexture(minimapTexture.getTexture());
     minimapSprite.setTextureRect(viewRect);
+
+    if (viewRect.width == 0 || viewRect.height == 0) {
+        std::cerr << "[Bug] - UI.cpp - updateMinimap()\n";
+    }
     sf::Vector2f scale = sf::Vector2f(minimapSize.x / viewRect.width, minimapSize.y / viewRect.height);
     minimapSprite.setScale(scale);
 
@@ -254,7 +259,7 @@ void UI::updateMinimap(const float& dt, const Player& player, const sf::Vector2f
     minimapPlayerDot.setPosition(dotPosition);
 
     regionName.setCharacterSize(regionNameSize);
-    regionName.setString(player.getCollisionRegionName());
+    regionName.setString(Region::getName(player.getCollisionRegionID()));
     regionName.setOrigin(regionName.getLocalBounds().left + regionName.getLocalBounds().width / 2, 0);
                         //  regionName.getLocalBounds().top + regionName.getLocalBounds().height / 2);
     regionName.setPosition(minimapPosition + sf::Vector2f(minimapSize.x / 2, PADDING.y * 2));

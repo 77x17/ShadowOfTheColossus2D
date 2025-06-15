@@ -51,8 +51,12 @@ void Eye::followPlayer(const Player& player) {
     sf::Vector2f normalizeDirection = player.getPosition() - position;
     float length = std::sqrt(normalizeDirection.x * normalizeDirection.x + normalizeDirection.y * normalizeDirection.y);
 
-    if (length != 0) {
+    const float EPSILON = 1e-6f;
+    if (length > EPSILON) {
         normalizeDirection /= length;
+    }
+    else {
+        std::cerr << "[Bug] Eye.cpp - followPlayer()\n";
     }
 
     if (alertCooldownTimer <= 0 && shootCooldownTimer <= 0) {
@@ -122,10 +126,10 @@ void Eye::update(const float& dt, Player& player, const std::vector<sf::FloatRec
     }
 }
 
-void Eye::draw(sf::RenderWindow& window) {
-    Enemy::draw(window);
+void Eye::draw(sf::RenderTarget& target) {
+    Enemy::draw(target);
     
     if (isAlive()) {
-        projectile.draw(window);
+        projectile.draw(target);
     }
 }

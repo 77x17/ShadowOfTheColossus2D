@@ -82,5 +82,5 @@ public:
     virtual void updateAnimation() = 0;
     virtual void update(const float& dt, Player& player, const std::vector<sf::FloatRect>& collisionRects);
 
-    virtual void draw(sf::RenderWindow& window);
+    virtual void draw(sf::RenderTarget& target);
 };

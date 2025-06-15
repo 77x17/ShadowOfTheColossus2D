@@ -1,12 +1,17 @@
 #include "Projectile.hpp"
 
 #include <cmath>
+#include <iostream>
 
 // Helper function to normalize a vector (make its length 1)
 sf::Vector2f Projectile::normalize(const sf::Vector2f& source) {
     float length = std::sqrt((source.x * source.x) + (source.y * source.y));
-    if (length != 0) {
+    const float EPSILON = 1e-6f;
+    if (length > EPSILON) {
         return sf::Vector2f(source.x / length, source.y / length);
+    }
+    else {
+        // std::cerr << "[Bug] - Projectile.cpp - normalize()\n";
     }
     // Return the original vector if its length is 0 to avoid division by zero.
     return source;
@@ -52,11 +57,11 @@ void Projectile::update(float dt) {
     lifetime -= dt; // Decrease the remaining lifetime
 }
 
-void Projectile::draw(sf::RenderWindow& window) const {
+void Projectile::draw(sf::RenderTarget& target) const {
     if (isAlive()) {
         // window.draw(hitbox);
 
-        window.draw(sprite);
+        target.draw(sprite);
     }
 }
 

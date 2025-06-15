@@ -4,12 +4,12 @@
 void TextureManager::load(const std::string& id, const std::string& path) {
     sf::Texture texture;
     if (texture.loadFromFile(path)) {
+        texture.setSmooth(false);
         textures[id] = texture;
     } 
     else {
         std::cerr << "Failed to load texture: " << path << '\n';
     }
-    texture.setSmooth(false);
 }
 
 // Lấy một tham chiếu hằng (const reference) đến texture đã được tải

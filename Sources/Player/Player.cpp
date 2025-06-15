@@ -1,6 +1,6 @@
 #include "Player.hpp"
 
-#include "ShaderManager.hpp"
+#include "EntityEffects.hpp"
 #include "Region.hpp"
 
 #include <cmath>
@@ -95,9 +95,9 @@ Player::Player(const float& x, const float& y, const float& hp, std::vector<Ques
     knockbackCooldownTimer = 0.0f;
 
     quests.clear();
-    quests              = std::move(_quests);
-    updateQuest         = false;
-    collisionRegionName = "Unknown Area";
+    quests            = std::move(_quests);
+    updateQuest       = false;
+    collisionRegionID = -1;
 }
 
 void Player::handleMove(const sf::RenderWindow& window) {
@@ -436,7 +436,7 @@ void Player::updateCollisionArea(const float& dt, const std::vector<Npc>& npcs, 
                 quest.update(dataPack);
             }
 
-            collisionRegionName = Region::getName(regionRect.first);
+            collisionRegionID = regionRect.first;
 
             // SoundManager::resumeMusic(dt, "region" + std::to_string(regionRect.first));
         }
@@ -459,6 +459,10 @@ void Player::updatePosition(const float& dt, const std::vector<sf::FloatRect>& c
         nextHitboxRect.left += velocity.x;
         for (const sf::FloatRect& rect : collisionRects) {
             while (rect.intersects(nextHitboxRect)) {
+                if (velocity.x == 0) {
+                    std::cerr << "[Bug] - Player.cpp - updatePosition()\n";
+                }
+                
                 nextHitboxRect.left -= velocity.x / 10.0f;
             }
         }
@@ -467,6 +471,10 @@ void Player::updatePosition(const float& dt, const std::vector<sf::FloatRect>& c
         nextHitboxRect.top += velocity.y;
         for (const sf::FloatRect& rect : collisionRects) {
             while (rect.intersects(nextHitboxRect)) {
+                if (velocity.y == 0) {
+                    std::cerr << "[Bug] - Player.cpp - updatePosition()\n";
+                }
+
                 nextHitboxRect.top -= velocity.y / 10.0f;
             }
         }
@@ -613,27 +621,27 @@ void Player::update(const float& dt,
     updateQuests(); 
 }
 
-void Player::draw(sf::RenderWindow& window) {
+void Player::draw(sf::RenderTarget& target) {
     // window.draw(hitbox);
     // window.draw(loadingBox);
 
-    shadow.draw(window);
+    shadow.draw(target);
 
     if (invincibleCooldownTimer > 0) {
-        animationManager.draw(window, ShaderManager::get("invincible"));
+        animationManager.draw(target, EntityEffects::get("invincible"));
     }
     else if (knockbackCooldownTimer > 0) {
-        animationManager.draw(window, ShaderManager::get("flash"));   
+        animationManager.draw(target, EntityEffects::get("flash"));   
     }
     else {
-        animationManager.draw(window);
+        animationManager.draw(target);
     }
 
     for (auto& p : projectiles) {
-        p.draw(window);
+        p.draw(target);
     }
 
-    window.draw(interactText);
+    target.draw(interactText);
 }
 
 sf::Vector2f Player::getPosition() const {
@@ -723,13 +731,13 @@ sf::Vector2f Player::getCenterPosition() const {
 
 void Player::updateView(const float& dt, sf::View& view) const {
     sf::Vector2f currentCenter = view.getCenter();
-    sf::Vector2f targetCenter  = position;
+    sf::Vector2f targetCenter  = getCenterPosition();
     sf::Vector2f lerped        = currentCenter + VIEW_LEAP_SPEED * (targetCenter - currentCenter) * dt;
     lerped.x = std::round(lerped.x);
     lerped.y = std::round(lerped.y);
     view.setCenter(lerped);
 }
 
-const std::string& Player::getCollisionRegionName() const {
-    return collisionRegionName;
+int Player::getCollisionRegionID() const {
+    return collisionRegionID;
 }

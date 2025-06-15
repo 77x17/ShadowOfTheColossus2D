@@ -10,8 +10,12 @@ public:
                 return "Elderfall Village";
             case 1:
                 return "Greenthorn Grove";
+            case 2:
+                return "G.Grove Upper";
             default:
                 return "Unknown Area";
         }
+        
+        std::cerr << "[Bug] - Region.hpp\n";
     }
 };

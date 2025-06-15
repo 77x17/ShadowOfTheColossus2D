@@ -8,7 +8,6 @@ Animation::Animation(const sf::Texture& texture, int frameW, int frameH, int tot
     if (!flip) {
         sprite.setScale(2.f, 2.f);
         sprite.setOrigin(0, 0);
-        
     }
     else {
         sprite.setScale(-2.f, 2.f);
@@ -38,8 +37,8 @@ void Animation::setPosition(sf::Vector2f position) {
     sprite.setPosition(position);
 }
 
-void Animation::draw(sf::RenderWindow& window, sf::Shader* shader) const {
-    window.draw(sprite, shader);
+void Animation::draw(sf::RenderTarget& target, sf::Shader* shader) const {
+    target.draw(sprite, shader);
 }
 
 sf::Sprite Animation::getSprite() const {
@@ -61,7 +60,7 @@ void AnimationManager::addAnimation(int state, const sf::Texture& texture, int f
 }
 
 void AnimationManager::setState(int state) {
-    if (state != currentState) {
+    if (state != currentState && animations.find(state) != animations.end()) {
         currentState = state;
         animations[currentState].reset();
     }
@@ -78,11 +77,13 @@ void AnimationManager::setPosition(sf::Vector2f position) {
 }
 
 void AnimationManager::update() {
-    animations[currentState].update();
+    if (animations.find(currentState) != animations.end()) {
+        animations[currentState].update();
+    }
 }
 
-void AnimationManager::draw(sf::RenderWindow& window, sf::Shader* shader) const {
-    animations.at(currentState).draw(window, shader);
+void AnimationManager::draw(sf::RenderTarget& target, sf::Shader* shader) const {
+    animations.at(currentState).draw(target, shader);
 }
 
 sf::Sprite AnimationManager::getSprite() const {

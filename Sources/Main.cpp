@@ -22,7 +22,8 @@
 #include "ExploreObjective.hpp"
 #include "Npc.hpp"
 
-#include "ShaderManager.hpp"
+#include "EntityEffects.hpp"
+#include "NaturalEffects.hpp"
 
 sf::Font Font::font;
 
@@ -35,7 +36,7 @@ std::string SoundManager::oldRegionMusic = std::string();
 float SoundManager::normalVolume = 50.0f;
 float SoundManager::fadeVolume   = 50.0f;
 
-std::unordered_map<std::string, std::unique_ptr<sf::Shader>> ShaderManager::shaders;
+std::unordered_map<std::string, std::unique_ptr<sf::Shader>> EntityEffects::shaders;
 
 void loadSprite() {
     TextureManager::load("playerSprite", "Sprites/player.png");
@@ -53,16 +54,20 @@ void loadSprite() {
     TextureManager::load("fireball" , "Sprites/fireball.png");
 }
 
+NaturalEffects naturalEffects;
+
 void loadShader() {
-    ShaderManager::load("invincible", "Shaders/effect.frag", {
+    EntityEffects::load("invincible", "Shaders/entityEffects.frag", {
         {"invincibleAmount", 0.2f},
         {"flashAmount", 0.5f}
     });
 
-    ShaderManager::load("flash", "Shaders/effect.frag", {
+    EntityEffects::load("flash"     , "Shaders/entityEffects.frag", {
         {"invincibleAmount", 0.2f},
         {"flashAmount", 1.0f}
     });
+
+    naturalEffects.load("Shaders/naturalEffects.frag");
 }
 
 void loadSound() {
@@ -254,6 +259,9 @@ int main() {
     view.setCenter(PlayerTiles.x * TILE_SIZE, PlayerTiles.y * TILE_SIZE);
     sf::View  uiView       = window.getDefaultView();
     
+    sf::RenderTexture sceneTexture;                     //  for shader
+    sceneTexture.create(WINDOW_WIDTH, WINDOW_HEIGHT);   //  for shader
+
     while (window.isOpen()) {
         float dt = clock.restart().asSeconds();
         
@@ -278,7 +286,7 @@ int main() {
                 
                 view = window.getView();
                 view.setSize(WINDOW_HEIGHT * aspectRatio, WINDOW_HEIGHT);  // giữ chiều cao cố định
-                view.setCenter(view.getSize().x / 2, view.getSize().y / 2);
+                view.setCenter(player.getCenterPosition());
             }
             else if (event.type == sf::Event::KeyPressed) {
                 if (event.key.code == sf::Keyboard::Escape) {
@@ -290,8 +298,10 @@ int main() {
                     window.close();
                     if (isFullscreen) {
                         window.create(sf::VideoMode::getDesktopMode(), "Project_H", sf::Style::Fullscreen);
+                        sceneTexture.create(window.getSize().x, window.getSize().y);
                     } else {
                         window.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Project_H", sf::Style::Close);
+                        sceneTexture.create(window.getSize().x, window.getSize().y);
                     }
                     // window.setFramerateLimit(60);
                     window.setVerticalSyncEnabled(true);
@@ -301,7 +311,7 @@ int main() {
 
                     view = window.getView();
                     view.setSize(WINDOW_HEIGHT * aspectRatio, WINDOW_HEIGHT);  
-                    view.setCenter(view.getSize().x / 2, view.getSize().y / 2);
+                    view.setCenter(player.getCenterPosition());
 
                     uiView = window.getDefaultView();
                 }
@@ -337,17 +347,43 @@ int main() {
 
         map.update(dt);
 
-        window.clear(sf::Color::White);
-        window.setView(view);
+        sceneTexture.clear(sf::Color::White);
+        sceneTexture.setView(view);
 
-        window.draw(map);
-        
+        sceneTexture.draw(map);
         for (Enemy* enemy : enemys) if (enemy->calculateDistance(player) <= LOADING_DISTANCE) {
-            enemy->draw(window);
+            enemy->draw(sceneTexture);
         }
-        player.draw(window);
+        player.draw(sceneTexture);
+        
+        sceneTexture.display();
 
+        window.clear();
         window.setView(uiView);
+
+        {
+            sf::Vector2f playerScreenPos = sf::Vector2f(window.mapCoordsToPixel(player.getCenterPosition(), view));
+            sf::Vector2f windowSize = sf::Vector2f(window.getSize());
+            
+            sf::Vector2f lightNorm = {
+                playerScreenPos.x / windowSize.x,
+                playerScreenPos.y / windowSize.y
+            };
+
+            float aspectRatio = windowSize.x / windowSize.y;
+
+            naturalEffects.update(dt, player.getCollisionRegionID(), lightNorm, aspectRatio);
+        }
+
+        sf::Sprite sceneSprite(sceneTexture.getTexture());
+        if (naturalEffects.shouldApplyShader()) {
+            window.draw(sceneSprite, naturalEffects.get());
+        }
+        else {
+            window.draw(sceneSprite); 
+        }
+
+
         ui.draw(window);
 
         window.display();

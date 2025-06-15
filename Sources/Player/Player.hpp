@@ -88,7 +88,7 @@ private:
 
     std::vector<Quest> quests;
     bool               updateQuest;
-    std::string        collisionRegionName;
+    int                collisionRegionID;
 
 public:
     Player(const float& x, const float& y, const float& hp, std::vector<Quest>&& _quests);
@@ -123,7 +123,7 @@ public:
                 const std::unordered_map<int, sf::FloatRect>& regionRects, 
                 std::vector<Npc>& npcs);
 
-    void draw(sf::RenderWindow& window);
+    void draw(sf::RenderTarget& target);
 
     sf::Vector2f getPosition() const;
 
@@ -142,7 +142,7 @@ public:
     const std::vector<Quest>& getQuests() const;
     bool                      isUpdateQuest();
     sf::Vector2f              getCenterPosition() const;
-    const std::string&        getCollisionRegionName() const;
+    int                       getCollisionRegionID() const;
 
     void updateView(const float& dt, sf::View& view) const;
 };

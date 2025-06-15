@@ -1,5 +1,5 @@
 #include "Enemy.hpp"
-#include "ShaderManager.hpp"
+#include "EntityEffects.hpp"
 
 #include <cmath>
 #include <random>
@@ -199,8 +199,12 @@ void Enemy::followPlayer(const Player& player) {
     sf::Vector2f normalizeDirection = player.getPosition() - position;
     float length = std::sqrt(normalizeDirection.x * normalizeDirection.x + normalizeDirection.y * normalizeDirection.y);
 
-    if (length != 0) {
+    const float EPSILON = 1e-6f;
+    if (length > EPSILON) {
         normalizeDirection /= length;
+    }
+    else {
+        std::cerr << "[Bug] - Enemy.cpp followPlayer()\n";
     }
 
     if (alertCooldownTimer <= 0 && randomCooldownTimer > 0) {
@@ -221,10 +225,12 @@ void Enemy::moveRandomly() {
 
             // normalize
             float length = std::sqrt(movingDirection.x * movingDirection.x + movingDirection.y * movingDirection.y);
-            if (length != 0) {
+            const float EPSILON = 1e-6f;
+            if (length > EPSILON) {
                 movingDirection /= length * 3;
             }
             else {
+                // std::cerr << "[Bug] - Enemy.cpp - moveRandomly()\n";
                 movingDirection = sf::Vector2f(0.f, 0.f);
             }
 
@@ -357,29 +363,29 @@ void Enemy::update(const float& dt, Player& player, const std::vector<sf::FloatR
     updateAnimation();
 }
 
-void Enemy::draw(sf::RenderWindow& window) {
-    window.draw(labelBackground);
-    window.draw(label);
+void Enemy::draw(sf::RenderTarget& target) {
+    target.draw(labelBackground);
+    target.draw(label);
 
-    window.draw(healthPointsBarBackground);
-    window.draw(healthPointsBar);
+    target.draw(healthPointsBarBackground);
+    target.draw(healthPointsBar);
 
-    // window.draw(hitbox);
-    // window.draw(detectionBox);
+    // target.draw(hitbox);
+    // target.draw(detectionBox);
     
-    shadow.draw(window);
+    shadow.draw(target);
 
     if (invincibleCooldownTimer > 0) {
-        animationManager.draw(window, ShaderManager::get("invincible"));
+        animationManager.draw(target, EntityEffects::get("invincible"));
     }
     else if (knockbackCooldownTimer > 0) {
-        animationManager.draw(window, ShaderManager::get("flash"));   
+        animationManager.draw(target, EntityEffects::get("flash"));   
     }
     else {
-        animationManager.draw(window);
+        animationManager.draw(target);
     }
 
     if (alertCooldownTimer > 0) {
-        alert.draw(window);
+        alert.draw(target);
     }
 }

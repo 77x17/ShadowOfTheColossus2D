@@ -32,6 +32,6 @@ public:
     void updateProjectiles(const float& dt, Player& player);
     void update(const float& dt, Player& player, const std::vector<sf::FloatRect>& collisionRects) override;
 
-    void draw(sf::RenderWindow& window) override;
+    void draw(sf::RenderTarget& target) override;
 
 };

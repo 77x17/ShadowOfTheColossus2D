@@ -39,7 +39,7 @@ public:
     void reset();
     void setPosition(sf::Vector2f position);
 
-    void draw(sf::RenderWindow& window, sf::Shader* shader = nullptr) const;
+    void draw(sf::RenderTarget& target, sf::Shader* shader = nullptr) const;
 
     sf::Sprite getSprite() const;
 };
@@ -57,7 +57,7 @@ public:
     void setPosition(sf::Vector2f position);
     void update();
 
-    void draw(sf::RenderWindow& window, sf::Shader* shader = nullptr) const;
+    void draw(sf::RenderTarget& target, sf::Shader* shader = nullptr) const;
 
     sf::Sprite getSprite() const;
 };

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="256" height="256" tilewidth="16" tileheight="16" infinite="0" nextlayerid="19" nextobjectid="183">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="256" height="256" tilewidth="16" tileheight="16" infinite="0" nextlayerid="19" nextobjectid="190">
  <tileset firstgid="1" source="overworld.tsx"/>
  <tileset firstgid="1481" name="CastleWalls" tilewidth="16" tileheight="16" tilecount="1024" columns="32">
   <image source="CastleWalls.png" width="512" height="512"/>
@@ -888,19 +888,30 @@
      <property name="region_id" type="int" value="1"/>
     </properties>
    </object>
+   <object id="183" x="2000" y="1840" width="544" height="208">
+    <properties>
+     <property name="region_id" type="int" value="2"/>
+    </properties>
+   </object>
   </objectgroup>
  </group>
- <group id="7" name="Enemy" locked="1">
-  <objectgroup id="8" name="Bat Lv.1" locked="1">
+ <group id="7" name="Enemy">
+  <objectgroup id="8" name="Bat Lv.1">
    <object id="106" x="2048" y="1680" width="16" height="16"/>
    <object id="107" x="2144" y="1648" width="16" height="16"/>
    <object id="108" x="2256" y="1664" width="16" height="16"/>
    <object id="109" x="2368" y="1648" width="16" height="16"/>
    <object id="110" x="2064" y="1792" width="16" height="16"/>
+   <object id="184" x="2432" y="1904" width="16" height="16"/>
+   <object id="185" x="2336" y="1872" width="16" height="16"/>
+   <object id="186" x="2240" y="1872" width="16" height="16"/>
+   <object id="187" x="2144" y="1872" width="16" height="16"/>
   </objectgroup>
-  <objectgroup id="9" name="Eye Lv.5" locked="1">
+  <objectgroup id="9" name="Eye Lv.5">
    <object id="111" x="2208" y="1776" width="16" height="16"/>
    <object id="112" x="2384" y="1776" width="16" height="16"/>
+   <object id="188" x="2080" y="1920" width="16" height="16"/>
+   <object id="189" x="2160" y="1968" width="16" height="16"/>
   </objectgroup>
  </group>
 </map>

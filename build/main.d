@@ -8,4 +8,4 @@ Build/Main.o: Sources/Main.cpp Sources/Configuration/Constants.hpp \
  Sources/Enemy/Bat.hpp Sources/Enemy/Eye.hpp \
  Sources/Quest/KillMonsterObjective.hpp Sources/Quest/FinishObjective.hpp \
  Sources/Quest/TalkObjective.hpp Sources/Quest/ExploreObjective.hpp \
- Sources/Animation/ShaderManager.hpp
+ Sources/Animation/EntityEffects.hpp Sources/Animation/NaturalEffects.hpp

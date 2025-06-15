@@ -7,3 +7,8 @@
 - Attack cooldown: Tránh trường hợp quái tấn công ngay lập tức 
 - Invincible: Bất tử khi mới respawn
 - Nên dùng switch case thay vì if quá nhiều
+- Minimap nên dùng ảnh vẽ một lần rồi tính toán kéo thả chứ đừng vẽ lại.
+- Nên vẽ màn hình vào một texture rồi vẽ lên màn hình thay vì vẽ thẳng.
+- Khi làm shader bóng tối, view bị thay đổi leap đi theo player nên phải cần một instant view.
+- Vị trí trong OpenGL tăng từ dưới lên
+- float length != 0 suy ra chia ? => BUG BUG BUG
