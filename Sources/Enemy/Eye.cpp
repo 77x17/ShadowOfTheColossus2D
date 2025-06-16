@@ -113,9 +113,9 @@ void Eye::updateProjectiles(const float& dt, Player& player) {
             projectile = Projectile();
         }
     }
-    else {
-        projectile = Projectile();
-    }
+    // else {
+    //     projectile = Projectile();
+    // }
 }   
 
 void Eye::update(const float& dt, Player& player, const std::vector<sf::FloatRect>& collisionRects) {

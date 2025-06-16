@@ -458,12 +458,15 @@ void Player::updatePosition(const float& dt, const std::vector<sf::FloatRect>& c
     if (velocity.x != 0) {
         nextHitboxRect.left += velocity.x;
         for (const sf::FloatRect& rect : collisionRects) {
-            while (rect.intersects(nextHitboxRect)) {
-                if (velocity.x == 0) {
+            while (rect.intersects(nextHitboxRect)) {                
+                const float EPSILON = 1e-6;
+                if (std::abs(velocity.x) > EPSILON) {
+                    nextHitboxRect.left -= velocity.x / 10.0f;
+                }
+                else {
+                    nextHitboxRect.left -= velocity.x;
                     std::cerr << "[Bug] - Player.cpp - updatePosition()\n";
                 }
-                
-                nextHitboxRect.left -= velocity.x / 10.0f;
             }
         }
     }
@@ -471,11 +474,14 @@ void Player::updatePosition(const float& dt, const std::vector<sf::FloatRect>& c
         nextHitboxRect.top += velocity.y;
         for (const sf::FloatRect& rect : collisionRects) {
             while (rect.intersects(nextHitboxRect)) {
-                if (velocity.y == 0) {
+                const float EPSILON = 1e-6;
+                if (std::abs(velocity.y) > EPSILON) {
+                    nextHitboxRect.top -= velocity.y / 10.0f;
+                }
+                else {
+                    nextHitboxRect.top -= velocity.y;
                     std::cerr << "[Bug] - Player.cpp - updatePosition()\n";
                 }
-
-                nextHitboxRect.top -= velocity.y / 10.0f;
             }
         }
     }
@@ -580,6 +586,7 @@ void Player::updateQuests() {
         }
         else if (it->isCompleted() && !it->isReceiveReward()) {
             updateXP(it->getRewardExp());
+            ++it;
         }
         else {
             it->update(QuestEventData());

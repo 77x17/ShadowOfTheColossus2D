@@ -295,7 +295,14 @@ void Enemy::updatePosition(const float& dt, const std::vector<sf::FloatRect>& co
         nextHitboxRect.left += velocity.x;
         for (const sf::FloatRect& rect : collisionRects) {
             while (rect.intersects(nextHitboxRect)) {
-                nextHitboxRect.left -= velocity.x / 10.0f;
+                const float EPSILON = 1e-6;
+                if (std::abs(velocity.x) > EPSILON) {
+                    nextHitboxRect.left -= velocity.x / 10.0f;
+                }
+                else {
+                    nextHitboxRect.left -= velocity.x;
+                    std::cerr << "[Bug] - Enemy.cpp - updatePosition()\n";
+                }
             }
         }
     }
@@ -303,7 +310,14 @@ void Enemy::updatePosition(const float& dt, const std::vector<sf::FloatRect>& co
         nextHitboxRect.top += velocity.y;
         for (const sf::FloatRect& rect : collisionRects) {
             while (rect.intersects(nextHitboxRect)) {
-                nextHitboxRect.top -= velocity.y / 10.0f;
+                const float EPSILON = 1e-6;
+                if (std::abs(velocity.y) > EPSILON) {
+                    nextHitboxRect.top -= velocity.y / 10.0f;
+                }
+                else {
+                    nextHitboxRect.top -= velocity.y;
+                    std::cerr << "[Bug] - Enemy.cpp - updatePosition()\n";
+                }
             }
         }
     }
@@ -325,7 +339,14 @@ void Enemy::updateHitbox() {
     healthPointsBar.setPosition(position + sf::Vector2f(size.x / 2, 0));
     healthPointsBarBackground.setPosition(healthPointsBar.getPosition());
 
-    healthPointsBar.setSize(sf::Vector2f(HEALTH_POINTS_BAR_WIDTH * (healthPoints / maxHealthPoints), HEALTH_POINTS_BAR_HEIGHT)); 
+    float healthRatio = 0.0f;
+    if (maxHealthPoints > 0) {
+        healthRatio = healthPoints / maxHealthPoints;
+    }
+    else {
+        std::cerr << "[Bug] - Enemy.cpp - updateHitbox()\n";
+    }
+    healthPointsBar.setSize(sf::Vector2f(HEALTH_POINTS_BAR_WIDTH * healthRatio, HEALTH_POINTS_BAR_HEIGHT)); 
 }
 
 void Enemy::update(const float& dt, Player& player, const std::vector<sf::FloatRect>& collisionRects) {

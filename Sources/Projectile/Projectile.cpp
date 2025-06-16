@@ -48,10 +48,13 @@ Projectile::Projectile(const sf::Texture& texture, sf::Vector2f startPos, sf::Ve
 }
 
 bool Projectile::isCollision(const sf::FloatRect& rect) const {
+    if (!isAlive()) {
+        return false;
+    }
     return hitbox.getGlobalBounds().intersects(rect);
 }
 
-void Projectile::update(float dt) {
+void Projectile::update(const float& dt) {
     hitbox.move(velocity * dt * static_cast<float>(std::pow(4, 1.0 - lifetime)));
     sprite.setPosition(hitbox.getPosition());
     lifetime -= dt; // Decrease the remaining lifetime

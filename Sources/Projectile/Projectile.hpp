@@ -17,7 +17,7 @@ public:
 
     bool isCollision(const sf::FloatRect& rect) const;
 
-    void update(float dt);
+    void update(const float& dt);
     void draw(sf::RenderTarget& target) const;
 
     bool isAlive() const;  
