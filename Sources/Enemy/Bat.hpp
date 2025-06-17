@@ -20,6 +20,7 @@ public:
 
     void followPlayer(const Player& player) override;
 
+    void updateTimer(const float& dt) override;
     void updateAnimation() override;
 
 };

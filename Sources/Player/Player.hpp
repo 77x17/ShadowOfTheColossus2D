@@ -43,6 +43,7 @@ private:
     float DYING_TIME;
     float dyingCooldownTimer;
     
+    
     float RESPAWN_TIME;
     float respawnCooldownTimer;
         
@@ -124,6 +125,7 @@ public:
                 std::vector<Npc>& npcs);
 
     void draw(sf::RenderTarget& target);
+    void drawWithShader(sf::RenderTarget& target, sf::RenderStates states = sf::RenderStates::Default);
 
     sf::Vector2f getPosition() const;
 
@@ -145,4 +147,6 @@ public:
     int                       getCollisionRegionID() const;
 
     void updateView(const float& dt, sf::View& view) const;
+
+    sf::FloatRect getFloatRect() const;
 };

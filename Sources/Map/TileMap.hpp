@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <map>
 #include <utility>
+#include <memory>
 
 #include "pugixml.hpp"
 
@@ -32,7 +33,7 @@ private:
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
     std::vector<sf::VertexArray> m_layersVertices; 
-    std::unordered_map<std::string, sf::Texture> m_tilesetTextures;
+    std::unordered_map<std::string, std::unique_ptr<sf::Texture>> m_tilesetTextures;
     // std::unordered_map<int, std::string> m_gidToTilesetName;        // GID → tên tileset
     struct TilesetInfo {
         std::string name;

@@ -1,5 +1,7 @@
 #include "Bat.hpp"
 
+#include "TextureManager.hpp"
+
 Bat::Bat(const float& x = 0, const float& y = 0) : Enemy(x, y, TILE_SIZE, TILE_SIZE, 5.0f, "Bat Lv.1") {
     DETECION_RANGE = 150.0f;
 
@@ -21,10 +23,14 @@ Bat::Bat(const float& x = 0, const float& y = 0) : Enemy(x, y, TILE_SIZE, TILE_S
 
 void Bat::followPlayer(const Player& player) {
     Enemy::followPlayer(player);
-
-    if (calculateDistance(player) <= ATTACK_RANGE) {
-        movingDirection *= 3.0f;
+    
+    if (calculateDistance(player) <= ATTACK_RANGE) {    
+        movingDirection   *= 1.5f;
     }
+}
+
+void Bat::updateTimer(const float& dt) {
+    Enemy::updateTimer(dt);
 }
 
 void Bat::updateAnimation() {

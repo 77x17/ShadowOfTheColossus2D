@@ -1,5 +1,6 @@
 #include "Player.hpp"
 
+#include "TextureManager.hpp"
 #include "EntityEffects.hpp"
 #include "Region.hpp"
 
@@ -285,7 +286,7 @@ void Player::handleInput(const float& dt, const sf::RenderWindow& window, std::v
 
 bool Player::isCollisionProjectiles(const sf::FloatRect& rect) {
     for (Projectile& p : projectiles) {
-        if (p.isCollision(rect)) {
+        if (p.isAlive() && p.isCollision(rect)) {
             p.kill();
             return true;
         }
@@ -458,14 +459,13 @@ void Player::updatePosition(const float& dt, const std::vector<sf::FloatRect>& c
     if (velocity.x != 0) {
         nextHitboxRect.left += velocity.x;
         for (const sf::FloatRect& rect : collisionRects) {
-            while (rect.intersects(nextHitboxRect)) {                
-                const float EPSILON = 1e-6;
-                if (std::abs(velocity.x) > EPSILON) {
+            while (rect.intersects(nextHitboxRect)) { 
+                if (std::abs(velocity.x) > COLLISION_EPSILON) {
                     nextHitboxRect.left -= velocity.x / 10.0f;
                 }
                 else {
                     nextHitboxRect.left -= velocity.x;
-                    std::cerr << "[Bug] - Player.cpp - updatePosition()\n";
+                    // std::cerr << "[Bug] - Player.cpp - updatePosition()\n";
                 }
             }
         }
@@ -474,13 +474,12 @@ void Player::updatePosition(const float& dt, const std::vector<sf::FloatRect>& c
         nextHitboxRect.top += velocity.y;
         for (const sf::FloatRect& rect : collisionRects) {
             while (rect.intersects(nextHitboxRect)) {
-                const float EPSILON = 1e-6;
-                if (std::abs(velocity.y) > EPSILON) {
+                if (std::abs(velocity.y) > COLLISION_EPSILON) {
                     nextHitboxRect.top -= velocity.y / 10.0f;
                 }
                 else {
                     nextHitboxRect.top -= velocity.y;
-                    std::cerr << "[Bug] - Player.cpp - updatePosition()\n";
+                    // std::cerr << "[Bug] - Player.cpp - updatePosition()\n";
                 }
             }
         }
@@ -629,8 +628,8 @@ void Player::update(const float& dt,
 }
 
 void Player::draw(sf::RenderTarget& target) {
-    // window.draw(hitbox);
-    // window.draw(loadingBox);
+    // target.draw(hitbox);
+    // target.draw(loadingBox);
 
     shadow.draw(target);
 
@@ -642,6 +641,29 @@ void Player::draw(sf::RenderTarget& target) {
     }
     else {
         animationManager.draw(target);
+    }
+
+    for (auto& p : projectiles) {
+        p.draw(target);
+    }
+
+    target.draw(interactText);
+}
+
+void Player::drawWithShader(sf::RenderTarget& target, sf::RenderStates states) {
+    // target.draw(hitbox);
+    // target.draw(loadingBox);
+
+    shadow.draw(target);
+
+    if (invincibleCooldownTimer > 0) {
+        animationManager.draw(target, EntityEffects::get("invincible"));
+    }
+    else if (knockbackCooldownTimer > 0) {
+        animationManager.draw(target, EntityEffects::get("blackFlash"));   
+    }
+    else {
+        animationManager.drawWithShader(target, states);
     }
 
     for (auto& p : projectiles) {
@@ -747,4 +769,8 @@ void Player::updateView(const float& dt, sf::View& view) const {
 
 int Player::getCollisionRegionID() const {
     return collisionRegionID;
+}
+
+sf::FloatRect Player::getFloatRect() const {
+    return sf::FloatRect(position, size);
 }

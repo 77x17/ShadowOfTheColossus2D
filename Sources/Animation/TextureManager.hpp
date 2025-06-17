@@ -9,7 +9,7 @@
 class TextureManager {
 private:
     // Dùng map để lưu trữ texture, với key là một ID (string) và value là đối tượng texture
-    static std::unordered_map<std::string, sf::Texture> textures;
+    static std::unordered_map<std::string, std::unique_ptr<sf::Texture>> textures;
 
 public:
     // Tải một texture từ file và lưu bằng một ID

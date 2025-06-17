@@ -199,8 +199,7 @@ void Enemy::followPlayer(const Player& player) {
     sf::Vector2f normalizeDirection = player.getPosition() - position;
     float length = std::sqrt(normalizeDirection.x * normalizeDirection.x + normalizeDirection.y * normalizeDirection.y);
 
-    const float EPSILON = 1e-6f;
-    if (length > EPSILON) {
+    if (length > ZERO_EPSILON) {
         normalizeDirection /= length;
     }
     else {
@@ -227,8 +226,7 @@ void Enemy::moveRandomly() {
 
             // normalize
             float length = std::sqrt(movingDirection.x * movingDirection.x + movingDirection.y * movingDirection.y);
-            const float EPSILON = 1e-6f;
-            if (length > EPSILON) {
+            if (length > ZERO_EPSILON) {
                 movingDirection /= length * 3;
             }
             else {
@@ -259,7 +257,7 @@ void Enemy::updateThinking(Player& player) {
             }
         }
 
-        if (player.isAlive()) {
+        if (player.isAlive() && invincibleCooldownTimer <= 0) {
             if (attackCooldownTimer <= 0) {
                 followPlayer(player);
             }
@@ -295,13 +293,12 @@ void Enemy::updatePosition(const float& dt, const std::vector<sf::FloatRect>& co
         nextHitboxRect.left += velocity.x;
         for (const sf::FloatRect& rect : collisionRects) {
             while (rect.intersects(nextHitboxRect)) {
-                const float EPSILON = 1e-6;
-                if (std::abs(velocity.x) > EPSILON) {
+                if (std::abs(velocity.x) > COLLISION_EPSILON) {
                     nextHitboxRect.left -= velocity.x / 10.0f;
                 }
                 else {
                     nextHitboxRect.left -= velocity.x;
-                    std::cerr << "[Bug] - Enemy.cpp - updatePosition()\n";
+                    // std::cerr << "[Bug] - Enemy.cpp - updatePosition()\n";
                 }
             }
         }
@@ -310,13 +307,12 @@ void Enemy::updatePosition(const float& dt, const std::vector<sf::FloatRect>& co
         nextHitboxRect.top += velocity.y;
         for (const sf::FloatRect& rect : collisionRects) {
             while (rect.intersects(nextHitboxRect)) {
-                const float EPSILON = 1e-6;
-                if (std::abs(velocity.y) > EPSILON) {
+                if (std::abs(velocity.y) > COLLISION_EPSILON) {
                     nextHitboxRect.top -= velocity.y / 10.0f;
                 }
                 else {
                     nextHitboxRect.top -= velocity.y;
-                    std::cerr << "[Bug] - Enemy.cpp - updatePosition()\n";
+                    // std::cerr << "[Bug] - Enemy.cpp - updatePosition()\n";
                 }
             }
         }
@@ -391,8 +387,8 @@ void Enemy::draw(sf::RenderTarget& target) {
     target.draw(healthPointsBarBackground);
     target.draw(healthPointsBar);
 
-    target.draw(hitbox);
-    target.draw(detectionBox);
+    // target.draw(hitbox);
+    // target.draw(detectionBox);
     
     shadow.draw(target);
 
@@ -409,4 +405,35 @@ void Enemy::draw(sf::RenderTarget& target) {
     if (alertCooldownTimer > 0) {
         alert.draw(target);
     }
+}
+
+void Enemy::drawWithShader(sf::RenderTarget& target, sf::RenderStates states) {
+    target.draw(labelBackground);
+    target.draw(label);
+
+    target.draw(healthPointsBarBackground);
+    target.draw(healthPointsBar);
+
+    // target.draw(hitbox);
+    // target.draw(detectionBox);
+    
+    shadow.draw(target);
+
+    if (invincibleCooldownTimer > 0) {
+        animationManager.draw(target, EntityEffects::get("invincible"));
+    }
+    else if (knockbackCooldownTimer > 0) {
+        animationManager.draw(target, EntityEffects::get("blackFlash"));   
+    }
+    else {
+        animationManager.drawWithShader(target, states);
+    }
+
+    if (alertCooldownTimer > 0) {
+        alert.draw(target);
+    }
+}
+
+sf::FloatRect Enemy::getFloatRect() const {
+    return sf::FloatRect(position, size);
 }

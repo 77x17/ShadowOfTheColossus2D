@@ -25,6 +25,7 @@ void SoundManager::loadMusic(const std::string& name, const std::string& filepat
 void SoundManager::playSound(const std::string& name) {
     auto it = sounds.find(name);
     if (it != sounds.end()) {
+        it->second.setVolume(150);
         it->second.play();
     } else {
         std::cerr << "Sound not found: " << name << "\n";

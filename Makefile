@@ -3,7 +3,7 @@ CXX = g++
 CXXFLAGS = -Wall -g -std=c++17
 
 # SFML flags (adjust if SFML is in a custom path)
-SFML_LIBS = -lsfml-system -lsfml-graphics -lsfml-window -lsfml-audio 
+SFML_LIBS = -lsfml-system -lsfml-graphics -lsfml-window -lsfml-audio
 
 INCLUDES = -I"./Sources" \
 		   -I"./Sources/Animation" \

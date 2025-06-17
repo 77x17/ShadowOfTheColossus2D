@@ -3,4 +3,5 @@ Build/Enemy/Eye.o: Sources/Enemy/Eye.cpp Sources/Enemy/Eye.hpp \
  Sources/Animation/Animation.hpp Sources/Player/Player.hpp \
  Sources/Projectile/Projectile.hpp Sources/SoundManager/SoundManager.hpp \
  Sources/Configuration/Font.hpp Sources/Quest/Quest.hpp \
- Sources/Quest/QuestObjective.hpp Sources/Npc/Npc.hpp
+ Sources/Quest/QuestObjective.hpp Sources/Npc/Npc.hpp \
+ Sources/Animation/TextureManager.hpp

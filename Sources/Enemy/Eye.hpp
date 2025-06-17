@@ -5,6 +5,8 @@
 #include "Enemy.hpp"
 #include "Projectile.hpp"
 
+#include <memory>
+
 enum class EyeState {
     DYING = -2,
     DEAD  = -1,
@@ -14,11 +16,11 @@ enum class EyeState {
 
 class Eye : public Enemy {
 private:
-    Projectile projectile;
-    float      SHOOT_COOLDOWN;
-    float      PROJECTILE_SPEED;
-    float      PROJECTILE_LIFETIME;
-    float      shootCooldownTimer;
+    std::unique_ptr<Projectile> projectile;
+    float SHOOT_COOLDOWN;
+    float PROJECTILE_SPEED;
+    float PROJECTILE_LIFETIME;
+    float shootCooldownTimer;
 
 public:
     Eye(const float& x, const float& y);
@@ -33,5 +35,6 @@ public:
     void update(const float& dt, Player& player, const std::vector<sf::FloatRect>& collisionRects) override;
 
     void draw(sf::RenderTarget& target) override;
+    void drawWithShader(sf::RenderTarget& target, sf::RenderStates states = sf::RenderStates::Default) override;
 
 };

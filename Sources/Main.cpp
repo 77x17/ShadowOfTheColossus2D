@@ -25,9 +25,13 @@
 #include "EntityEffects.hpp"
 #include "NaturalEffects.hpp"
 
+#include "ParticleManager.hpp"
+
+#include "TextureManager.hpp"
+
 sf::Font Font::font;
 
-std::unordered_map<std::string, sf::Texture> TextureManager::textures;
+std::unordered_map<std::string, std::unique_ptr<sf::Texture>> TextureManager::textures;
 
 std::unordered_map<std::string, sf::SoundBuffer> SoundManager::buffers;
 std::unordered_map<std::string, sf::Sound> SoundManager::sounds;
@@ -59,12 +63,24 @@ NaturalEffects naturalEffects;
 void loadShader() {
     EntityEffects::load("invincible", "Shaders/entityEffects.frag", {
         {"invincibleAmount", 0.2f},
-        {"flashAmount", 0.5f}
+        {"flashAmount", 0.5f},
+        {"useBlackFlash", false},
     });
 
-    EntityEffects::load("flash"     , "Shaders/entityEffects.frag", {
+    EntityEffects::load("flash", "Shaders/entityEffects.frag", {
         {"invincibleAmount", 0.2f},
-        {"flashAmount", 1.0f}
+        {"flashAmount", 1.0f},
+        {"useBlackFlash", false}
+    });
+
+    EntityEffects::load("blackFlash", "Shaders/entityEffects.frag", {
+        {"invincibleAmount", 0.2f},
+        {"flashAmount", 1.0f},
+        {"useBlackFlash", true}
+    });
+
+    EntityEffects::load("glow", "Shaders/glowEffects.frag", {
+        {"glowColor", sf::Glsl::Vec4(1.0f, 1.0f, 1.0f, 1.0f)}
     });
 
     naturalEffects.load("Shaders/naturalEffects.frag");
@@ -80,11 +96,11 @@ void loadSound() {
     SoundManager::loadSound("talk"      , "Sounds/talk.wav");
     SoundManager::loadSound("menuOpen"  , "Sounds/menu-open.wav");
     SoundManager::loadSound("menuClose" , "Sounds/menu-close.wav");
-    SoundManager::loadSound("levelUp"   , "Sounds/levelUp.mp3");
-    SoundManager::loadMusic("region0"   , "Sounds/Salted - Wynn OST - 05 Detlas Suburb.ogg");
-    SoundManager::loadMusic("region1"   , "Sounds/Salted - Wynn OST - 04 Gavel Journey.ogg");
-    SoundManager::setMusicVolume("region0", 50.0f);
-    SoundManager::setMusicVolume("region1", 50.0f);
+    SoundManager::loadSound("levelUp"   , "Sounds/levelUp.wav");
+    // SoundManager::loadMusic("region0"   , "Sounds/Salted - Wynn OST - 05 Detlas Suburb.ogg");
+    // SoundManager::loadMusic("region1"   , "Sounds/Salted - Wynn OST - 04 Gavel Journey.ogg");
+    // SoundManager::setMusicVolume("region0", 50.0f);
+    // SoundManager::setMusicVolume("region1", 50.0f);
 
     // SoundManager::loadMusic("regionSong", "E:/Code/TestingSFML/Wynn OST ogg/Salted - Wynn OST - 01 Introduction.ogg");
 }
@@ -102,14 +118,14 @@ void loadMap(TileMap& map) {
     map.updateObjects();
 }
 
-void loadEnemy(std::vector<Enemy*>& enemys, const std::unordered_map<std::string, std::vector<sf::FloatRect>>& enemyRects) {
+void loadEnemy(std::vector<std::unique_ptr<Enemy>>& enemies, const std::unordered_map<std::string, std::vector<sf::FloatRect>>& enemyRects) {
     for (const auto& pair : enemyRects) {
         for (const sf::FloatRect& rect : pair.second) {
             if (pair.first == "Bat Lv.1") {
-                enemys.push_back(new Bat(rect.getPosition().x, rect.getPosition().y));
+                enemies.push_back(std::make_unique<Bat>(rect.getPosition().x, rect.getPosition().y));
             }
             else if (pair.first == "Eye Lv.5") {
-                enemys.push_back(new Eye(rect.getPosition().x, rect.getPosition().y));
+                enemies.push_back(std::make_unique<Eye>(rect.getPosition().x, rect.getPosition().y));
             }
             else {
                 std::cerr << "[Bug] - Main.cpp - loadEnemy()\n";
@@ -232,8 +248,8 @@ int main() {
     TileMap map;
     loadMap(map);
 
-    std::vector<Enemy*> enemys;
-    loadEnemy(enemys, map.getEnemyRects());
+    std::vector<std::unique_ptr<Enemy>> enemies;
+    loadEnemy(enemies, map.getEnemyRects());
 
     std::vector<Npc> npcs;
     loadNpc(npcs, map.getNpcRects());
@@ -245,12 +261,14 @@ int main() {
         78, 
         110
     );
-    Player player(PlayerTiles.x * TILE_SIZE, PlayerTiles.y * TILE_SIZE, 50.0f, std::move(quests));
+    Player player(PlayerTiles.x * TILE_SIZE, PlayerTiles.y * TILE_SIZE, 5000.0f, std::move(quests));
     UI ui;
 
     ui.generateMinimapTexture(map);
 
     std::cerr << "Finished loading\n";
+
+    srand(static_cast<unsigned int>(time(0)));
 
     sf::Clock clock;
     bool      isMinimized  = false;
@@ -261,6 +279,12 @@ int main() {
     
     sf::RenderTexture sceneTexture;                     //  for shader
     sceneTexture.create(WINDOW_WIDTH, WINDOW_HEIGHT);   //  for shader
+
+    ParticleManager particleManager;
+    // Load texture từ file
+    particleManager.loadTexture(ParticleType::Rain , "Maps/leaf.png");
+    particleManager.loadTexture(ParticleType::Leaf , "Maps/leaf.png");
+    particleManager.loadTexture(ParticleType::Cloud, "Maps/cloud.png");
 
     while (window.isOpen()) {
         float dt = clock.restart().asSeconds();
@@ -329,38 +353,32 @@ int main() {
                 }
             }
         }
+
+        if (dt <= 0 || dt > 1.0f) {
+            std::cerr << "[Bug] - Main.cpp - main(): " << dt << "\n";
+            dt = 0.016f; // Fallback to 60fps
+        }
         
         if (isMinimized) {
             // pause rendering or music here if needed
             continue;
         }
-
+        
+        // --- [Begin] update --- 
         player.update(dt, window, map.getCollisionRects(), map.getRegionRects(), npcs);
         ui.update(dt, player, uiView.getSize());
-
+        
         // Điều chỉnh camera theo player
         player.updateView(dt, view);
         
-        for (Enemy* enemy : enemys) {
+        for (auto& enemy : enemies) {
             enemy->update(dt, player, map.getCollisionRects());
         }
 
         map.update(dt);
-
-        sceneTexture.clear(sf::Color::White);
-        sceneTexture.setView(view);
-
-        sceneTexture.draw(map);
-        for (Enemy* enemy : enemys) if (enemy->calculateDistance(player) <= LOADING_DISTANCE) {
-            enemy->draw(sceneTexture);
-        }
-        player.draw(sceneTexture);
         
-        sceneTexture.display();
-
-        window.clear();
-        window.setView(uiView);
-
+        particleManager.update(dt, view);
+        
         {
             sf::Vector2f playerScreenPos = sf::Vector2f(window.mapCoordsToPixel(player.getCenterPosition(), view));
             sf::Vector2f windowSize = sf::Vector2f(window.getSize());
@@ -369,12 +387,47 @@ int main() {
                 playerScreenPos.x / windowSize.x,
                 playerScreenPos.y / windowSize.y
             };
-
+            
             float aspectRatio = windowSize.x / windowSize.y;
-
+            
             naturalEffects.update(dt, player.getCollisionRegionID(), lightNorm, aspectRatio);
         }
+        // --- [End] Update ---
 
+        sceneTexture.clear(sf::Color::White);
+        sceneTexture.setView(view);
+        
+        // --- [Begin] Draw layer 1 --- 
+        sceneTexture.draw(map);
+        for (auto& enemy : enemies) if (enemy->calculateDistance(player) <= LOADING_DISTANCE) {
+            if (!particleManager.isCollisionWithCloud(enemy->getFloatRect())) {
+                enemy->draw(sceneTexture);
+            }
+        }
+
+        player.draw(sceneTexture);
+        
+        sceneTexture.draw(particleManager);
+        // --- [End] Draw layer 1 ---
+
+        // --- [Begin] Draw layer 2 ---
+        for (auto& enemy : enemies) if (enemy->calculateDistance(player) <= LOADING_DISTANCE) {
+            if (particleManager.isCollisionWithCloud(enemy->getFloatRect())) {
+                enemy->drawWithShader(sceneTexture, EntityEffects::get("glow"));
+            }
+        }
+
+        if (particleManager.isCollisionWithCloud(player.getFloatRect())) {
+            player.drawWithShader(sceneTexture, EntityEffects::get("glow"));
+        }
+        // --- [End] Draw layer 2 ---
+    
+        sceneTexture.display(); 
+
+        window.clear();
+        window.setView(uiView);
+
+        // --- [Begin] Add natural shader --- 
         sf::Sprite sceneSprite(sceneTexture.getTexture());
         if (naturalEffects.shouldApplyShader()) {
             window.draw(sceneSprite, naturalEffects.get());
@@ -382,8 +435,11 @@ int main() {
         else {
             window.draw(sceneSprite); 
         }
+        // --- [End] Add natural shader ---
 
-
+        // particleManager.drawScreen(window);
+        window.setView(uiView);
+        
         ui.draw(window);
 
         window.display();

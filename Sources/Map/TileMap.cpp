@@ -18,8 +18,8 @@ bool TileMap::load(const std::string& tmxPath, const std::vector<std::pair<std::
     m_tilesetTextures.clear();
 
     for (const auto& [tilesetName, tilesetPath] : tilesets) {
-        sf::Texture texture;
-        if (!texture.loadFromFile(tilesetPath)) {
+        auto texture = std::make_unique<sf::Texture>();;
+        if (!texture->loadFromFile(tilesetPath)) {
             std::cerr << "Failed to load tileset: " << tilesetPath << '\n';
             return false;
         }
@@ -193,13 +193,12 @@ bool TileMap::load(const std::string& tmxPath, const std::vector<std::pair<std::
                 // Kiểm tra xem tile này có animation không
                 auto animIt = m_animations.find(tileGid);
                 if (animIt != m_animations.end()) {
-                    // ---- ĐÂY LÀ TILE ĐỘNG ----
-                    
-                    // Lấy thông tin tileset
-                    // std::string tilesetName = m_gidToTilesetName[tileGid];
-                    // const sf::Texture& tex = m_tilesetTextures.at(tilesetName);
-                    const sf::Texture& tex = m_tilesetTextures.at(tsInfo.name);
-                    // int firstGidForTileset = tilesetNameToFirstGid.at(tilesetName);
+                    auto texIt = m_tilesetTextures.find(tsInfo.name);
+                    if (texIt == m_tilesetTextures.end()) {
+                        std::cerr << "[Bug] - TileMap.cpp() load()\n";
+                        continue;
+                    }
+                    const sf::Texture& tex = *texIt->second;
 
                     // Tạo một instance AnimatedTile mới
                     AnimatedTile animatedTile;
@@ -218,14 +217,20 @@ bool TileMap::load(const std::string& tmxPath, const std::vector<std::pair<std::
                     int initialFrameTileGid = animatedTile.animationData->frames[0].tileID;
                     TilesetInfo frameTsInfo = getTilesetInfoForGid(initialFrameTileGid); 
                     int localTileId = initialFrameTileGid - frameTsInfo.firstGid;
-                    int tilesPerRow = tex.getSize().x / tileWidth;
 
-                    // if (tilesPerRow != 0) {
-                    //     std::cerr << "[Bug] - TileMap.cpp load() 3\n";
-                    //     return false;
-                    // }
-                    int tu = localTileId % tilesPerRow;
-                    int tv = localTileId / tilesPerRow;
+                    int tilesPerRow = 0;
+                    if (tileWidth != 0) {
+                        tilesPerRow = tex.getSize().x / tileWidth;
+                    }
+                    else {
+                        std::cerr << "[Bug] - TileMap.cpp - load()\n";
+                    }
+
+                    int tu = 0, tv = 0;
+                    if (tilesPerRow != 0) {
+                        tu = localTileId % tilesPerRow;
+                        tv = localTileId / tilesPerRow;
+                    }
                     
                     quad[0].texCoords = sf::Vector2f(tu * tileWidth, tv * tileHeight);
                     quad[1].texCoords = sf::Vector2f((tu + 1) * tileWidth, tv * tileHeight);
@@ -237,30 +242,30 @@ bool TileMap::load(const std::string& tmxPath, const std::vector<std::pair<std::
                     m_animatedTiles.push_back(std::move(animatedTile));
                 } 
                 else {
-                    // ---- ĐÂY LÀ TILE TĨNH ----
-                    // if (m_gidToTilesetName.count(tileGid) == 0) continue; 
-
-                    // std::string tilesetName = m_gidToTilesetName[tileGid];
-                    // auto texIt = m_tilesetTextures.find(tilesetName);
-                    // if (texIt == m_tilesetTextures.end()) continue;
-                    // const sf::Texture& tex = texIt->second;
-                    const sf::Texture& tex = m_tilesetTextures.at(tsInfo.name);
-
-                    // int firstGidForTileset = tilesetNameToFirstGid.at(tilesetName);
+                    auto texIt = m_tilesetTextures.find(tsInfo.name);
+                    if (texIt == m_tilesetTextures.end()) {
+                        std::cerr << "[Bug] - TileMap.cpp() load()\n";
+                        continue;
+                    }
+                    const sf::Texture& tex = *texIt->second;
 
                     int localTileId = tileGid - tsInfo.firstGid;
-                    // if (tileWidth == 0) {
-                    //     std::cerr << "[Bug] - TileMap.cpp load() 1\n";
-                    //     return false;
-                    // }
-                    int tilesPerRow = tex.getSize().x / tileWidth;
+                    int tilesPerRow = 0;
+                    if (tileWidth != 0) {
+                        tilesPerRow = tex.getSize().x / tileWidth;
+                    }
+                    else {
+                        std::cerr << "[Bug] - TileMap.cpp - load()\n";
+                    }
 
-                    // if (tilesPerRow != 0) {
-                    //     std::cerr << "[Bug] - TileMap.cpp load() 2\n";
-                    //     return false;
-                    // }
-                    int tu = localTileId % tilesPerRow;
-                    int tv = localTileId / tilesPerRow;
+                    int tu = 0, tv = 0;
+                    if (tilesPerRow != 0) {
+                        tu = localTileId % tilesPerRow;
+                        tv = localTileId / tilesPerRow;
+                    }
+                    else {
+                        std::cerr << "[Bug] - TileMap.cpp - load()\n";
+                    }
 
                     sf::VertexArray& va = tilesetToVertices[tsInfo.name];
                     if (va.getVertexCount() == 0) {
@@ -395,7 +400,7 @@ void TileMap::draw(sf::RenderTarget& target, sf::RenderStates states) const {
     states.transform *= getTransform();
 
     for (const auto& [tilesetName, layer] : m_layerData) {
-        states.texture = &m_tilesetTextures.at(tilesetName);
+        states.texture = &*m_tilesetTextures.at(tilesetName);
         target.draw(layer, states);
     }
 
@@ -408,29 +413,29 @@ void TileMap::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 
         // std::string tilesetName = m_gidToTilesetName.at(tsInfo.name);
 
-        states.texture = &m_tilesetTextures.at(tsInfo.name);
+        states.texture = &*m_tilesetTextures.at(tsInfo.name);
         target.draw(tile.vertices, states);
     }
     // --- KẾT THÚC THÊM MỚI ---
 
     sf::RectangleShape hitbox;
-    hitbox.setOutlineColor(sf::Color::Cyan);
-    hitbox.setOutlineThickness(1.f);
-    hitbox.setFillColor(sf::Color::Transparent);
+    // hitbox.setOutlineColor(sf::Color::Cyan);
+    // hitbox.setOutlineThickness(1.f);
+    // hitbox.setFillColor(sf::Color::Transparent);
     // for (const sf::FloatRect& rect : m_collisionRects) {
     //     hitbox.setSize(rect.getSize());
     //     hitbox.setPosition(rect.getPosition());
     //     target.draw(hitbox);
     // }
     
-    hitbox.setOutlineColor(sf::Color::Yellow);
-    for (auto& pair : m_enemyRects) {
-        for (const sf::FloatRect& rect : pair.second) {
-            hitbox.setSize(rect.getSize());
-            hitbox.setPosition(rect.getPosition());
-            target.draw(hitbox);
-        }
-    }
+    // hitbox.setOutlineColor(sf::Color::Yellow);
+    // for (auto& pair : m_enemyRects) {
+    //     for (const sf::FloatRect& rect : pair.second) {
+    //         hitbox.setSize(rect.getSize());
+    //         hitbox.setPosition(rect.getPosition());
+    //         target.draw(hitbox);
+    //     }
+    // }
 
     hitbox.setOutlineColor(sf::Color::Green);
     for (auto& pair : m_NPCRects) {
@@ -439,19 +444,19 @@ void TileMap::draw(sf::RenderTarget& target, sf::RenderStates states) const {
         target.draw(hitbox);
     }
 
-    hitbox.setOutlineColor(sf::Color::Magenta);
-    for (auto& pair : m_RegionRects) {
-        hitbox.setSize(pair.second.getSize());
-        hitbox.setPosition(pair.second.getPosition());
-        target.draw(hitbox);
-    }
+    // hitbox.setOutlineColor(sf::Color::Magenta);
+    // for (auto& pair : m_RegionRects) {
+    //     hitbox.setSize(pair.second.getSize());
+    //     hitbox.setPosition(pair.second.getPosition());
+    //     target.draw(hitbox);
+    // }
 }
 
 void TileMap::drawMinimap(sf::RenderTarget& target, sf::RenderStates states) const {
     states.transform *= getTransform();
 
     for (const auto& [tilesetName, layer] : m_layerData) {
-        states.texture = &m_tilesetTextures.at(tilesetName);
+        states.texture = &*m_tilesetTextures.at(tilesetName);
         target.draw(layer, states);
     }
 
@@ -463,7 +468,7 @@ void TileMap::drawMinimap(sf::RenderTarget& target, sf::RenderStates states) con
 
         // std::string tilesetName = m_gidToTilesetName.at(tsInfo.name);
 
-        states.texture = &m_tilesetTextures.at(tsInfo.name);
+        states.texture = &*m_tilesetTextures.at(tsInfo.name);
         target.draw(tile.vertices, states);
     }
 
@@ -522,15 +527,15 @@ void TileMap::update(const float& dt) {
         tile.elapsedTime += dt;
         
         const auto& frames = tile.animationData->frames;
+        if (frames.empty()) {
+            std::cerr << "[Bug] - TileMap.cpp - update()\n";
+            return;
+        }
         if (tile.elapsedTime >= frames[tile.currentFrame].duration) {
             // Trừ đi thời gian của frame đã qua
             tile.elapsedTime -= frames[tile.currentFrame].duration;
             
             // Chuyển sang frame tiếp theo, quay vòng lại nếu hết
-            if (frames.empty()) {
-                std::cerr << "[Bug] - TileMap.cpp - update()\n";
-                return;
-            }
             tile.currentFrame = (tile.currentFrame + 1) % frames.size();
 
             // Cập nhật texture coordinates cho frame mới
@@ -541,14 +546,24 @@ void TileMap::update(const float& dt) {
 
             // Cần có cách map GID -> Tên tileset hiệu quả
             // m_gidToTilesetName đã làm việc này
-            const sf::Texture& tex = m_tilesetTextures.at(tsInfo.name);
+            auto texIt = m_tilesetTextures.find(tsInfo.name);
+            if (texIt == m_tilesetTextures.end()) {
+                std::cerr << "[Bug] - TileMap.cpp() load()\n";
+                continue;
+            }
+            const sf::Texture& tex = *texIt->second;
 
             // Cần có cách map Tên tileset -> firstGid hiệu quả
             int localTileId = nextFrameGid - tsInfo.firstGid;
-            int tilesPerRow = tex.getSize().x / tileWidth;
-
+            int tilesPerRow = 0;
+            if (tileWidth != 0) {
+                tilesPerRow = tex.getSize().x / tileWidth;
+            }
+            else {
+                std::cerr << "[Bug] - TileMap.cpp - load()\n";
+            }
+            
             int tu = 0, tv = 0;
-
             if (tilesPerRow != 0) {
                 tu = localTileId % tilesPerRow;
                 tv = localTileId / tilesPerRow;

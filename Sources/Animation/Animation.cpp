@@ -41,6 +41,10 @@ void Animation::draw(sf::RenderTarget& target, sf::Shader* shader) const {
     target.draw(sprite, shader);
 }
 
+void Animation::drawWithShader(sf::RenderTarget& target, sf::RenderStates states) const {
+    target.draw(sprite, states);
+}
+
 sf::Sprite Animation::getSprite() const {
     return sprite;
 }
@@ -84,6 +88,10 @@ void AnimationManager::update() {
 
 void AnimationManager::draw(sf::RenderTarget& target, sf::Shader* shader) const {
     animations.at(currentState).draw(target, shader);
+}
+
+void AnimationManager::drawWithShader(sf::RenderTarget& target,  sf::RenderStates states) const {
+    animations.at(currentState).drawWithShader(target, states);
 }
 
 sf::Sprite AnimationManager::getSprite() const {

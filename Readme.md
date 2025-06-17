@@ -12,3 +12,4 @@
 - Khi làm shader bóng tối, view bị thay đổi leap đi theo player nên phải cần một instant view.
 - Vị trí trong OpenGL tăng từ dưới lên
 - float length != 0 suy ra chia ? => BUG BUG BUG
+- Bug 2 ngày vì float / 10.0f quá nhỏ tiệm cận 0 => 0

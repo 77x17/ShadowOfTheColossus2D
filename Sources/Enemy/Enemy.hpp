@@ -83,4 +83,7 @@ public:
     virtual void update(const float& dt, Player& player, const std::vector<sf::FloatRect>& collisionRects);
 
     virtual void draw(sf::RenderTarget& target);
+    virtual void drawWithShader(sf::RenderTarget& target, sf::RenderStates states = sf::RenderStates::Default);
+
+    sf::FloatRect getFloatRect() const;
 };

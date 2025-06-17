@@ -1,13 +1,14 @@
 #include "Projectile.hpp"
 
+#include "Constants.hpp"
+
 #include <cmath>
 #include <iostream>
 
 // Helper function to normalize a vector (make its length 1)
 sf::Vector2f Projectile::normalize(const sf::Vector2f& source) {
     float length = std::sqrt((source.x * source.x) + (source.y * source.y));
-    const float EPSILON = 1e-6f;
-    if (length > EPSILON) {
+    if (length > ZERO_EPSILON) {
         return sf::Vector2f(source.x / length, source.y / length);
     }
     else {
@@ -55,9 +56,12 @@ bool Projectile::isCollision(const sf::FloatRect& rect) const {
 }
 
 void Projectile::update(const float& dt) {
-    hitbox.move(velocity * dt * static_cast<float>(std::pow(4, 1.0 - lifetime)));
-    sprite.setPosition(hitbox.getPosition());
-    lifetime -= dt; // Decrease the remaining lifetime
+    if (isAlive()) {
+        hitbox.move(velocity * dt * static_cast<float>(std::pow(4, 1.0 - lifetime)));
+
+        sprite.setPosition(hitbox.getPosition());
+        lifetime -= dt; // Decrease the remaining lifetime
+    }
 }
 
 void Projectile::draw(sf::RenderTarget& target) const {

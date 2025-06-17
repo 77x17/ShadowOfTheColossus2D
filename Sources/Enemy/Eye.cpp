@@ -1,5 +1,7 @@
 #include "Eye.hpp"
 
+#include "TextureManager.hpp"
+
 #include <cmath>
 
 Eye::Eye(const float& x = 0, const float& y = 0) : Enemy(x, y, TILE_SIZE, TILE_SIZE, 5.0f, "Eye Lv.5") {
@@ -29,14 +31,14 @@ void Eye::respawn() {
     if (state == static_cast<int>(EyeState::DEAD) && respawnCooldownTimer <= 0) {
         Enemy::respawn();
 
-        projectile = Projectile();
+        projectile.reset();
     }
 }
 
 void Eye::kill() {
     Enemy::kill();
 
-    projectile = Projectile();
+    projectile.reset();
 }
 
 void Eye::updateTimer(const float &dt) {
@@ -51,8 +53,7 @@ void Eye::followPlayer(const Player& player) {
     sf::Vector2f normalizeDirection = player.getPosition() - position;
     float length = std::sqrt(normalizeDirection.x * normalizeDirection.x + normalizeDirection.y * normalizeDirection.y);
 
-    const float EPSILON = 1e-6f;
-    if (length > EPSILON) {
+    if (length > ZERO_EPSILON) {
         normalizeDirection /= length;
     }
     else {
@@ -64,7 +65,7 @@ void Eye::followPlayer(const Player& player) {
     }
 
     if (shootCooldownTimer <= 0) {
-        projectile = Projectile(
+        projectile = std::make_unique<Projectile>(
             TextureManager::get("fireball"),
             position + size / 2.f,
             normalizeDirection,
@@ -103,25 +104,29 @@ void Eye::updateAnimation() {
 }
 
 void Eye::updateProjectiles(const float& dt, Player& player) {
-    projectile.update(dt);
+    if (!projectile) {
+        return;
+    }
 
-    if (projectile.isAlive()) {
-        if (projectile.isCollision(player.getHitBox())) {
+    projectile->update(dt);
+
+    if (projectile->isAlive()) {
+        if (projectile->isCollision(player.getHitBox())) {
             player.hurt(1.0f);
-            player.knockback(projectile.getPosition());
+            player.knockback(projectile->getPosition());
 
-            projectile = Projectile();
+            projectile.reset();
         }
     }
-    // else {
-    //     projectile = Projectile();
-    // }
+    else {
+        projectile.reset();
+    }
 }   
 
 void Eye::update(const float& dt, Player& player, const std::vector<sf::FloatRect>& collisionRects) {
     Enemy::update(dt, player,collisionRects);
     
-    if (invincibleCooldownTimer <= 0) {
+    if (invincibleCooldownTimer <= 0 && projectile) {
         updateProjectiles(dt, player);
     }
 }
@@ -129,7 +134,15 @@ void Eye::update(const float& dt, Player& player, const std::vector<sf::FloatRec
 void Eye::draw(sf::RenderTarget& target) {
     Enemy::draw(target);
     
-    if (isAlive()) {
-        projectile.draw(target);
+    if (projectile) {
+        projectile->draw(target);
+    }
+}
+
+void Eye::drawWithShader(sf::RenderTarget& target, sf::RenderStates states) {
+    Enemy::drawWithShader(target, states);
+    
+    if (projectile) {
+        projectile->draw(target);
     }
 }

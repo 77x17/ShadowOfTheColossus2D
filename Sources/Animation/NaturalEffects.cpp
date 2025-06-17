@@ -26,25 +26,25 @@ void NaturalEffects::update(float dt, int regionID, const sf::Vector2f& lightNor
     
     switch (regionID) {
         case 0:
-            targetFogDensity = 0.2f;
+            targetFogDensity = 0.1f;
+            targetFogColor = sf::Vector3f(0.8f, 0.8f, 0.85f);
+            targetClearRadius = 1.0f;
+            
+            break;
+        case 1:
+            // targetDarkness = 0.6f;
+            // targetLightRadius = 0.4f;
+
+            targetFogDensity = 0.4f;
             targetFogColor = sf::Vector3f(0.8f, 0.8f, 0.85f);
             targetClearRadius = 0.5f;
             
             break;
-        case 1:
-            targetDarkness = 0.6f;
-            targetLightRadius = 0.4f;
-
-            targetFogDensity = 0.4f;
-            targetFogColor = sf::Vector3f(0.8f, 0.8f, 0.85f);
-            targetClearRadius = 0.25f;
-            
-            break;
         case 2: // Vùng tối nặng
-            targetDarkness = 0.8f;
+            targetDarkness = 0.9f;
             targetLightRadius = 0.3f;
 
-            targetFogDensity = 0.4f;
+            targetFogDensity = 0.2f;
             targetFogColor = sf::Vector3f(0.8f, 0.8f, 0.85f);
             targetClearRadius = 0.25f;
             
@@ -105,7 +105,7 @@ sf::Shader* NaturalEffects::get() {
 }
 
 bool NaturalEffects::shouldApplyShader() const { 
-    return shader && currentDarkness > 0.01f || currentFogDensity > 0.01f; 
+    return shader && (currentDarkness > 0.01f || currentFogDensity > 0.01f); 
 }
 
 void NaturalEffects::setFadeSpeed(float speed) { FADE_SPEED = speed; }
