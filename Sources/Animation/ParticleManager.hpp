@@ -21,7 +21,10 @@ struct Particle {
     Particle(const sf::Texture& texture, ParticleType _type, const sf::Vector2f& pos, const sf::Vector2f& vel, float life = 1.0f)
         : type(_type), velocity(vel), lifetime(life) {
         sprite.setTexture(texture);
-        sprite.setOrigin(sprite.getLocalBounds().width / 2.f, sprite.getLocalBounds().height / 2.f);
+
+        if (type == ParticleType::Cloud) {
+            sprite.setOrigin(sprite.getLocalBounds().width / 2.f, sprite.getLocalBounds().height / 2.f);
+        }
         sprite.setPosition(pos);
 
         // Giảm kích thước bounds xuống 50% mỗi chiều (bỏ 1/4 mỗi bên)
@@ -66,8 +69,13 @@ struct Particle {
         sprite.setRotation(rotation);
     }
 
-    void flip(const float& rotation) {
-        sprite.setRotation(rotation);
+    void flip(bool flipX, bool flipY) {
+        if (flipX) {
+            sprite.setScale(-1.0f, 1.0f);
+        }
+        if (flipY) {
+            sprite.setScale(1.0f, -1.0f);
+        }
     }
 };
 
@@ -78,9 +86,13 @@ private:
     std::unordered_map<ParticleType, sf::Texture> textures;
 
     float LEAVES_SPAWN_COOLDOWN_TIME = 10.0f;
-    float CLOUDS_SPAWN_COOLDOWN_TIME = 15.0f;
-
     float leavesSpawnCooldownTimer   = 0.0f;
+
+    float RAINS_SPAWN_COOLDOWN_TIME  = 2.0f;
+    float rainsSpawnCooldownTimer    = 0.0f;
+    bool  makeRain                   = false;
+
+    float CLOUDS_SPAWN_COOLDOWN_TIME = 15.0f;
     float cloudsSpawnCooldownTimer   = 0.0f;
 
 public:
@@ -96,5 +108,6 @@ public:
 
     void drawScreen(sf::RenderTarget& target, sf::RenderStates states = sf::RenderStates::Default) const;
 
-    bool isCollisionWithCloud(const sf::FloatRect& rect) const;
+    void isCollisionWithCloud(const sf::FloatRect& rect);
+    void isCollisionWithRain(int regionID);
 };

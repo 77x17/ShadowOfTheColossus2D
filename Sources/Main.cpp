@@ -282,7 +282,7 @@ int main() {
 
     ParticleManager particleManager;
     // Load texture từ file
-    particleManager.loadTexture(ParticleType::Rain , "Maps/leaf.png");
+    particleManager.loadTexture(ParticleType::Rain , "Maps/rain.png");
     particleManager.loadTexture(ParticleType::Leaf , "Maps/leaf.png");
     particleManager.loadTexture(ParticleType::Cloud, "Maps/cloud.png");
 
@@ -374,10 +374,19 @@ int main() {
         for (auto& enemy : enemies) {
             enemy->update(dt, player, map.getCollisionRects());
         }
-
+        
         map.update(dt);
+        map.updateOverlayTransparency(player.getFloatRect());
+        for (const auto& enemy : enemies) {
+            map.updateOverlayTransparency(enemy->getFloatRect());
+        }
         
         particleManager.update(dt, view);
+        particleManager.isCollisionWithCloud(player.getFloatRect());
+        for (const auto& enemy : enemies) {
+            particleManager.isCollisionWithCloud(enemy->getFloatRect());
+        }
+        particleManager.isCollisionWithRain(player.getCollisionRegionID());
         
         {
             sf::Vector2f playerScreenPos = sf::Vector2f(window.mapCoordsToPixel(player.getCenterPosition(), view));
@@ -399,29 +408,23 @@ int main() {
         
         // --- [Begin] Draw layer 1 --- 
         sceneTexture.draw(map);
+
         for (auto& enemy : enemies) if (enemy->calculateDistance(player) <= LOADING_DISTANCE) {
-            if (!particleManager.isCollisionWithCloud(enemy->getFloatRect())) {
-                enemy->draw(sceneTexture);
-            }
+            enemy->draw(sceneTexture);
         }
 
         player.draw(sceneTexture);
         
+        map.drawOverlay(sceneTexture);
+
         sceneTexture.draw(particleManager);
         // --- [End] Draw layer 1 ---
 
         // --- [Begin] Draw layer 2 ---
-        for (auto& enemy : enemies) if (enemy->calculateDistance(player) <= LOADING_DISTANCE) {
-            if (particleManager.isCollisionWithCloud(enemy->getFloatRect())) {
-                enemy->drawWithShader(sceneTexture, EntityEffects::get("glow"));
-            }
-        }
-
-        if (particleManager.isCollisionWithCloud(player.getFloatRect())) {
-            player.drawWithShader(sceneTexture, EntityEffects::get("glow"));
-        }
+        sceneTexture.setView(uiView);
+        particleManager.drawScreen(sceneTexture);
         // --- [End] Draw layer 2 ---
-    
+
         sceneTexture.display(); 
 
         window.clear();
@@ -436,9 +439,6 @@ int main() {
             window.draw(sceneSprite); 
         }
         // --- [End] Add natural shader ---
-
-        // particleManager.drawScreen(window);
-        window.setView(uiView);
         
         ui.draw(window);
 

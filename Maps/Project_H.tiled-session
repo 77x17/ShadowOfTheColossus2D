@@ -1,0 +1,53 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "test.tmx",
+    "expandedProjectPaths": [
+        "."
+    ],
+    "file.lastUsedOpenFilter": "All Files (*)",
+    "fileStates": {
+        "": {
+            "scaleInDock": 1
+        },
+        "overworld.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "test.tmx": {
+            "expandedGroupLayers": [
+                11
+            ],
+            "scale": 1.5,
+            "selectedLayer": 5,
+            "viewCenter": {
+                "x": 1881.3333333333333,
+                "y": 1759.3333333333333
+            }
+        },
+        "test.tmx#CastleWalls": {
+            "scaleInDock": 1
+        },
+        "test.tmx#big_oak_tree_static": {
+            "scaleInDock": 1
+        },
+        "test.tmx#medium_oak_tree_static": {
+            "scaleInDock": 1
+        },
+        "test.tmx#overworld_grass": {
+            "scaleInDock": 1
+        }
+    },
+    "openFiles": [
+        "test.tmx",
+        "overworld.tsx"
+    ],
+    "project": "Project_H.tiled-project",
+    "recentFiles": [
+        "overworld.tsx",
+        "test.tmx"
+    ]
+}

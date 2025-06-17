@@ -21,6 +21,8 @@ void ParticleManager::spawn(ParticleType type, const sf::Vector2f& position, con
         case ParticleType::Rain: {
             // velocity = sf::Vector2f(0.f, 300.f);
             lifeTime = 2.f;
+
+            particles.emplace_back(textures[type], ParticleType::Rain, position, velocity, lifeTime);
             break;
         }
         case ParticleType::Leaf: {
@@ -30,7 +32,8 @@ void ParticleManager::spawn(ParticleType type, const sf::Vector2f& position, con
         }
         case ParticleType::Cloud: {
             cloudParticles.emplace_back(textures[ParticleType::Cloud], ParticleType::Cloud, position, velocity);
-            cloudParticles.back().rotate((rand() % 1) * 180);
+            cloudParticles.back().rotate((rand() % 2) * 180);
+            cloudParticles.back().flip(rand() % 2, rand() % 2);
             break;
         }
         default: {
@@ -38,8 +41,6 @@ void ParticleManager::spawn(ParticleType type, const sf::Vector2f& position, con
             break;
         }
     }
-
-    // particles.emplace_back(textures[type], type, position, velocity, lifeTime);
 }
 
 void ParticleManager::update(float dt, const sf::View& view) {
@@ -49,9 +50,19 @@ void ParticleManager::update(float dt, const sf::View& view) {
     if (cloudsSpawnCooldownTimer > 0) {
         cloudsSpawnCooldownTimer -= dt;
     }
+    if (rainsSpawnCooldownTimer > 0) {
+        rainsSpawnCooldownTimer -= dt;
+    }
 
-    // particleManager.spawn(ParticleType::Rain , player.getPosition());
-    // particleManager.spawn(ParticleType::Leaf , view.getCenter() - view.getSize() / 3.0f);
+    if (rainsSpawnCooldownTimer <= 0 && makeRain) {
+        sf::Vector2f rainPosition = sf::Vector2f(0.0f, -static_cast<float>(textures[ParticleType::Rain].getSize().y));
+        sf::Vector2f rainVelocity = sf::Vector2f(-100.0f, 400.0f);
+
+        spawn(ParticleType::Rain, rainPosition, rainVelocity);
+
+        rainsSpawnCooldownTimer = RAINS_SPAWN_COOLDOWN_TIME;
+    }
+
     if (cloudsSpawnCooldownTimer <= 0) {
         sf::Vector2f cloudPosition;
         sf::Vector2f cloudVelocity;
@@ -75,9 +86,9 @@ void ParticleManager::update(float dt, const sf::View& view) {
         cloudsSpawnCooldownTimer = CLOUDS_SPAWN_COOLDOWN_TIME;
     }
 
-    // for (auto& p : particles) {
-    //     p.update(dt);
-    // }
+    for (auto& particle : particles) {
+        particle.update(dt);
+    }
     for (Particle& particle : cloudParticles) {
         particle.update(dt);
 
@@ -85,6 +96,8 @@ void ParticleManager::update(float dt, const sf::View& view) {
         if (particle.isNotInView(viewRect)) {
             particle.disappear();
         }
+
+        particle.sprite.setColor(sf::Color(255, 255, 255, 255));
     }
     // std::cerr << cloudParticles.size() << '\n';
 
@@ -93,25 +106,38 @@ void ParticleManager::update(float dt, const sf::View& view) {
 }
 
 void ParticleManager::draw(sf::RenderTarget& target, sf::RenderStates states) const {
-    // for (const auto& p : particles) {
-    //     target.draw(p.sprite, states);
-    // }
     for (const Particle& particle : cloudParticles) {
         target.draw(particle.sprite, states);
     }
 }
 
 void ParticleManager::drawScreen(sf::RenderTarget& target, sf::RenderStates states) const {
-    for (const auto& p : particles) {
-        target.draw(p.sprite, states);
+    for (const auto& particle : particles) {
+        target.draw(particle.sprite, states);
     }
 }
 
-bool ParticleManager::isCollisionWithCloud(const sf::FloatRect& rect) const {
-    for (const Particle& particle : cloudParticles) {
+void ParticleManager::isCollisionWithCloud(const sf::FloatRect& rect) {
+    for (Particle& particle : cloudParticles) {
         if (particle.intersects(rect)) {
-            return true;
+            particle.sprite.setColor(sf::Color(255, 255, 255, 150));
         }
     }
-    return false;
+}
+
+void ParticleManager::isCollisionWithRain(int regionID) {
+    switch (regionID) {
+        case 0:
+            makeRain = false;
+            break;
+        case 1:
+            makeRain = false;
+            break;
+        case 2:
+            makeRain = true;
+            break;
+        default:
+            makeRain = false;
+            break;
+    }
 }

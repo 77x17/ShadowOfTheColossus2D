@@ -34,7 +34,6 @@ private:
 
     std::vector<sf::VertexArray> m_layersVertices; 
     std::unordered_map<std::string, std::unique_ptr<sf::Texture>> m_tilesetTextures;
-    // std::unordered_map<int, std::string> m_gidToTilesetName;        // GID → tên tileset
     struct TilesetInfo {
         std::string name;
         int firstGid;
@@ -63,6 +62,9 @@ private:
 
     std::vector<AnimatedTile> m_animatedTiles;
 
+    std::vector<std::pair<std::string, sf::VertexArray>> m_overlayLayerData;
+    std::vector<AnimatedTile> m_overlayAnimatedTiles;
+
 public:
     bool load(const std::string& tmxPath, const std::vector<std::pair<std::string, std::string>>& tilesets);
 
@@ -70,6 +72,7 @@ public:
 
     sf::FloatRect getGlobalBounds() const;
     sf::Vector2u getPixelSize() const;
+    void drawOverlay(sf::RenderTarget& target, sf::RenderStates states = sf::RenderStates::Default) const;
     void drawMinimap(sf::RenderTarget& target, sf::RenderStates states = sf::RenderStates::Default) const;
 
     const std::vector<sf::FloatRect>& getCollisionRects() const;
@@ -79,5 +82,6 @@ public:
 
     // Tilemap Animation
     void update(const float& dt);
+    void updateOverlayTransparency(const sf::FloatRect& targetBounds);
 
 };

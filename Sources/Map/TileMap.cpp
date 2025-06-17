@@ -17,6 +17,9 @@ bool TileMap::load(const std::string& tmxPath, const std::vector<std::pair<std::
     m_layersVertices.clear();
     m_tilesetTextures.clear();
 
+    m_overlayLayerData.clear();
+    m_overlayAnimatedTiles.clear();
+
     for (const auto& [tilesetName, tilesetPath] : tilesets) {
         auto texture = std::make_unique<sf::Texture>();;
         if (!texture->loadFromFile(tilesetPath)) {
@@ -45,7 +48,6 @@ bool TileMap::load(const std::string& tmxPath, const std::vector<std::pair<std::
     mapHeight    = mapNode.attribute("height").as_uint();
     tileWidth    = mapNode.attribute("tilewidth").as_uint();
     tileHeight   = mapNode.attribute("tileheight").as_uint();
-    // std::map<int, std::string> gidStartToTileset;
     m_gidStartToTileset.clear();
     for (pugi::xml_node tilesetNode : mapNode.children("tileset")) {
         int firstGid = tilesetNode.attribute("firstgid").as_int();
@@ -63,24 +65,6 @@ bool TileMap::load(const std::string& tmxPath, const std::vector<std::pair<std::
         m_gidStartToTileset[firstGid] = tilesetName;
     }
 
-    // std::vector<int> gids;
-    // for (const auto& [gid, _] : gidStartToTileset) gids.push_back(gid);
-    // std::sort(gids.begin(), gids.end());
-
-    // for (size_t i = 0; i < gids.size(); ++i) {
-    //     int start = gids[i];
-    //     constexpr int MAX_GID_PER_TILESET = 10000;
-    //     int  end = (i + 1 < gids.size()) ? gids[i + 1] - 1 : gids[i] + MAX_GID_PER_TILESET;
-    //     std::string tilesetName = gidStartToTileset[start];
-    //     for (int gid = start; gid <= end; ++gid) {
-    //         m_gidToTilesetName[gid] = tilesetName;
-    //     }
-    // }
-
-    // --- THÊM MỚI: Đọc dữ liệu animation ---
-    // std::cout << "Loading animation data..." << std::endl;
-
-    // Lấy đường dẫn thư mục của file TMX để tìm file TSX
     std::string tmxDirectory;
     size_t lastSlash = tmxPath.find_last_of("/\\");
     if (lastSlash != std::string::npos) {
@@ -92,7 +76,6 @@ bool TileMap::load(const std::string& tmxPath, const std::vector<std::pair<std::
         pugi::xml_attribute sourceAttr = tilesetNodeInMap.attribute("source");
 
         if (sourceAttr) {
-            // --- XỬ LÝ TILESET NGOÀI (.tsx) ---
             std::string tsxPath = tmxDirectory + sourceAttr.as_string();
             
             pugi::xml_document tsxDoc;
@@ -101,8 +84,6 @@ bool TileMap::load(const std::string& tmxPath, const std::vector<std::pair<std::
                 continue;
             }
             
-            // std::cout << "Successfully loaded external tileset: " << tsxPath << std::endl;
-
             pugi::xml_node tsxTilesetNode = tsxDoc.child("tileset");
             for (pugi::xml_node tileNode : tsxTilesetNode.children("tile")) {
                 int localId = tileNode.attribute("id").as_int();
@@ -118,14 +99,12 @@ bool TileMap::load(const std::string& tmxPath, const std::vector<std::pair<std::
                         anim.frames.emplace_back(firstGid + frameLocalId, durationMs / 1000.f);
                     }
                     if (!anim.frames.empty()) {
-                        // std::cout << "Found animation for GID: " << globalId << std::endl;
                         m_animations[globalId] = anim;
                     }
                 }
             }
 
         } else {
-            // --- XỬ LÝ TILESET NHÚNG TRỰC TIẾP (code cũ của bạn) ---
             for (pugi::xml_node tileNode : tilesetNodeInMap.children("tile")) {
                 int localId = tileNode.attribute("id").as_int();
                 int globalId = firstGid + localId;
@@ -140,17 +119,17 @@ bool TileMap::load(const std::string& tmxPath, const std::vector<std::pair<std::
                         anim.frames.emplace_back(firstGid + frameLocalId, durationMs / 1000.f);
                     }
                     if (!anim.frames.empty()) {
-                        // std::cout << "Found embedded animation for GID: " << globalId << std::endl;
                         m_animations[globalId] = anim;
                     }
                 }
             }
         }
     }
-    // std::cout << "Finished loading animation data. Total animations: " << m_animations.size() << std::endl;
-    // --- KẾT THÚC THÊM MỚI ---
 
     for (pugi::xml_node layerNode : mapNode.children("layer")) {
+        std::string layerName = layerNode.attribute("name").as_string();
+        bool isOverlayLayer = (layerName == "Overlay");
+
         pugi::xml_node dataNode = layerNode.child("data");
         if (!dataNode || std::string(dataNode.attribute("encoding").as_string()) != "csv") {
             continue;
@@ -175,11 +154,6 @@ bool TileMap::load(const std::string& tmxPath, const std::vector<std::pair<std::
             continue; 
         }
 
-        // std::unordered_map<std::string, int> tilesetNameToFirstGid;
-        // for (const auto& [gid, name] : gidStartToTileset) {
-        //     tilesetNameToFirstGid[name] = gid;
-        // }
-
         std::unordered_map<std::string, sf::VertexArray> tilesetToVertices;
         for (unsigned int i = 0; i < mapWidth; ++i) {
             for (unsigned int j = 0; j < mapHeight; ++j) {
@@ -187,10 +161,8 @@ bool TileMap::load(const std::string& tmxPath, const std::vector<std::pair<std::
                 if (tileGid == 0) continue;
                 
                 TilesetInfo tsInfo = getTilesetInfoForGid(tileGid);
-                if (tsInfo.name.empty()) continue; // Bỏ qua nếu không tìm thấy tileset
+                if (tsInfo.name.empty()) continue; 
 
-                // --- SỬA ĐỔI LỚN BẮT ĐẦU TỪ ĐÂY ---
-                // Kiểm tra xem tile này có animation không
                 auto animIt = m_animations.find(tileGid);
                 if (animIt != m_animations.end()) {
                     auto texIt = m_tilesetTextures.find(tsInfo.name);
@@ -200,20 +172,18 @@ bool TileMap::load(const std::string& tmxPath, const std::vector<std::pair<std::
                     }
                     const sf::Texture& tex = *texIt->second;
 
-                    // Tạo một instance AnimatedTile mới
                     AnimatedTile animatedTile;
                     animatedTile.animationData = &animIt->second; // Trỏ tới dữ liệu animation
                     animatedTile.currentFrame = 0;
+                    animatedTile.elapsedTime = 0.0f; 
                     animatedTile.vertices.setPrimitiveType(sf::Quads);
                     
-                    // Tạo 4 đỉnh cho tile này
                     sf::Vertex quad[4];
                     quad[0].position = sf::Vector2f(i * tileWidth, j * tileHeight);
                     quad[1].position = sf::Vector2f((i + 1) * tileWidth, j * tileHeight);
                     quad[2].position = sf::Vector2f((i + 1) * tileWidth, (j + 1) * tileHeight);
                     quad[3].position = sf::Vector2f(i * tileWidth, (j + 1) * tileHeight);
 
-                    // Set texCoords cho frame đầu tiên
                     int initialFrameTileGid = animatedTile.animationData->frames[0].tileID;
                     TilesetInfo frameTsInfo = getTilesetInfoForGid(initialFrameTileGid); 
                     int localTileId = initialFrameTileGid - frameTsInfo.firstGid;
@@ -237,9 +207,13 @@ bool TileMap::load(const std::string& tmxPath, const std::vector<std::pair<std::
                     quad[2].texCoords = sf::Vector2f((tu + 1) * tileWidth, (tv + 1) * tileHeight);
                     quad[3].texCoords = sf::Vector2f(tu * tileWidth, (tv + 1) * tileHeight);
 
-                    for(int k=0; k<4; ++k) animatedTile.vertices.append(quad[k]);
-
-                    m_animatedTiles.push_back(std::move(animatedTile));
+                    for (int k = 0; k < 4; ++k) animatedTile.vertices.append(quad[k]);
+                    
+                    if (isOverlayLayer) {
+                        m_overlayAnimatedTiles.push_back(std::move(animatedTile));
+                    } else {
+                        m_animatedTiles.push_back(std::move(animatedTile));
+                    }
                 } 
                 else {
                     auto texIt = m_tilesetTextures.find(tsInfo.name);
@@ -289,11 +263,14 @@ bool TileMap::load(const std::string& tmxPath, const std::vector<std::pair<std::
                     va.append(quad[2]);
                     va.append(quad[3]);
                 }
-                // --- KẾT THÚC SỬA ĐỔI ---
             }
         }
         for (auto& [tilesetName, va] : tilesetToVertices) {
-            m_layerData.emplace_back(tilesetName, std::move(va));
+            if (isOverlayLayer) {
+                m_overlayLayerData.emplace_back(tilesetName, std::move(va));
+            } else {
+                m_layerData.emplace_back(tilesetName, std::move(va));
+            }
         }
     }
     
@@ -404,24 +381,20 @@ void TileMap::draw(sf::RenderTarget& target, sf::RenderStates states) const {
         target.draw(layer, states);
     }
 
-     // --- THÊM MỚI ---
     for (const auto& tile : m_animatedTiles) {
-        // Tìm GID của frame hiện tại để xác định đúng texture
         int currentFrameGid = tile.animationData->frames[tile.currentFrame].tileID;
         TilesetInfo tsInfo = getTilesetInfoForGid(currentFrameGid);
         if (tsInfo.name.empty()) continue;
 
-        // std::string tilesetName = m_gidToTilesetName.at(tsInfo.name);
-
         states.texture = &*m_tilesetTextures.at(tsInfo.name);
         target.draw(tile.vertices, states);
     }
-    // --- KẾT THÚC THÊM MỚI ---
 
     sf::RectangleShape hitbox;
+    hitbox.setOutlineThickness(1.f);
+    hitbox.setFillColor(sf::Color::Transparent);
+    
     // hitbox.setOutlineColor(sf::Color::Cyan);
-    // hitbox.setOutlineThickness(1.f);
-    // hitbox.setFillColor(sf::Color::Transparent);
     // for (const sf::FloatRect& rect : m_collisionRects) {
     //     hitbox.setSize(rect.getSize());
     //     hitbox.setPosition(rect.getPosition());
@@ -452,6 +425,25 @@ void TileMap::draw(sf::RenderTarget& target, sf::RenderStates states) const {
     // }
 }
 
+void TileMap::drawOverlay(sf::RenderTarget& target, sf::RenderStates states) const {
+    states.transform *= getTransform();
+
+    for (const auto& [tilesetName, layer] : m_overlayLayerData) {
+        states.texture = &*m_tilesetTextures.at(tilesetName);
+        target.draw(layer, states);
+    }
+
+    for (const auto& tile : m_overlayAnimatedTiles) {
+        int currentFrameGid = tile.animationData->frames[tile.currentFrame].tileID;
+        TilesetInfo tsInfo = getTilesetInfoForGid(currentFrameGid);
+        if (tsInfo.name.empty()) continue;
+
+        states.texture = &*m_tilesetTextures.at(tsInfo.name);
+        target.draw(tile.vertices, states);
+    }
+}
+
+
 void TileMap::drawMinimap(sf::RenderTarget& target, sf::RenderStates states) const {
     states.transform *= getTransform();
 
@@ -459,23 +451,32 @@ void TileMap::drawMinimap(sf::RenderTarget& target, sf::RenderStates states) con
         states.texture = &*m_tilesetTextures.at(tilesetName);
         target.draw(layer, states);
     }
-
     for (const auto& tile : m_animatedTiles) {
-        // Tìm GID của frame hiện tại để xác định đúng texture
         int currentFrameGid = tile.animationData->frames[tile.currentFrame].tileID;
         TilesetInfo tsInfo = getTilesetInfoForGid(currentFrameGid);
         if (tsInfo.name.empty()) continue;
-
-        // std::string tilesetName = m_gidToTilesetName.at(tsInfo.name);
 
         states.texture = &*m_tilesetTextures.at(tsInfo.name);
         target.draw(tile.vertices, states);
     }
 
+    for (const auto& [tilesetName, layer] : m_overlayLayerData) {
+        states.texture = &*m_tilesetTextures.at(tilesetName);
+        target.draw(layer, states);
+    }
+    for (const auto& tile : m_overlayAnimatedTiles) {
+        int currentFrameGid = tile.animationData->frames[tile.currentFrame].tileID;
+        TilesetInfo tsInfo = getTilesetInfoForGid(currentFrameGid);
+        if (tsInfo.name.empty()) continue;
+        states.texture = &*m_tilesetTextures.at(tsInfo.name);
+        target.draw(tile.vertices, states);
+    }
+
     sf::RectangleShape hitbox;
-    hitbox.setOutlineColor(sf::Color::Cyan);
     hitbox.setOutlineThickness(5.f);
     hitbox.setFillColor(sf::Color::Transparent);
+
+    // hitbox.setOutlineColor(sf::Color::Cyan);
     // for (const sf::FloatRect& rect : m_collisionRects) {
     //     hitbox.setSize(rect.getSize());
     //     hitbox.setPosition(rect.getPosition());
@@ -529,23 +530,17 @@ void TileMap::update(const float& dt) {
         const auto& frames = tile.animationData->frames;
         if (frames.empty()) {
             std::cerr << "[Bug] - TileMap.cpp - update()\n";
-            return;
+            continue;
         }
         if (tile.elapsedTime >= frames[tile.currentFrame].duration) {
-            // Trừ đi thời gian của frame đã qua
             tile.elapsedTime -= frames[tile.currentFrame].duration;
-            
-            // Chuyển sang frame tiếp theo, quay vòng lại nếu hết
             tile.currentFrame = (tile.currentFrame + 1) % frames.size();
 
-            // Cập nhật texture coordinates cho frame mới
             int nextFrameGid = frames[tile.currentFrame].tileID;
             
             TilesetInfo tsInfo = getTilesetInfoForGid(nextFrameGid);
             if (tsInfo.name.empty()) continue; // Bỏ qua nếu có lỗi
 
-            // Cần có cách map GID -> Tên tileset hiệu quả
-            // m_gidToTilesetName đã làm việc này
             auto texIt = m_tilesetTextures.find(tsInfo.name);
             if (texIt == m_tilesetTextures.end()) {
                 std::cerr << "[Bug] - TileMap.cpp() load()\n";
@@ -553,7 +548,6 @@ void TileMap::update(const float& dt) {
             }
             const sf::Texture& tex = *texIt->second;
 
-            // Cần có cách map Tên tileset -> firstGid hiệu quả
             int localTileId = nextFrameGid - tsInfo.firstGid;
             int tilesPerRow = 0;
             if (tileWidth != 0) {
@@ -572,11 +566,101 @@ void TileMap::update(const float& dt) {
                 std::cerr << "[Bug] - TileMap.cpp - update()\n";
             }
 
-            // Cập nhật texCoords cho 4 đỉnh của tile
             tile.vertices[0].texCoords = sf::Vector2f(tu * tileWidth, tv * tileHeight);
             tile.vertices[1].texCoords = sf::Vector2f((tu + 1) * tileWidth, tv * tileHeight);
             tile.vertices[2].texCoords = sf::Vector2f((tu + 1) * tileWidth, (tv + 1) * tileHeight);
             tile.vertices[3].texCoords = sf::Vector2f(tu * tileWidth, (tv + 1) * tileHeight);
+        }
+    }
+
+    for (auto& tile : m_overlayAnimatedTiles) {
+        tile.elapsedTime += dt;
+        
+        const auto& frames = tile.animationData->frames;
+        if (frames.empty()) {
+            std::cerr << "[Bug] - TileMap.cpp - update()\n";
+            continue;
+        }
+        
+        while (tile.elapsedTime >= frames[tile.currentFrame].duration) {
+            tile.elapsedTime -= frames[tile.currentFrame].duration;
+            tile.currentFrame = (tile.currentFrame + 1) % frames.size();
+        }
+
+        int currentFrameGid = frames[tile.currentFrame].tileID;
+        TilesetInfo tsInfo = getTilesetInfoForGid(currentFrameGid);
+        if (tsInfo.name.empty()) continue;
+
+        auto texIt = m_tilesetTextures.find(tsInfo.name);
+        if (texIt == m_tilesetTextures.end()) continue;
+        const sf::Texture& tex = *texIt->second;
+
+        int localTileId = currentFrameGid - tsInfo.firstGid;
+        if (tileWidth == 0) {
+            std::cerr << "[Bug] - TileMap.cpp - update()\n";
+        }
+        int tilesPerRow = tex.getSize().x / tileWidth;
+        if (tilesPerRow == 0) {
+            std::cerr << "[Bug] - TileMap.cpp - update()\n";
+            continue;
+        }
+        int tu = localTileId % tilesPerRow;
+        int tv = localTileId / tilesPerRow;
+
+        tile.vertices[0].texCoords = sf::Vector2f(tu * tileWidth, tv * tileHeight);
+        tile.vertices[1].texCoords = sf::Vector2f((tu + 1) * tileWidth, tv * tileHeight);
+        tile.vertices[2].texCoords = sf::Vector2f((tu + 1) * tileWidth, (tv + 1) * tileHeight);
+        tile.vertices[3].texCoords = sf::Vector2f(tu * tileWidth, (tv + 1) * tileHeight);
+    }
+
+    for (auto& pair : m_overlayLayerData) {
+        sf::VertexArray& va = pair.second;
+        for (std::size_t i = 0; i < va.getVertexCount(); ++i) {
+            va[i].color = sf::Color::White;
+        }
+    }
+    for (auto& tile : m_overlayAnimatedTiles) {
+        for (std::size_t i = 0; i < 4; ++i) { // Mỗi tile động là 1 quad (4 đỉnh)
+            tile.vertices[i].color = sf::Color::White;
+        }
+    }
+}
+
+void TileMap::updateOverlayTransparency(const sf::FloatRect& targetBounds) {
+    const sf::Color TransparentColor(255, 255, 255, 150);
+
+    const int fadeRadius = 2;
+    const float influenceWidth  = static_cast<float>((2 * fadeRadius + 1) * tileWidth);
+    const float influenceHeight = static_cast<float>((2 * fadeRadius + 1) * tileHeight);
+
+    for (auto& pair : m_overlayLayerData) {
+        sf::VertexArray& va = pair.second;
+        for (std::size_t i = 0; i < va.getVertexCount(); i += 4) {
+            sf::Vector2f tilePosition = va[i].position;
+            float influenceLeft = tilePosition.x - (fadeRadius * tileWidth);
+            float influenceTop  = tilePosition.y - (fadeRadius * tileHeight);
+            sf::FloatRect influenceRect(influenceLeft, influenceTop, influenceWidth, influenceHeight);
+            sf::FloatRect transformedInfluenceRect = getTransform().transformRect(influenceRect);
+            if (targetBounds.intersects(transformedInfluenceRect)) {
+                va[i].color = TransparentColor;
+                va[i + 1].color = TransparentColor;
+                va[i + 2].color = TransparentColor;
+                va[i + 3].color = TransparentColor;
+            }
+        }
+    }
+
+    for (auto& tile : m_overlayAnimatedTiles) {
+        sf::Vector2f tilePosition = tile.vertices[0].position;
+        float influenceLeft = tilePosition.x - (fadeRadius * tileWidth);
+        float influenceTop  = tilePosition.y - (fadeRadius * tileHeight);
+        sf::FloatRect influenceRect(influenceLeft, influenceTop, influenceWidth, influenceHeight);
+        sf::FloatRect transformedInfluenceRect = getTransform().transformRect(influenceRect);
+        if (targetBounds.intersects(transformedInfluenceRect)) {
+            tile.vertices[0].color = TransparentColor;
+            tile.vertices[1].color = TransparentColor;
+            tile.vertices[2].color = TransparentColor;
+            tile.vertices[3].color = TransparentColor;
         }
     }
 }
