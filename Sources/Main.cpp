@@ -86,6 +86,7 @@ void loadShader() {
     });
 
     naturalEffects.load("Shaders/naturalEffects.frag");
+    naturalEffects.loadSmartLightingShader("Shaders/smartLighting.frag");
 }
 
 void loadSound() {
@@ -282,7 +283,13 @@ int main() {
     particleManager.loadTexture(ParticleType::Leaf , "Maps/leaf.png");
     particleManager.loadTexture(ParticleType::Cloud, "Maps/cloud.png");
 
-    Clock gameClock;
+    Clock gameClock(22 * 60.0f);
+
+    int playerLightID = naturalEffects.addLight(player.getPosition(), 350.0f, sf::Vector3f(1.0f, 1.0f, 1.0f), 1.0f, 1);
+    for (const sf::Vector2f lightPosition : map.getLights()) {
+        naturalEffects.addLight(lightPosition);
+    }
+
     // [End] - Loading
 
     while (window.isOpen()) {
@@ -401,6 +408,8 @@ int main() {
             float aspectRatio = windowSize.x / windowSize.y;
             
             naturalEffects.update(dt, player.getCollisionRegionID(), lightNorm, aspectRatio, gameClock);
+            naturalEffects.updateLightPosition(playerLightID, player.getCenterPosition()); 
+            naturalEffects.updateSmartLighting(player.getCenterPosition(), view);
         }
         // --- [End] Update ---
 
@@ -424,6 +433,9 @@ int main() {
         // --- [Begin] Draw layer 2 ---
         sceneTexture.setView(uiView);
         particleManager.drawScreen(sceneTexture);
+
+        sceneTexture.setView(view);
+        player.drawInteractText(sceneTexture);
         // --- [End] Draw layer 2 ---
 
         sceneTexture.display(); 
@@ -433,7 +445,10 @@ int main() {
 
         // --- [Begin] Add natural shader --- 
         sf::Sprite sceneSprite(sceneTexture.getTexture());
-        if (naturalEffects.shouldApplyShader()) {
+        if (naturalEffects.shouldApplySmartLighting()) {
+            window.draw(sceneSprite, naturalEffects.getSmartLightingShader());
+        }
+        else if (naturalEffects.shouldApplyShader()) {
             window.draw(sceneSprite, naturalEffects.get());
         }
         else {

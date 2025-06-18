@@ -20,6 +20,8 @@ bool TileMap::load(const std::string& tmxPath, const std::vector<std::pair<std::
     m_overlayLayerData.clear();
     m_overlayAnimatedTiles.clear();
 
+    m_lights.clear();
+
     for (const auto& [tilesetName, tilesetPath] : tilesets) {
         auto texture = std::make_unique<sf::Texture>();;
         if (!texture->loadFromFile(tilesetPath)) {
@@ -319,6 +321,9 @@ bool TileMap::load(const std::string& tmxPath, const std::vector<std::pair<std::
                         std::cerr << "[Bug] - TileMap.cpp - load() Enemy\n";
                     }
                 }
+                else if (groupName == "Light") {
+                    m_lights.emplace_back(x, y);
+                }
                 else {
                     std::cerr << "[Bug] - TileMap.cpp - load()\n";
                 }
@@ -346,6 +351,10 @@ void TileMap::updateObjects() {
 
     for (auto& pair : m_RegionRects) {
         pair.second = getTransform().transformRect(pair.second);
+    }
+
+    for (sf::Vector2f& lightPosition : m_lights) {
+        lightPosition = getTransform().transformPoint(lightPosition);
     }
 }
 
@@ -521,6 +530,10 @@ const std::unordered_map<std::string, std::vector<sf::FloatRect>>& TileMap::getE
 
 const std::unordered_map<int, sf::FloatRect>& TileMap::getRegionRects() const {
     return m_RegionRects;
+}
+
+const std::vector<sf::Vector2f>& TileMap::getLights() const {
+    return m_lights;
 }
 
 void TileMap::update(const float& dt) {

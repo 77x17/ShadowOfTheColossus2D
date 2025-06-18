@@ -2,12 +2,15 @@
 #include <SFML/Graphics.hpp>
 
 #include "Clock.hpp"
+#include "SmartLightSource.hpp"
 
 #include <memory>
 
 class NaturalEffects {
 private:
     std::unique_ptr<sf::Shader> shader;
+    std::unique_ptr<SmartLightSource> smartLights;
+
     // Darkness properties
     float currentDarkness = 0.0f;
     float targetDarkness  = 0.0f;
@@ -31,14 +34,43 @@ private:
 
 public:
     NaturalEffects();
+    ~NaturalEffects() = default;
     
     void load(const std::string& path);
+    bool loadSmartLightingShader(const std::string& smartLightingPath);
 
     void update(float dt, int regionID, const sf::Vector2f& lightNorm, const float& aspectRatio, const Clock& gameClock);
+    void updateSmartLighting(const sf::Vector2f& playerPos, const sf::View& view);
     
     sf::Shader* get();
+    sf::Shader* getSmartLightingShader();
 
     bool shouldApplyShader() const;
+    bool shouldApplySmartLighting() const;
+
+    // Quản lý lights
+    int addLight(const sf::Vector2f& position, float radius = 700.0f, 
+                 const sf::Vector3f& color = sf::Vector3f(1.0f, 1.0f, 1.0f),
+                 float intensity = 1.0f, int priority = 0);
+    void removeLight(int lightID);
+    void updateLightPosition(int lightID, const sf::Vector2f& position);
+    void setLightActive(int lightID, bool active);
+    void setLightIntensity(int lightID, float intensity);
+    void setLightColor(int lightID, const sf::Vector3f& color);
+    void setLightPriority(int lightID, int priority);
     
+    // Utility
     void setFadeSpeed(float speed);
+    void clearAllLights();
+    std::vector<int> getLightsInRange(const sf::Vector2f& center, float range) const;
+
+    // Debug info
+    int getTotalLights() const;
+    int getActiveLights() const;
+    std::vector<int> getCurrentlyRenderedLights() const;
+
+private:
+    void interpolateValues(float dt);
+    void updateShaderUniforms(const sf::Vector2f& lightNorm, const float& aspectRatio);
+
 };

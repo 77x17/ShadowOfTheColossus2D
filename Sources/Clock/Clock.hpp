@@ -7,7 +7,7 @@ private:
     float minutes;
 
 public:
-    Clock();
+    Clock(const float& _minutes = 360.0f);
 
     void update(const float& dt);
     int getHour() const;

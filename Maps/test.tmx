@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="256" height="256" tilewidth="16" tileheight="16" infinite="0" nextlayerid="21" nextobjectid="212">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="256" height="256" tilewidth="16" tileheight="16" infinite="0" nextlayerid="23" nextobjectid="227">
  <tileset firstgid="1" source="overworld.tsx"/>
  <tileset firstgid="1481" name="CastleWalls" tilewidth="16" tileheight="16" tilecount="1024" columns="32">
   <image source="CastleWalls.png" width="512" height="512"/>
@@ -1053,6 +1053,19 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
+ <group id="21" name="Light">
+  <objectgroup id="22" name="Light">
+   <object id="213" x="1344" y="1776" width="16" height="16"/>
+   <object id="215" x="1520" y="1776" width="16" height="16"/>
+   <object id="218" x="1728" y="1728" width="16" height="16"/>
+   <object id="220" x="1888" y="1680" width="16" height="16"/>
+   <object id="221" x="1792" y="1904" width="16" height="16"/>
+   <object id="223" x="2176" y="1808" width="16" height="16"/>
+   <object id="224" x="2096" y="1664" width="16" height="16"/>
+   <object id="225" x="2320" y="1648" width="16" height="16"/>
+   <object id="226" x="2416" y="1792" width="16" height="16"/>
+  </objectgroup>
+ </group>
  <group id="11" name="Collision">
   <objectgroup id="13" name="Npc" locked="1">
    <object id="113" x="1296" y="1744" width="16" height="16">

@@ -9,5 +9,6 @@ Build/Main.o: Sources/Main.cpp Sources/Configuration/Constants.hpp \
  Sources/Quest/KillMonsterObjective.hpp Sources/Quest/FinishObjective.hpp \
  Sources/Quest/TalkObjective.hpp Sources/Quest/ExploreObjective.hpp \
  Sources/Animation/EntityEffects.hpp Sources/Animation/NaturalEffects.hpp \
+ Sources/LightSource/SmartLightSource.hpp \
  Sources/Animation/ParticleManager.hpp \
  Sources/Animation/TextureManager.hpp

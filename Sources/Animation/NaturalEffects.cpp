@@ -4,12 +4,17 @@
 
 NaturalEffects::NaturalEffects() {
     shader = std::make_unique<sf::Shader>();
+    smartLights = std::make_unique<SmartLightSource>();
 }
 
 void NaturalEffects::load(const std::string& path) {
     if (!shader->loadFromFile(path, sf::Shader::Fragment)) {
         std::cerr << "[Bug] - NaturalEffects.cpp - load() " << path << "\n"; 
     }
+}
+
+bool NaturalEffects::loadSmartLightingShader(const std::string& smartLightingPath) {
+    return smartLights->loadShader(smartLightingPath);
 }
 
 void NaturalEffects::update(float dt, int regionID, const sf::Vector2f& lightNorm, const float& aspectRatio, const Clock& gameClock) {
@@ -104,7 +109,20 @@ void NaturalEffects::update(float dt, int regionID, const sf::Vector2f& lightNor
             break;
     }
     
-    // Cập nhật mượt mà tất cả giá trị
+    // Interpolate values smoothly
+    interpolateValues(dt);
+
+    // Update shader uniforms
+    updateShaderUniforms(lightNorm, aspectRatio);
+}
+
+void NaturalEffects::updateSmartLighting(const sf::Vector2f& playerPos, const sf::View& view) {
+    if (smartLights) {
+        smartLights->update(playerPos, view);
+    }
+}
+
+void NaturalEffects::interpolateValues(float dt) {
     currentDarkness    += (targetDarkness    - currentDarkness)    * FADE_SPEED * dt;
     currentLightRadius += (targetLightRadius - currentLightRadius) * FADE_SPEED * dt;
     
@@ -119,22 +137,32 @@ void NaturalEffects::update(float dt, int regionID, const sf::Vector2f& lightNor
     currentTintColor.y  += (targetTintColor.y  - currentTintColor.y)  * FADE_SPEED * dt;
     currentTintColor.z  += (targetTintColor.z  - currentTintColor.z)  * FADE_SPEED * dt;
     currentTintStrength += (targetTintStrength - currentTintStrength) * FADE_SPEED * dt;
+}
 
-    shader->setUniform("lightPosition", lightNorm);
-    shader->setUniform("aspectRatio", aspectRatio);
-
-    // Darkness uniforms
-    shader->setUniform("darkness"   , currentDarkness);
-    shader->setUniform("lightRadius", currentLightRadius);
-
-    // Fog uniforms
-    shader->setUniform("fogDensity" , currentFogDensity);
-    shader->setUniform("clearRadius", currentClearRadius);
-    shader->setUniform("fogColor"   , currentFogColor);
-
-    // Tint uniform
-    shader->setUniform("tintColor"   , currentTintColor);
-    shader->setUniform("tintStrength", currentTintStrength);
+void NaturalEffects::updateShaderUniforms(const sf::Vector2f& lightNorm, const float& aspectRatio) {
+    // Update old shader uniforms
+    if (shader) {
+        shader->setUniform("lightPosition", lightNorm);
+        shader->setUniform("aspectRatio", aspectRatio);
+        shader->setUniform("darkness"   , currentDarkness);
+        shader->setUniform("lightRadius", currentLightRadius);
+        shader->setUniform("fogDensity" , currentFogDensity);
+        shader->setUniform("clearRadius", currentClearRadius);
+        shader->setUniform("fogColor"   , currentFogColor);
+        shader->setUniform("tintColor"   , currentTintColor);
+        shader->setUniform("tintStrength", currentTintStrength);
+    }
+    
+    // Update smart lighting shader uniforms
+    if (smartLights && smartLights->getShader()) {
+        sf::Shader* smartShader = smartLights->getShader();
+        smartShader->setUniform("darkness", currentDarkness);
+        smartShader->setUniform("fogDensity", currentFogDensity);
+        smartShader->setUniform("clearRadius", currentClearRadius);
+        smartShader->setUniform("fogColor", currentFogColor);
+        smartShader->setUniform("tintColor", currentTintColor);
+        smartShader->setUniform("tintStrength", currentTintStrength);
+    }
 }
 
 sf::Shader* NaturalEffects::get() {
@@ -147,10 +175,68 @@ sf::Shader* NaturalEffects::get() {
     return nullptr;
 }
 
+sf::Shader* NaturalEffects::getSmartLightingShader() {
+    return smartLights ? smartLights->getShader() : nullptr;
+}
+
 bool NaturalEffects::shouldApplyShader() const { 
     return shader && (currentDarkness > 0.01f || currentFogDensity > 0.01f || currentTintStrength > 0.01f); 
 }
 
+bool NaturalEffects::shouldApplySmartLighting() const {
+    return smartLights && smartLights->shouldApplyShader();
+}
+
+// Light management functions
+int NaturalEffects::addLight(const sf::Vector2f& position, float radius, 
+                            const sf::Vector3f& color, float intensity, int priority) {
+    return smartLights ? smartLights->addLight(position, radius, color, intensity, priority) : -1;
+}
+
+void NaturalEffects::removeLight(int lightID) {
+    if (smartLights) smartLights->removeLight(lightID);
+}
+
+void NaturalEffects::updateLightPosition(int lightID, const sf::Vector2f& position) {
+    if (smartLights) smartLights->updateLight(lightID, position);
+}
+
+void NaturalEffects::setLightActive(int lightID, bool active) {
+    if (smartLights) smartLights->setLightActive(lightID, active);
+}
+
+void NaturalEffects::setLightIntensity(int lightID, float intensity) {
+    if (smartLights) smartLights->setLightIntensity(lightID, intensity);
+}
+
+void NaturalEffects::setLightColor(int lightID, const sf::Vector3f& color) {
+    if (smartLights) smartLights->setLightColor(lightID, color);
+}
+
+void NaturalEffects::setLightPriority(int lightID, int priority) {
+    if (smartLights) smartLights->setLightPriority(lightID, priority);
+}
+
 void NaturalEffects::setFadeSpeed(float speed) { 
     FADE_SPEED = speed; 
+}
+
+void NaturalEffects::clearAllLights() {
+    if (smartLights) smartLights->clearAllLights();
+}
+
+std::vector<int> NaturalEffects::getLightsInRange(const sf::Vector2f& center, float range) const {
+    return smartLights ? smartLights->getLightsInRange(center, range) : std::vector<int>();
+}
+
+int NaturalEffects::getTotalLights() const {
+    return smartLights ? smartLights->getTotalLights() : 0;
+}
+
+int NaturalEffects::getActiveLights() const {
+    return smartLights ? smartLights->getActiveLights() : 0;
+}
+
+std::vector<int> NaturalEffects::getCurrentlyRenderedLights() const {
+    return smartLights ? smartLights->getCurrentlyRenderedLights() : std::vector<int>();
 }

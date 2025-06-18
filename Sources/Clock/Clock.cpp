@@ -3,12 +3,12 @@
 #include <iomanip>
 #include <sstream>
 
-Clock::Clock() {
-    minutes = 6 * 60.0f; // 6h
+Clock::Clock(const float& _minutes) {
+    minutes = _minutes; // 6h
 }
 
 void Clock::update(const float& dt) {
-    minutes += dt * 30.0f;
+    minutes += dt;
     if (minutes >= 24 * 60.0f) minutes -= 24 * 60.0f;
 }
 

@@ -125,6 +125,7 @@ public:
                 std::vector<Npc>& npcs);
 
     void draw(sf::RenderTarget& target);
+    void drawInteractText(sf::RenderTarget& target);
     void drawWithShader(sf::RenderTarget& target, sf::RenderStates states = sf::RenderStates::Default);
 
     sf::Vector2f getPosition() const;

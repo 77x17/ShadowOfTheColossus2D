@@ -646,7 +646,9 @@ void Player::draw(sf::RenderTarget& target) {
     for (auto& p : projectiles) {
         p.draw(target);
     }
+}
 
+void Player::drawInteractText(sf::RenderTarget& target) {
     target.draw(interactText);
 }
 
