@@ -5,4 +5,4 @@ Build/Player/UI.o: Sources/Player/UI.cpp Sources/Player/UI.hpp \
  Sources/Quest/Quest.hpp Sources/Quest/QuestObjective.hpp \
  Sources/Npc/Npc.hpp Sources/Map/TileMap.hpp \
  Sources/Configuration/pugixml.hpp Sources/Configuration/pugiconfig.hpp \
- Sources/Map/Region.hpp
+ Sources/Clock/Clock.hpp Sources/Map/Region.hpp

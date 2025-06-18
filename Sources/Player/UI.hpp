@@ -4,6 +4,7 @@
 
 #include "Player.hpp"
 #include "TileMap.hpp"
+#include "Clock.hpp"
 
 class UI {
 private:
@@ -60,6 +61,7 @@ private:
     float              REGION_NAME_MAXIMUM_SIZE;
     float              regionNameSize;
     sf::Text           regionName;
+    sf::Text           clockText;
 
 public:
     UI();
@@ -68,7 +70,8 @@ public:
     void updateLevelAndXP(const float& dt, const Player& player);
     void updateQuests(const float& dt, const std::vector<Quest>& quests, const sf::Vector2f& uiSize);
     void updateMinimap(const float& dt, const Player& player, const sf::Vector2f& uiSize);
-    void update(const float& dt, Player& player, const sf::Vector2f& uiSize);
+    void updateClock(const sf::Vector2f& uiSize, const Clock& gameClock);
+    void update(const float& dt, Player& player, const sf::Vector2f& uiSize, const Clock& gameClock);
 
     void draw(sf::RenderWindow& window);
 

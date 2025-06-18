@@ -21,11 +21,11 @@
             "expandedGroupLayers": [
                 11
             ],
-            "scale": 1.5,
+            "scale": 4,
             "selectedLayer": 5,
             "viewCenter": {
-                "x": 1881.3333333333333,
-                "y": 1759.3333333333333
+                "x": 1949,
+                "y": 1733
             }
         },
         "test.tmx#CastleWalls": {

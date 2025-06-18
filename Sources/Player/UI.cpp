@@ -138,6 +138,12 @@ UI::UI() {
         regionName.setFillColor(sf::Color::White);
         regionName.setOutlineThickness(1.0f);
         regionName.setOutlineColor(sf::Color::Black);
+
+        clockText.setFont(Font::font);
+        clockText.setCharacterSize(REGION_NAME_MINIMUM_SIZE);
+        clockText.setFillColor(sf::Color::White);
+        clockText.setOutlineThickness(1.0f);
+        clockText.setOutlineColor(sf::Color::Black);
     }
 }
 
@@ -265,7 +271,14 @@ void UI::updateMinimap(const float& dt, const Player& player, const sf::Vector2f
     regionName.setPosition(minimapPosition + sf::Vector2f(minimapSize.x / 2, PADDING.y * 2));
 }
 
-void UI::update(const float& dt, Player& player, const sf::Vector2f& uiSize) {
+void UI::updateClock(const sf::Vector2f& uiSize, const Clock& gameClock) {    
+    clockText.setString(gameClock.getTimeString() + " - " + gameClock.getTimeOfDay());
+    clockText.setOrigin(clockText.getLocalBounds().left + clockText.getLocalBounds().width / 2.0, 0);
+
+    clockText.setPosition(minimapPosition + sf::Vector2f(minimapSize.x / 2, minimapSize.y + PADDING.y * 2));
+}
+
+void UI::update(const float& dt, Player& player, const sf::Vector2f& uiSize, const Clock& gameClock) {
     updateHealthBar(dt, player);
 
     updateLevelAndXP(dt, player);
@@ -276,6 +289,8 @@ void UI::update(const float& dt, Player& player, const sf::Vector2f& uiSize) {
     updateQuests(dt, player.getQuests(), uiSize);
 
     updateMinimap(dt, player, uiSize);
+
+    updateClock(uiSize, gameClock);
 }
 
 void UI::draw(sf::RenderWindow& window) {
@@ -302,6 +317,7 @@ void UI::draw(sf::RenderWindow& window) {
     window.draw(minimapSprite);
     window.draw(minimapPlayerDot);
     window.draw(regionName);
+    window.draw(clockText);
 }
 
 void UI::updateQuestsBox() {

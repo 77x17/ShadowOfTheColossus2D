@@ -1,6 +1,8 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 
+#include "Clock.hpp"
+
 #include <memory>
 
 class NaturalEffects {
@@ -20,6 +22,11 @@ private:
     sf::Vector3f currentFogColor = sf::Vector3f(0.7f, 0.7f, 0.7f);
     sf::Vector3f targetFogColor  = sf::Vector3f(0.7f, 0.7f, 0.7f);
     
+    float currentTintStrength = 0.0f;
+    float targetTintStrength = 0.0f;
+    sf::Vector3f currentTintColor;
+    sf::Vector3f targetTintColor;
+
     float FADE_SPEED = 0.5f;
 
 public:
@@ -27,7 +34,7 @@ public:
     
     void load(const std::string& path);
 
-    void update(float dt, int regionID, const sf::Vector2f& lightNorm, const float& aspectRatio);
+    void update(float dt, int regionID, const sf::Vector2f& lightNorm, const float& aspectRatio, const Clock& gameClock);
     
     sf::Shader* get();
 

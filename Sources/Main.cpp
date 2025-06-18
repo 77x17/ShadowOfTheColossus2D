@@ -29,6 +29,8 @@
 
 #include "TextureManager.hpp"
 
+#include "Clock.hpp"
+
 sf::Font Font::font;
 
 std::unordered_map<std::string, std::unique_ptr<sf::Texture>> TextureManager::textures;
@@ -240,6 +242,7 @@ int main() {
     // window.setFramerateLimit(60);
     window.setVerticalSyncEnabled(true);
 
+    // [Begin] - Loading
     Font::font.loadFromFile("Fonts/Roboto_Mono.ttf");
     loadSprite();
     loadShader();
@@ -257,16 +260,10 @@ int main() {
     std::vector<Quest> quests;
     loadQuests(quests);
 
-    sf::Vector2f PlayerTiles = sf::Vector2f(
-        78, 
-        110
-    );
+    sf::Vector2f PlayerTiles = sf::Vector2f( 78, 110);
     Player player(PlayerTiles.x * TILE_SIZE, PlayerTiles.y * TILE_SIZE, 5000.0f, std::move(quests));
     UI ui;
-
     ui.generateMinimapTexture(map);
-
-    std::cerr << "Finished loading\n";
 
     srand(static_cast<unsigned int>(time(0)));
 
@@ -281,10 +278,12 @@ int main() {
     sceneTexture.create(WINDOW_WIDTH, WINDOW_HEIGHT);   //  for shader
 
     ParticleManager particleManager;
-    // Load texture từ file
     particleManager.loadTexture(ParticleType::Rain , "Maps/rain.png");
     particleManager.loadTexture(ParticleType::Leaf , "Maps/leaf.png");
     particleManager.loadTexture(ParticleType::Cloud, "Maps/cloud.png");
+
+    Clock gameClock;
+    // [End] - Loading
 
     while (window.isOpen()) {
         float dt = clock.restart().asSeconds();
@@ -365,8 +364,10 @@ int main() {
         }
         
         // --- [Begin] update --- 
+        gameClock.update(dt);
+
         player.update(dt, window, map.getCollisionRects(), map.getRegionRects(), npcs);
-        ui.update(dt, player, uiView.getSize());
+        ui.update(dt, player, uiView.getSize(), gameClock);
         
         // Điều chỉnh camera theo player
         player.updateView(dt, view);
@@ -399,7 +400,7 @@ int main() {
             
             float aspectRatio = windowSize.x / windowSize.y;
             
-            naturalEffects.update(dt, player.getCollisionRegionID(), lightNorm, aspectRatio);
+            naturalEffects.update(dt, player.getCollisionRegionID(), lightNorm, aspectRatio, gameClock);
         }
         // --- [End] Update ---
 

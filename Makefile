@@ -7,6 +7,7 @@ SFML_LIBS = -lsfml-system -lsfml-graphics -lsfml-window -lsfml-audio
 
 INCLUDES = -I"./Sources" \
 		   -I"./Sources/Animation" \
+		   -I"./Sources/Clock" \
 		   -I"./Sources/Configuration" \
 		   -I"./Sources/Enemy" \
 		   -I"./Sources/Map" \
@@ -24,6 +25,7 @@ TARGET    = ./Build/Demo.exe
 # Find all .cpp files in SRC_DIR
 SRCS := $(wildcard $(SRC_DIR)/*.cpp) \
         $(wildcard $(SRC_DIR)/Animation/*.cpp) \
+        $(wildcard $(SRC_DIR)/Clock/*.cpp) \
         $(wildcard $(SRC_DIR)/Configuration/*.cpp) \
         $(wildcard $(SRC_DIR)/Enemy/*.cpp) \
         $(wildcard $(SRC_DIR)/Map/*.cpp) \
