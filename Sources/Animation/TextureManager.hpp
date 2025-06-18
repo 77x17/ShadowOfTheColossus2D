@@ -17,4 +17,6 @@ public:
 
     // Lấy một tham chiếu hằng (const reference) đến texture đã được tải
     static const sf::Texture& get(const std::string& id);
+
+    static void loadSprite();
 };

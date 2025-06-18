@@ -39,87 +39,10 @@ std::unordered_map<std::string, sf::SoundBuffer> SoundManager::buffers;
 std::unordered_map<std::string, sf::Sound> SoundManager::sounds;
 std::unordered_map<std::string, std::unique_ptr<sf::Music>> SoundManager::regionMusic;
 std::string SoundManager::oldRegionMusic = std::string();
-float SoundManager::normalVolume = 50.0f;
-float SoundManager::fadeVolume   = 50.0f;
+float SoundManager::normalVolume = 100.0f;
+float SoundManager::fadeVolume   = 100.0f;
 
 std::unordered_map<std::string, std::unique_ptr<sf::Shader>> EntityEffects::shaders;
-
-void loadSprite() {
-    TextureManager::load("playerSprite", "Sprites/player.png");
-    TextureManager::load("playerShadow", "Sprites/playerShadow.png");
-    TextureManager::load("arrow"       , "Sprites/arrow.png");
-
-    TextureManager::load("alert"    , "Sprites/alert.png");
-    TextureManager::load("batSprite", "Sprites/bat.png");
-    TextureManager::load("batShadow", "Sprites/batShadow.png");
-    TextureManager::load("batDead"  , "Sprites/batDead.png");
-    
-    TextureManager::load("eyeSprite", "Sprites/eye.png");
-    TextureManager::load("eyeShadow", "Sprites/eyeShadow.png");
-    TextureManager::load("eyeDead"  , "Sprites/eyeDead.png");
-    TextureManager::load("fireball" , "Sprites/fireball.png");
-}
-
-NaturalEffects naturalEffects;
-
-void loadShader() {
-    EntityEffects::load("invincible", "Shaders/entityEffects.frag", {
-        {"invincibleAmount", 0.2f},
-        {"flashAmount", 0.5f},
-        {"useBlackFlash", false},
-    });
-
-    EntityEffects::load("flash", "Shaders/entityEffects.frag", {
-        {"invincibleAmount", 0.2f},
-        {"flashAmount", 1.0f},
-        {"useBlackFlash", false}
-    });
-
-    EntityEffects::load("blackFlash", "Shaders/entityEffects.frag", {
-        {"invincibleAmount", 0.2f},
-        {"flashAmount", 1.0f},
-        {"useBlackFlash", true}
-    });
-
-    EntityEffects::load("glow", "Shaders/glowEffects.frag", {
-        {"glowColor", sf::Glsl::Vec4(1.0f, 1.0f, 1.0f, 1.0f)}
-    });
-
-    naturalEffects.load("Shaders/naturalEffects.frag");
-    naturalEffects.loadSmartLightingShader("Shaders/smartLighting.frag");
-}
-
-void loadSound() {
-    SoundManager::loadSound("arrow"     , "Sounds/arrow.wav");
-    SoundManager::loadSound("roll"      , "Sounds/roll.wav");
-    SoundManager::loadSound("playerHurt", "Sounds/playerHurt.wav");
-    SoundManager::loadSound("playerDie" , "Sounds/playerDie.wav");
-    SoundManager::loadSound("enemyHurt" , "Sounds/enemyHurt.wav");
-    SoundManager::loadSound("enemyDie"  , "Sounds/enemyDie.wav");
-    SoundManager::loadSound("talk"      , "Sounds/talk.wav");
-    SoundManager::loadSound("menuOpen"  , "Sounds/menu-open.wav");
-    SoundManager::loadSound("menuClose" , "Sounds/menu-close.wav");
-    SoundManager::loadSound("levelUp"   , "Sounds/levelUp.wav");
-    // SoundManager::loadMusic("region0"   , "Sounds/Salted - Wynn OST - 05 Detlas Suburb.ogg");
-    // SoundManager::loadMusic("region1"   , "Sounds/Salted - Wynn OST - 04 Gavel Journey.ogg");
-    // SoundManager::setMusicVolume("region0", 50.0f);
-    // SoundManager::setMusicVolume("region1", 50.0f);
-
-    // SoundManager::loadMusic("regionSong", "E:/Code/TestingSFML/Wynn OST ogg/Salted - Wynn OST - 01 Introduction.ogg");
-}
-
-void loadMap(TileMap& map) {
-    map.load("Maps/test.tmx", {
-        {"overworld", "Maps/overworld.png"},
-        {"overworld_grass", "Maps/overworld_grass.png"},
-        {"CastleWalls", "Maps/CastleWalls.png"},
-        {"medium_oak_tree_static", "Maps/medium_oak_tree_static.png"},
-        {"big_oak_tree_static", "Maps/big_oak_tree_static.png"}
-    });
-
-    map.scale(2.f, 2.f);
-    map.updateObjects();
-}
 
 void loadEnemy(std::vector<std::unique_ptr<Enemy>>& enemies, const std::unordered_map<std::string, std::vector<sf::FloatRect>>& enemyRects) {
     for (const auto& pair : enemyRects) {
@@ -140,23 +63,27 @@ void loadEnemy(std::vector<std::unique_ptr<Enemy>>& enemies, const std::unordere
 void loadNpc(std::vector<Npc>& npcs, const std::unordered_map<int, sf::FloatRect>& npcRects) {
     npcs.emplace_back(
         0,
-        // Elder Thorne
-        npcRects.at(0)
+        npcRects.at(0),
+        "Elder Thorne",
+        "npc_00"
     );
     npcs.emplace_back(
         1,
-        // Torren 
-        npcRects.at(1)
+        npcRects.at(1),
+        "Torren",
+        "npc_01"
     );
     npcs.emplace_back(
         2,
-        // Mira 
-        npcRects.at(2)
+        npcRects.at(2),
+        "Mira",
+        "npc_02"
     );
     npcs.emplace_back(
         3,
-        // Bren 
-        npcRects.at(3)
+        npcRects.at(3),
+        "Bren",
+        "npc_03"
     );
 }
 
@@ -245,12 +172,17 @@ int main() {
 
     // [Begin] - Loading
     Font::font.loadFromFile("Fonts/Roboto_Mono.ttf");
-    loadSprite();
-    loadShader();
-    loadSound();
+    TextureManager::loadSprite();
+    EntityEffects::loadShader();
+
+    NaturalEffects naturalEffects;
+    naturalEffects.load("Shaders/naturalEffects.frag");
+    naturalEffects.loadSmartLightingShader("Shaders/smartLighting.frag");
+
+    SoundManager::loadSound();
 
     TileMap map;
-    loadMap(map);
+    map.loadMap();
 
     std::vector<std::unique_ptr<Enemy>> enemies;
     loadEnemy(enemies, map.getEnemyRects());
@@ -279,9 +211,7 @@ int main() {
     sceneTexture.create(WINDOW_WIDTH, WINDOW_HEIGHT);   //  for shader
 
     ParticleManager particleManager;
-    particleManager.loadTexture(ParticleType::Rain , "Maps/rain.png");
-    particleManager.loadTexture(ParticleType::Leaf , "Maps/leaf.png");
-    particleManager.loadTexture(ParticleType::Cloud, "Maps/cloud.png");
+    particleManager.loadTexture();
 
     Clock gameClock(6 * 60.0f);
 
@@ -382,6 +312,10 @@ int main() {
         for (auto& enemy : enemies) {
             enemy->update(dt, player, map.getCollisionRects());
         }
+
+        for (auto& npc : npcs) {
+            npc.update();
+        }
         
         map.update(dt);
         map.updateOverlayTransparency(player.getFloatRect());
@@ -421,6 +355,10 @@ int main() {
 
         for (auto& enemy : enemies) if (enemy->calculateDistance(player) <= LOADING_DISTANCE) {
             enemy->draw(sceneTexture);
+        }
+
+        for (auto& npc : npcs) {
+            npc.draw(sceneTexture);
         }
 
         player.draw(sceneTexture);

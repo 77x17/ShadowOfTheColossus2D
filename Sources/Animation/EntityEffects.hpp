@@ -17,4 +17,6 @@ public:
     static void load(const std::string& id, const std::string& path, const std::unordered_map<std::string, UniformVariant>& uniforms);
 
     static sf::Shader* get(const std::string& id);
+
+    static void loadShader();
 };

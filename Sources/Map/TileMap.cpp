@@ -399,9 +399,9 @@ void TileMap::draw(sf::RenderTarget& target, sf::RenderStates states) const {
         target.draw(tile.vertices, states);
     }
 
-    sf::RectangleShape hitbox;
-    hitbox.setOutlineThickness(1.f);
-    hitbox.setFillColor(sf::Color::Transparent);
+    // sf::RectangleShape hitbox;
+    // hitbox.setOutlineThickness(1.f);
+    // hitbox.setFillColor(sf::Color::Transparent);
     
     // hitbox.setOutlineColor(sf::Color::Cyan);
     // for (const sf::FloatRect& rect : m_collisionRects) {
@@ -419,12 +419,12 @@ void TileMap::draw(sf::RenderTarget& target, sf::RenderStates states) const {
     //     }
     // }
 
-    hitbox.setOutlineColor(sf::Color::Green);
-    for (auto& pair : m_NPCRects) {
-        hitbox.setSize(pair.second.getSize());
-        hitbox.setPosition(pair.second.getPosition());
-        target.draw(hitbox);
-    }
+    // hitbox.setOutlineColor(sf::Color::Green);
+    // for (auto& pair : m_NPCRects) {
+    //     hitbox.setSize(pair.second.getSize());
+    //     hitbox.setPosition(pair.second.getPosition());
+    //     target.draw(hitbox);
+    // }
 
     // hitbox.setOutlineColor(sf::Color::Magenta);
     // for (auto& pair : m_RegionRects) {
@@ -502,6 +502,7 @@ void TileMap::drawMinimap(sf::RenderTarget& target, sf::RenderStates states) con
     // }
 
     hitbox.setOutlineColor(sf::Color::Green);
+    hitbox.setFillColor(sf::Color::Green);
     for (auto& pair : m_NPCRects) {
         hitbox.setSize(pair.second.getSize());
         hitbox.setPosition(pair.second.getPosition());
@@ -509,6 +510,7 @@ void TileMap::drawMinimap(sf::RenderTarget& target, sf::RenderStates states) con
     }
 
     hitbox.setOutlineColor(sf::Color::Magenta);
+    hitbox.setFillColor(sf::Color::Transparent);
     for (auto& pair : m_RegionRects) {
         hitbox.setSize(pair.second.getSize());
         hitbox.setPosition(pair.second.getPosition());
@@ -676,4 +678,17 @@ void TileMap::updateOverlayTransparency(const sf::FloatRect& targetBounds) {
             tile.vertices[3].color = TransparentColor;
         }
     }
+}
+
+void TileMap::loadMap() {
+    load("Maps/test.tmx", {
+        {"overworld", "Maps/overworld.png"},
+        {"overworld_grass", "Maps/overworld_grass.png"},
+        {"CastleWalls", "Maps/CastleWalls.png"},
+        {"medium_oak_tree_static", "Maps/medium_oak_tree_static.png"},
+        {"big_oak_tree_static", "Maps/big_oak_tree_static.png"}
+    });
+
+    scale(2.f, 2.f);
+    updateObjects();
 }

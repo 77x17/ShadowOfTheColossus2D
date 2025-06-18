@@ -86,4 +86,6 @@ public:
     void update(const float& dt);
     void updateOverlayTransparency(const sf::FloatRect& targetBounds);
 
+    void loadMap();
+
 };

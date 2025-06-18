@@ -17,3 +17,24 @@ void TextureManager::load(const std::string& id, const std::string& path) {
 const sf::Texture& TextureManager::get(const std::string& id) {
     return *textures.at(id); 
 }
+
+void TextureManager::loadSprite() {
+    load("playerSprite", "Sprites/player.png");
+    load("playerShadow", "Sprites/playerShadow.png");
+    load("arrow"       , "Sprites/arrow.png");
+
+    load("alert"    , "Sprites/alert.png");
+    load("batSprite", "Sprites/bat.png");
+    load("batShadow", "Sprites/batShadow.png");
+    load("batDead"  , "Sprites/batDead.png");
+    
+    load("eyeSprite", "Sprites/eye.png");
+    load("eyeShadow", "Sprites/eyeShadow.png");
+    load("eyeDead"  , "Sprites/eyeDead.png");
+    load("fireball" , "Sprites/fireball.png");
+
+    load("npc_00", "Sprites/npc_00.png");
+    load("npc_01", "Sprites/npc_01.png");
+    load("npc_02", "Sprites/npc_02.png");
+    load("npc_03", "Sprites/npc_03.png");
+}

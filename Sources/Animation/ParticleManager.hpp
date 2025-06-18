@@ -110,4 +110,6 @@ public:
 
     void isCollisionWithCloud(const sf::FloatRect& rect);
     void isCollisionWithRain(int regionID);
+
+    void loadTexture();
 };

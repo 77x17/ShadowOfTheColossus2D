@@ -19,6 +19,8 @@ Enemy::Enemy(const float& x = 0, const float& y = 0, const float& width = TILE_S
         label.setString(nameAndLevel);
         label.setCharacterSize(TEXT_SIZE);
         label.setFillColor(sf::Color::White);
+        label.setOutlineThickness(1.0f);
+        label.setOutlineColor(sf::Color::Black);
         label.setPosition(position + sf::Vector2f(size.x / 2, 0));
 
         labelBackground.setFillColor(sf::Color(60, 60, 60, 139));

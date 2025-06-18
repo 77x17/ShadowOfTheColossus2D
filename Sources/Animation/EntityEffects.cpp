@@ -25,3 +25,27 @@ sf::Shader* EntityEffects::get(const std::string& id) {
 
     return nullptr;
 }
+
+void EntityEffects::loadShader() {
+    load("invincible", "Shaders/entityEffects.frag", {
+        {"invincibleAmount", 0.2f},
+        {"flashAmount", 0.5f},
+        {"useBlackFlash", false},
+    });
+
+    load("flash", "Shaders/entityEffects.frag", {
+        {"invincibleAmount", 0.2f},
+        {"flashAmount", 1.0f},
+        {"useBlackFlash", false}
+    });
+
+    load("blackFlash", "Shaders/entityEffects.frag", {
+        {"invincibleAmount", 0.2f},
+        {"flashAmount", 1.0f},
+        {"useBlackFlash", true}
+    });
+
+    load("glow", "Shaders/glowEffects.frag", {
+        {"glowColor", sf::Glsl::Vec4(1.0f, 1.0f, 1.0f, 1.0f)}
+    });
+}

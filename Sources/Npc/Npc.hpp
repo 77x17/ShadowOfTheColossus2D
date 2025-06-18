@@ -4,36 +4,31 @@
 #include <string>
 #include <vector>
 
-enum class NPCState {
-    IDLE,
-    GIVING_QUEST,
-    REQUIRED,
-    COMPLETED_QUEST
-};
+#include "Animation.hpp"
+#include "TextureManager.hpp"
 
 class Npc {
 private:
-    NPCState                 state;
-    int                      ID;
-    std::vector<std::string> dialogue;
-    sf::FloatRect            hitbox;
+    int           ID;
+    sf::Vector2f  size;
+    sf::Vector2f  position;
+    sf::FloatRect hitbox;
+
+    int                TEXT_SIZE;
+    float              BACKGROUND_PADDING;
+    sf::Text           label;
+    sf::RectangleShape labelBackground;
     
-    int  dialogueIndex;
-    bool finishedTalk;
+    AnimationManager   animationManager;
+    Animation          shadow;
 
 public:
-    Npc(int _id, const sf::FloatRect& _hitbox);
-
-    void setRequired();
-
-    void givingQuest();
-    void completedQuest();
-    void isInterruptedGivingQuest();
-
-    std::string getDialogue();
-
-    bool isFinishedTalk() const;
+    Npc(int _id, const sf::FloatRect& _hitbox, const std::string& name, const std::string& spriteName);
 
     int getID() const;
     sf::FloatRect getHitbox() const;
-};
+
+    void update();
+
+    void draw(sf::RenderTarget& target);
+} ;

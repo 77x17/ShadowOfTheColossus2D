@@ -141,3 +141,9 @@ void ParticleManager::isCollisionWithRain(int regionID) {
             break;
     }
 }
+
+void ParticleManager::loadTexture() {
+    loadTexture(ParticleType::Rain , "Maps/rain.png");
+    loadTexture(ParticleType::Leaf , "Maps/leaf.png");
+    loadTexture(ParticleType::Cloud, "Maps/cloud.png");
+}
