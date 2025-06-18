@@ -6,17 +6,22 @@ CXXFLAGS = -Wall -g -std=c++17
 SFML_LIBS = -lsfml-system -lsfml-graphics -lsfml-window -lsfml-audio
 
 INCLUDES = -I"./Sources" \
-		   -I"./Sources/Animation" \
+		   -I"./Sources/AnimationManager" \
 		   -I"./Sources/Clock" \
 		   -I"./Sources/Configuration" \
-		   -I"./Sources/Enemy" \
+		   -I"./Sources/Effects" \
+		   -I"./Sources/Enemies" \
+		   -I"./Sources/Inventory" \
 		   -I"./Sources/LightSource" \
-		   -I"./Sources/Map" \
+		   -I"./Sources/Maps" \
 		   -I"./Sources/Npc" \
+		   -I"./Sources/ParticleManager" \
 		   -I"./Sources/Player" \
 		   -I"./Sources/Projectile" \
-		   -I"./Sources/Quest" \
-		   -I"./Sources/SoundManager"
+		   -I"./Sources/Quests" \
+		   -I"./Sources/SoundManager" \
+		   -I"./Sources/TextureManager" \
+		   -I"./Sources/UI"
 
 # Directories
 SRC_DIR   = Sources
@@ -25,17 +30,22 @@ TARGET    = ./Build/Demo.exe
 
 # Find all .cpp files in SRC_DIR
 SRCS := $(wildcard $(SRC_DIR)/*.cpp) \
-        $(wildcard $(SRC_DIR)/Animation/*.cpp) \
+        $(wildcard $(SRC_DIR)/AnimationManager/*.cpp) \
         $(wildcard $(SRC_DIR)/Clock/*.cpp) \
         $(wildcard $(SRC_DIR)/Configuration/*.cpp) \
-        $(wildcard $(SRC_DIR)/Enemy/*.cpp) \
+        $(wildcard $(SRC_DIR)/Effects/*.cpp) \
+        $(wildcard $(SRC_DIR)/Enemies/*.cpp) \
+        $(wildcard $(SRC_DIR)/Inventory/*.cpp) \
         $(wildcard $(SRC_DIR)/LightSource/*.cpp) \
-        $(wildcard $(SRC_DIR)/Map/*.cpp) \
+        $(wildcard $(SRC_DIR)/Maps/*.cpp) \
         $(wildcard $(SRC_DIR)/Npc/*.cpp) \
+        $(wildcard $(SRC_DIR)/ParticleManager/*.cpp) \
         $(wildcard $(SRC_DIR)/Player/*.cpp) \
         $(wildcard $(SRC_DIR)/Projectile/*.cpp) \
-        $(wildcard $(SRC_DIR)/Quest/*.cpp) \
-        $(wildcard $(SRC_DIR)/SoundManager/*.cpp) 
+        $(wildcard $(SRC_DIR)/Quests/*.cpp) \
+        $(wildcard $(SRC_DIR)/SoundManager/*.cpp) \
+        $(wildcard $(SRC_DIR)/TextureManager/*.cpp) \
+        $(wildcard $(SRC_DIR)/UI/*.cpp) 
 
 # Generate corresponding .o filenames
 OBJS := $(SRCS:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.o)

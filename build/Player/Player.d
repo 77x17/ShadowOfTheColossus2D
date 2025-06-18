@@ -1,7 +1,8 @@
 Build/Player/Player.o: Sources/Player/Player.cpp \
  Sources/Player/Player.hpp Sources/Configuration/Constants.hpp \
- Sources/Animation/Animation.hpp Sources/Projectile/Projectile.hpp \
- Sources/SoundManager/SoundManager.hpp Sources/Configuration/Font.hpp \
- Sources/Quest/Quest.hpp Sources/Quest/QuestObjective.hpp \
- Sources/Npc/Npc.hpp Sources/Animation/TextureManager.hpp \
- Sources/Animation/EntityEffects.hpp Sources/Map/Region.hpp
+ Sources/AnimationManager/AnimationManager.hpp \
+ Sources/Projectile/Projectile.hpp Sources/SoundManager/SoundManager.hpp \
+ Sources/Configuration/Font.hpp Sources/Quests/Quest.hpp \
+ Sources/Quests/QuestObjective.hpp Sources/Npc/Npc.hpp \
+ Sources/TextureManager/TextureManager.hpp \
+ Sources/Effects/EntityEffects.hpp Sources/Maps/Region.hpp

@@ -27,41 +27,41 @@ int SmartLightSource::addLight(const sf::Vector2f& position, float radius,
                                const sf::Vector3f& color, float intensity, int priority) {
     auto light = std::make_unique<LightSource>(position, radius, color, intensity, priority);
     lights.push_back(std::move(light));
-    return lights.size() - 1; // Trả về ID của light mới
+    return static_cast<int>(lights.size()) - 1; // Trả về ID của light mới
 }
 
 void SmartLightSource::removeLight(int lightID) {
-    if (lightID >= 0 && lightID < lights.size()) {
+    if (lightID >= 0 && lightID < static_cast<int>(lights.size())) {
         lights.erase(lights.begin() + lightID);
     }
 }
 
 void SmartLightSource::updateLight(int lightID, const sf::Vector2f& position) {
-    if (lightID >= 0 && lightID < lights.size() && lights[lightID]) {
+    if (lightID >= 0 && lightID < static_cast<int>(lights.size()) && lights[lightID]) {
         lights[lightID]->position = position;
     }
 }
 
 void SmartLightSource::setLightActive(int lightID, bool active) {
-    if (lightID >= 0 && lightID < lights.size() && lights[lightID]) {
+    if (lightID >= 0 && lightID < static_cast<int>(lights.size()) && lights[lightID]) {
         lights[lightID]->isActive = active;
     }
 }
 
 void SmartLightSource::setLightIntensity(int lightID, float intensity) {
-    if (lightID >= 0 && lightID < lights.size() && lights[lightID]) {
+    if (lightID >= 0 && lightID < static_cast<int>(lights.size()) && lights[lightID]) {
         lights[lightID]->intensity = std::clamp(intensity, 0.0f, 1.0f);
     }
 }
 
 void SmartLightSource::setLightColor(int lightID, const sf::Vector3f& color) {
-    if (lightID >= 0 && lightID < lights.size() && lights[lightID]) {
+    if (lightID >= 0 && lightID < static_cast<int>(lights.size()) && lights[lightID]) {
         lights[lightID]->color = color;
     }
 }
 
 void SmartLightSource::setLightPriority(int lightID, int priority) {
-    if (lightID >= 0 && lightID < lights.size() && lights[lightID]) {
+    if (lightID >= 0 && lightID < static_cast<int>(lights.size()) && lights[lightID]) {
         lights[lightID]->priority = priority;
     }
 }
@@ -186,7 +186,7 @@ std::vector<int> SmartLightSource::getCurrentlyRenderedLights() const {
     // Tìm lại lights đang được render dựa trên logic tương tự
     std::vector<int> candidateLights;
     
-    for (int i = 0; i < lights.size(); ++i) {
+    for (int i = 0; i < static_cast<int>(lights.size()); ++i) {
         if (!lights[i] || !lights[i]->isActive) continue;
         
         float distToPlayer = lights[i]->distanceTo(playerPosition);
@@ -212,7 +212,7 @@ std::vector<int> SmartLightSource::getCurrentlyRenderedLights() const {
                   return distA < distB;
               });
     
-    int count = std::min((int)candidateLights.size(), MAX_LIGHTS);
+    int count = std::min(static_cast<int>(candidateLights.size()), MAX_LIGHTS);
     for (int i = 0; i < count; ++i) {
         result.push_back(candidateLights[i]);
     }
@@ -228,7 +228,7 @@ void SmartLightSource::clearAllLights() {
 std::vector<int> SmartLightSource::getLightsInRange(const sf::Vector2f& center, float range) const {
     std::vector<int> result;
     
-    for (int i = 0; i < lights.size(); ++i) {
+    for (int i = 0; i < static_cast<int>(lights.size()); ++i) {
         if (lights[i] && lights[i]->isActive) {
             float distance = lights[i]->distanceTo(center);
             if (distance <= range) {

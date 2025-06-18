@@ -116,18 +116,18 @@ void SoundManager::setMusicVolume(const std::string& name, const float& volume) 
 }
 
 void SoundManager::loadSound() {
-    loadSound("arrow"     , "Sounds/arrow.wav");
-    loadSound("roll"      , "Sounds/roll.wav");
-    loadSound("playerHurt", "Sounds/playerHurt.wav");
-    loadSound("playerDie" , "Sounds/playerDie.wav");
-    loadSound("enemyHurt" , "Sounds/enemyHurt.wav");
-    loadSound("enemyDie"  , "Sounds/enemyDie.wav");
-    loadSound("talk"      , "Sounds/talk.wav");
-    loadSound("menuOpen"  , "Sounds/menu-open.wav");
-    loadSound("menuClose" , "Sounds/menu-close.wav");
-    loadSound("levelUp"   , "Sounds/levelUp.wav");
-    // loadMusic("region0"   , "Sounds/Salted - Wynn OST - 05 Detlas Suburb.ogg");
-    // loadMusic("region1"   , "Sounds/Salted - Wynn OST - 04 Gavel Journey.ogg");
+    loadSound("arrow"     , "Assets/Sounds/arrow.wav");
+    loadSound("roll"      , "Assets/Sounds/roll.wav");
+    loadSound("playerHurt", "Assets/Sounds/playerHurt.wav");
+    loadSound("playerDie" , "Assets/Sounds/playerDie.wav");
+    loadSound("enemyHurt" , "Assets/Sounds/enemyHurt.wav");
+    loadSound("enemyDie"  , "Assets/Sounds/enemyDie.wav");
+    loadSound("talk"      , "Assets/Sounds/talk.wav");
+    loadSound("menuOpen"  , "Assets/Sounds/menu-open.wav");
+    loadSound("menuClose" , "Assets/Sounds/menu-close.wav");
+    loadSound("levelUp"   , "Assets/Sounds/levelUp.wav");
+    // loadMusic("region0"   , "Assets/Sounds/Salted - Wynn OST - 05 Detlas Suburb.ogg");
+    // loadMusic("region1"   , "Assets/Sounds/Salted - Wynn OST - 04 Gavel Journey.ogg");
     // setMusicVolume("region0", 50.0f);
     // setMusicVolume("region1", 50.0f);
 }

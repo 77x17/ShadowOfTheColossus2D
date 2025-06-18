@@ -24,12 +24,12 @@
 
 #include "EntityEffects.hpp"
 #include "NaturalEffects.hpp"
-
 #include "ParticleManager.hpp"
-
 #include "TextureManager.hpp"
 
 #include "Clock.hpp"
+
+#include "InventoryUI.hpp"
 
 sf::Font Font::font;
 
@@ -171,13 +171,13 @@ int main() {
     window.setVerticalSyncEnabled(true);
 
     // [Begin] - Loading
-    Font::font.loadFromFile("Fonts/Roboto_Mono.ttf");
+    Font::font.loadFromFile("Assets/Fonts/Roboto_Mono.ttf");
     TextureManager::loadSprite();
     EntityEffects::loadShader();
 
     NaturalEffects naturalEffects;
-    naturalEffects.load("Shaders/naturalEffects.frag");
-    naturalEffects.loadSmartLightingShader("Shaders/smartLighting.frag");
+    naturalEffects.load("Assets/Shaders/naturalEffects.frag");
+    naturalEffects.loadSmartLightingShader("Assets/Shaders/smartLighting.frag");
 
     SoundManager::loadSound();
 
@@ -219,6 +219,11 @@ int main() {
     for (const sf::Vector2f lightPosition : map.getLights()) {
         naturalEffects.addLight(lightPosition);
     }
+
+    Item* bow = new Bow("Old Bow", 1.0f);
+
+    InventoryUI inventoryUI(static_cast<sf::Vector2f>(window.getSize()));
+    inventoryUI.addItem(bow);
 
     // [End] - Loading
 
@@ -287,6 +292,21 @@ int main() {
                 else if (event.key.code == sf::Keyboard::M) {
                     ui.openMap(uiView.getSize());
                 }
+                else if (event.key.code == sf::Keyboard::E) {
+                    inventoryUI.toggle();
+                }
+            }
+            else if (event.type == sf::Event::MouseButtonPressed 
+                  && event.mouseButton.button == sf::Mouse::Left) {
+
+                sf::Vector2f mousePos = window.mapPixelToCoords({event.mouseButton.x, event.mouseButton.y});
+                inventoryUI.handleClick(mousePos);
+            }
+            else if (event.type == sf::Event::MouseButtonReleased 
+                  && event.mouseButton.button == sf::Mouse::Left) {
+
+                sf::Vector2f mousePos = window.mapPixelToCoords({event.mouseButton.x, event.mouseButton.y});
+                inventoryUI.handleRelease(mousePos);
             }
         }
 
@@ -345,6 +365,12 @@ int main() {
             naturalEffects.updateLightPosition(playerLightID, player.getCenterPosition()); 
             naturalEffects.updateSmartLighting(player.getCenterPosition(), view);
         }
+
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+            sf::Vector2f mousePos = static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
+            inventoryUI.update(mousePos);
+        }
+
         // --- [End] Update ---
 
         sceneTexture.clear(sf::Color::White);
@@ -395,6 +421,7 @@ int main() {
         // --- [End] Add natural shader ---
         
         ui.draw(window);
+        inventoryUI.draw(window);
 
         window.display();
     }

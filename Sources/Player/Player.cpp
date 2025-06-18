@@ -683,6 +683,7 @@ void Player::levelUp() {
     level++;
 
     maxHealthPoints++;
+    healthPoints = maxHealthPoints;
 
     SoundManager::playSound("levelUp");
 }

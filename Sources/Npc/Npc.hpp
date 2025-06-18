@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "Animation.hpp"
+#include "AnimationManager.hpp"
 #include "TextureManager.hpp"
 
 class Npc {

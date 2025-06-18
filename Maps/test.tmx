@@ -1071,7 +1071,7 @@
    <object id="260" x="2320" y="1936" width="16" height="16"/>
   </objectgroup>
  </group>
- <group id="11" name="Collision" visible="0">
+ <group id="11" name="Collision">
   <objectgroup id="13" name="Npc" locked="1">
    <object id="113" x="1296" y="1744" width="16" height="16">
     <properties>
@@ -1190,8 +1190,6 @@
    <object id="247" x="2321.67" y="1909.33" width="13.6667" height="8.33333"/>
    <object id="248" x="2434.67" y="1888.67" width="10" height="10.6667"/>
    <object id="249" x="1632" y="1920" width="16" height="16"/>
-   <object id="250" x="2224" y="1616" width="16" height="16"/>
-   <object id="251" x="2464" y="1616" width="16" height="16"/>
   </objectgroup>
   <objectgroup id="18" name="Region" visible="0">
    <object id="181" x="1056" y="1552" width="864" height="496">

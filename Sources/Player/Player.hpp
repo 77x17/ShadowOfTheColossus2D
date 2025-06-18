@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "Constants.hpp"
-#include "Animation.hpp"
+#include "AnimationManager.hpp"
 #include "Projectile.hpp"
 #include "SoundManager.hpp"
 #include "Font.hpp"
