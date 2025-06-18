@@ -57,14 +57,14 @@ void NaturalEffects::update(float dt, int regionID, const sf::Vector2f& lightNor
         targetTintStrength = 0.6f;
     }
     else if (timeOfDay == "Evening") {
-        targetDarkness    = 0.5f;
+        targetDarkness    = 0.4f;
         targetLightRadius = 0.3f;
 
         targetTintColor    = sf::Vector3f(1.0f, 0.6f, 0.4f); // cam đỏ buổi tối
-        targetTintStrength = 0.8f;
+        targetTintStrength = 0.3f;
     }
     else if (timeOfDay == "Night") {
-        targetDarkness    = 0.8f;
+        targetDarkness    = 0.6f;
         targetLightRadius = 0.3f;
 
         targetTintColor    = sf::Vector3f(0.7f, 0.8f, 1.2f); // xanh đêm nhẹ

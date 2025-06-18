@@ -8,7 +8,7 @@ Clock::Clock(const float& _minutes) {
 }
 
 void Clock::update(const float& dt) {
-    minutes += dt;
+    minutes += dt * 30.0f;
     if (minutes >= 24 * 60.0f) minutes -= 24 * 60.0f;
 }
 

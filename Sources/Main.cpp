@@ -283,7 +283,7 @@ int main() {
     particleManager.loadTexture(ParticleType::Leaf , "Maps/leaf.png");
     particleManager.loadTexture(ParticleType::Cloud, "Maps/cloud.png");
 
-    Clock gameClock(22 * 60.0f);
+    Clock gameClock(6 * 60.0f);
 
     int playerLightID = naturalEffects.addLight(player.getPosition(), 350.0f, sf::Vector3f(1.0f, 1.0f, 1.0f), 1.0f, 1);
     for (const sf::Vector2f lightPosition : map.getLights()) {
