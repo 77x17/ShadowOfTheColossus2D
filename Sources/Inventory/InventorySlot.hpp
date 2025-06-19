@@ -1,13 +1,14 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include <memory>
 
-#include "Item.hpp"
+#include "ItemData.hpp"
 
 class InventorySlot {
 public:
     sf::RectangleShape slotBox;
-    Item* item = nullptr;
+    std::shared_ptr<ItemData> item = nullptr;
 
     bool contains(const sf::Vector2f& point) const;
 

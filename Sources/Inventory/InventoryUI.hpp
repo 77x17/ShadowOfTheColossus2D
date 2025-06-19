@@ -26,7 +26,7 @@ private:
     std::vector<EquipSlot>* equipSlots = nullptr;
     
     int previousDraggedItemID = -1;
-    Item* draggedItem         = nullptr;
+    std::shared_ptr<ItemData> draggedItem = nullptr;
     sf::Vector2f dreggedPos;
 
     sf::Text itemInformationText;

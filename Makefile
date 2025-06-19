@@ -10,14 +10,18 @@ INCLUDES = -I"./Sources" \
 		   -I"./Sources/Clock" \
 		   -I"./Sources/Configuration" \
 		   -I"./Sources/Effects" \
-		   -I"./Sources/Enemies" \
+		   -I"./Sources/Entities" \
+		   -I"./Sources/Entities/Enemies" \
+		   -I"./Sources/Entities/Enemies/Bat" \
+		   -I"./Sources/Entities/Enemies/Eye" \
+		   -I"./Sources/Entities/Item" \
+		   -I"./Sources/Entities/Npc" \
+		   -I"./Sources/Entities/Player" \
+		   -I"./Sources/Entities/Projectile" \
 		   -I"./Sources/Inventory" \
 		   -I"./Sources/LightSource" \
 		   -I"./Sources/Maps" \
-		   -I"./Sources/Npc" \
 		   -I"./Sources/ParticleManager" \
-		   -I"./Sources/Player" \
-		   -I"./Sources/Projectile" \
 		   -I"./Sources/Quests" \
 		   -I"./Sources/SoundManager" \
 		   -I"./Sources/TextureManager" \
@@ -34,14 +38,18 @@ SRCS := $(wildcard $(SRC_DIR)/*.cpp) \
         $(wildcard $(SRC_DIR)/Clock/*.cpp) \
         $(wildcard $(SRC_DIR)/Configuration/*.cpp) \
         $(wildcard $(SRC_DIR)/Effects/*.cpp) \
-        $(wildcard $(SRC_DIR)/Enemies/*.cpp) \
+        $(wildcard $(SRC_DIR)/Entities/*.cpp) \
+        $(wildcard $(SRC_DIR)/Entities/Enemies/*.cpp) \
+        $(wildcard $(SRC_DIR)/Entities/Enemies/Bat/*.cpp) \
+        $(wildcard $(SRC_DIR)/Entities/Enemies/Eye/*.cpp) \
+        $(wildcard $(SRC_DIR)/Entities/Item/*.cpp) \
+        $(wildcard $(SRC_DIR)/Entities/Npc/*.cpp) \
+        $(wildcard $(SRC_DIR)/Entities/Player/*.cpp) \
+        $(wildcard $(SRC_DIR)/Entities/Projectile/*.cpp) \
         $(wildcard $(SRC_DIR)/Inventory/*.cpp) \
         $(wildcard $(SRC_DIR)/LightSource/*.cpp) \
         $(wildcard $(SRC_DIR)/Maps/*.cpp) \
-        $(wildcard $(SRC_DIR)/Npc/*.cpp) \
         $(wildcard $(SRC_DIR)/ParticleManager/*.cpp) \
-        $(wildcard $(SRC_DIR)/Player/*.cpp) \
-        $(wildcard $(SRC_DIR)/Projectile/*.cpp) \
         $(wildcard $(SRC_DIR)/Quests/*.cpp) \
         $(wildcard $(SRC_DIR)/SoundManager/*.cpp) \
         $(wildcard $(SRC_DIR)/TextureManager/*.cpp) \

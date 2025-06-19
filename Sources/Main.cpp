@@ -4,16 +4,22 @@
 
 #include "Constants.hpp"
 
+#include "Clock.hpp"
+
 #include "Font.hpp"
 #include "SoundManager.hpp"
 #include "TileMap.hpp"
 
-#include "Player.hpp"
-#include "UI.hpp"
-
+// --- [Begin] - Entities ---
 #include "Enemy.hpp"
 #include "Bat.hpp"
 #include "Eye.hpp"
+#include "Player.hpp"
+#include "Item.hpp"
+// --- [End] - Entities ---
+
+#include "UI.hpp"
+#include "InventoryUI.hpp"
 
 #include "Quest.hpp"
 #include "KillMonsterObjective.hpp"
@@ -27,9 +33,6 @@
 #include "ParticleManager.hpp"
 #include "TextureManager.hpp"
 
-#include "Clock.hpp"
-
-#include "InventoryUI.hpp"
 
 sf::Font Font::font;
 
@@ -48,10 +51,10 @@ void loadEnemy(std::vector<std::unique_ptr<Enemy>>& enemies, const std::unordere
     for (const auto& pair : enemyRects) {
         for (const sf::FloatRect& rect : pair.second) {
             if (pair.first == "Bat Lv.1") {
-                enemies.push_back(std::make_unique<Bat>(rect.getPosition().x, rect.getPosition().y));
+                enemies.push_back(std::make_unique<Bat>(rect.getPosition()));
             }
             else if (pair.first == "Eye Lv.5") {
-                enemies.push_back(std::make_unique<Eye>(rect.getPosition().x, rect.getPosition().y));
+                enemies.push_back(std::make_unique<Eye>(rect.getPosition()));
             }
             else {
                 std::cerr << "[Bug] - Main.cpp - loadEnemy()\n";
@@ -88,81 +91,71 @@ void loadNpc(std::vector<Npc>& npcs, const std::unordered_map<int, sf::FloatRect
 }
 
 void loadQuests(std::vector<Quest>& quests) {
-    {
-        quests.push_back(Quest("Explore strange paths", 40));
-        quests.back().addRequiredLevel(1);
+    // --- [Begin] - Explore strange path --- 
+    quests.push_back(Quest("Explore strange paths", 40));
+    quests.back().addRequiredLevel(1);
 
-        quests.back().addNpcID      (0, 0);
-        quests.back().addDialogue   (0, "[1/4] The forest has changed. It no longer feels safe");
-        quests.back().addDialogue   (0, "[2/4] Long ago, we sealed something deep beyond those hills");
-        quests.back().addDialogue   (0, "[3/4] But now... whispers return, and beasts creep closer each night");
-        quests.back().addDialogue   (0, "[4/4] You must go, find the truth. We're counting on you");
-        quests.back().addDescription(0, "Come see the road behind the wooden bridge");
-        quests.back().addObjective  (0, std::make_shared<ExploreObjective>(1));
-        
-        quests.back().addNpcID      (1, -1);
-        quests.back().addDialogue   (1, std::string());
-        quests.back().addDescription(1, "Return back to Elder Throne");
-        quests.back().addObjective  (1, std::make_shared<TalkObjective>(0));
+    quests.back().addNpcID      (0, 0);
+    quests.back().addDialogue   (0, "[1/4] The forest has changed. It no longer feels safe");
+    quests.back().addDialogue   (0, "[2/4] Long ago, we sealed something deep beyond those hills");
+    quests.back().addDialogue   (0, "[3/4] But now... whispers return, and beasts creep closer each night");
+    quests.back().addDialogue   (0, "[4/4] You must go, find the truth. We're counting on you");
+    quests.back().addDescription(0, "Come see the road behind the wooden bridge");
+    quests.back().addObjective  (0, std::make_shared<ExploreObjective>(1));
+    
+    quests.back().addNpcID      (1, -1);
+    quests.back().addDialogue   (1, std::string());
+    quests.back().addDescription(1, "Return back to Elder Throne");
+    quests.back().addObjective  (1, std::make_shared<TalkObjective>(0));
 
-        quests.back().addNpcID      (2, 0);
-        quests.back().addDialogue   (2, "[1/3] Oh, you are back");
-        quests.back().addDialogue   (2, "[2/3] This place used to be very peaceful");
-        quests.back().addDialogue   (2, "[3/3] Talk to Torren to prepare for the journey");
-        quests.back().addDescription(2, "Return back to Elder Throne");
-        quests.back().addObjective  (2, std::make_shared<TalkObjective>(0));
+    quests.back().addNpcID      (2, 0);
+    quests.back().addDialogue   (2, "[1/3] Oh, you are back");
+    quests.back().addDialogue   (2, "[2/3] This place used to be very peaceful");
+    quests.back().addDialogue   (2, "[3/3] Talk to Torren to prepare for the journey");
+    quests.back().addDescription(2, "Return back to Elder Throne");
+    quests.back().addObjective  (2, std::make_shared<TalkObjective>(0));
 
-        quests.back().addNpcID      (3, -1);
-        quests.back().addDialogue   (3, std::string());
-        quests.back().addDescription(3, "Find Torren");
-        quests.back().addObjective  (3, std::make_shared<TalkObjective>(1));
-        
-        quests.back().addNpcID      (4, 1);
-        quests.back().addDialogue   (4, "[1/6] Oh, Elder Thorne told you to come here?");
-        quests.back().addDialogue   (4, "[2/6] You sure about leaving? It's dangerous out there");
-        quests.back().addDialogue   (4, "[3/6] I've seen strange tracks near the river, not animal ones");
-        quests.back().addDialogue   (4, "[4/6] If you're going, take this bow. Just in case");
-        quests.back().addDialogue   (4, "[5/6] Press [Space] to use that bow");
-        quests.back().addDialogue   (4, "[6/6] Now, as an archer, help us defeat the monsters around here");
-        quests.back().addDescription(4, "Find Torren");
-        quests.back().addObjective  (4, std::make_shared<TalkObjective>(1));
-        
-        quests.back().addNpcID      (5, -1);
-        quests.back().addDialogue   (5, std::string());
-        quests.back().addDescription(5, "Help the villages defeat the monsters");
-        quests.back().addObjective  (5, std::make_shared<KillMonsterObjective>("Bat Lv.1", 5));
-        quests.back().addObjective  (5, std::make_shared<KillMonsterObjective>("Eye Lv.5", 2));
+    quests.back().addNpcID      (3, -1);
+    quests.back().addDialogue   (3, std::string());
+    quests.back().addDescription(3, "Find Torren");
+    quests.back().addObjective  (3, std::make_shared<TalkObjective>(1));
+    
+    quests.back().addNpcID      (4, 1);
+    quests.back().addDialogue   (4, "[1/6] Oh, Elder Thorne told you to come here?");
+    quests.back().addDialogue   (4, "[2/6] You sure about leaving? It's dangerous out there");
+    quests.back().addDialogue   (4, "[3/6] I've seen strange tracks near the river, not animal ones");
+    quests.back().addDialogue   (4, "[4/6] If you're going, take this bow. Just in case");
+    quests.back().addDialogue   (4, "[5/6] Press [Space] to use that bow");
+    quests.back().addDialogue   (4, "[6/6] Now, as an archer, help us defeat the monsters around here");
+    quests.back().addDescription(4, "Find Torren");
+    quests.back().addObjective  (4, std::make_shared<TalkObjective>(1));
+    
+    quests.back().addNpcID      (5, -1);
+    quests.back().addDialogue   (5, std::string());
+    quests.back().addDescription(5, "Help the villages defeat the monsters");
+    quests.back().addObjective  (5, std::make_shared<KillMonsterObjective>("Bat Lv.1", 5));
+    quests.back().addObjective  (5, std::make_shared<KillMonsterObjective>("Eye Lv.5", 2));
 
-        quests.back().addNpcID      (6, -1);
-        quests.back().addDialogue   (6, std::string());
-        quests.back().addDescription(6, "Return back to Torren");
-        quests.back().addObjective  (6, std::make_shared<TalkObjective>(1));
+    quests.back().addNpcID      (6, -1);
+    quests.back().addDialogue   (6, std::string());
+    quests.back().addDescription(6, "Return back to Torren");
+    quests.back().addObjective  (6, std::make_shared<TalkObjective>(1));
 
-        quests.back().addNpcID      (7, 1);
-        quests.back().addDialogue   (7, "[1/3] Oh, you are back");
-        quests.back().addDialogue   (7, "[2/3] You like the bow I gave you, no problem");
-        quests.back().addDialogue   (7, "[3/3] I see, you are strong enough to write your journey");
-        quests.back().addDescription(7, "Return back to Torren");
-        quests.back().addObjective  (7, std::make_shared<TalkObjective>(1));
-    }
-    // {
-    //     quests.push_back(Quest("Help the children", 100));
-    //     quests.back().addRequiredLevel(2);
+    quests.back().addNpcID      (7, 1);
+    quests.back().addDialogue   (7, "[1/3] Oh, you are back");
+    quests.back().addDialogue   (7, "[2/3] You like the bow I gave you, no problem");
+    quests.back().addDialogue   (7, "[3/3] I see, you are strong enough to write your journey");
+    quests.back().addDescription(7, "Return back to Torren");
+    quests.back().addObjective  (7, std::make_shared<TalkObjective>(1));
+    // --- [End] - Explore strange path --- 
+    
+    // quests.push_back(Quest("...", exp));
+    // quests.back().addRequiredLevel(playerLevel);
 
-    //     quests.back().addNpcID      (stage, npcID);
-    //     quests.back().addDialogue   (stage, "...");
-    //     quests.back().addDescription(stage, "...");
-    //     quests.back().addObjective  (stage, objective);
-    // }
-    {
-        // quests.push_back(Quest("...", exp));
-        // quests.back().addRequiredLevel(playerLevel);
-
-        // quests.back().addNpcID      (stage, npcID);
-        // quests.back().addDialogue   (stage, "...");
-        // quests.back().addDescription(stage, "...");
-        // quests.back().addObjective  (stage, objective);
-    }
+    // quests.back().addNpcID      (stage, npcID);
+    // quests.back().addDialogue   (stage, "...");
+    // quests.back().addDescription(stage, "...");
+    // quests.back().addObjective  (stage, objective);
 }
 
 int main() {
@@ -194,7 +187,7 @@ int main() {
     loadQuests(quests);
 
     sf::Vector2f PlayerTiles = sf::Vector2f( 78, 110);
-    Player player(PlayerTiles.x * TILE_SIZE, PlayerTiles.y * TILE_SIZE, 10.0f, std::move(quests));
+    Player player(PlayerTiles * static_cast<float>(TILE_SIZE), 10.0f, std::move(quests));
     UI ui;
     ui.generateMinimapTexture(map);
 
@@ -219,16 +212,12 @@ int main() {
     for (const sf::Vector2f lightPosition : map.getLights()) {
         naturalEffects.addLight(lightPosition);
     }
-
-    Item* bow_00    = new Bow("Old Bow", "bow_00", 1.0f, 1);
-    Item* bow_01    = new Bow("Wooden Bow", "bow_00", 2.5f, 1);
-    Item* helmet_00 = new Helmet("Old Helmet", "helmet_00", 2.0f, 1);
-    Item* helmet_01 = new Helmet("Copper Helmet", "helmet_00", 4.0f, 1);
-
-    player.addItem(bow_00);
-    player.addItem(bow_01);
-    player.addItem(helmet_00);
-    player.addItem(helmet_01);
+    
+    std::vector<Item> items;
+    items.emplace_back(player.getPosition() + sf::Vector2f(100.0f, 0), std::make_shared<Bow>("Old Bow", "bow_00", 1.0f, 1));
+    items.emplace_back(player.getPosition() + sf::Vector2f(200.0f, 0), std::make_shared<Bow>("Wooden Bow", "bow_00", 2.5f, 1));
+    items.emplace_back(player.getPosition() + sf::Vector2f(300.0f, 0), std::make_shared<Helmet>("Old Helmet", "helmet_00", 2.0f, 1));
+    items.emplace_back(player.getPosition() + sf::Vector2f(400.0f, 0), std::make_shared<Helmet>("Copper Helmet", "helmet_00", 4.0f, 1));
 
     InventoryUI inventoryUI(static_cast<sf::Vector2f>(window.getSize()), player);
     // [End] - Loading
@@ -327,7 +316,7 @@ int main() {
         // --- [Begin] update --- 
         gameClock.update(dt);
 
-        player.update(dt, window, map.getCollisionRects(), map.getRegionRects(), npcs);
+        player.update(dt, window, map.getCollisionRects(), map.getRegionRects(), npcs, items);
         ui.update(dt, player, uiView.getSize(), gameClock);
         
         // Điều chỉnh camera theo player
@@ -340,17 +329,21 @@ int main() {
         for (auto& npc : npcs) {
             npc.update();
         }
+
+        for (Item& item : items) {
+            item.update(dt);
+        }
         
         map.update(dt);
-        map.updateOverlayTransparency(player.getFloatRect());
+        map.updateOverlayTransparency(player.getHitbox());
         for (const auto& enemy : enemies) {
-            map.updateOverlayTransparency(enemy->getFloatRect());
+            map.updateOverlayTransparency(enemy->getHitbox());
         }
         
         particleManager.update(dt, view);
-        particleManager.isCollisionWithCloud(player.getFloatRect());
+        particleManager.isCollisionWithCloud(player.getHitbox());
         for (const auto& enemy : enemies) {
-            particleManager.isCollisionWithCloud(enemy->getFloatRect());
+            particleManager.isCollisionWithCloud(enemy->getHitbox());
         }
         particleManager.isCollisionWithRain(player.getCollisionRegionID());
         
@@ -393,6 +386,10 @@ int main() {
 
         for (auto& npc : npcs) {
             npc.draw(sceneTexture);
+        }
+
+        for (auto& item : items) {
+            item.draw(sceneTexture);
         }
 
         player.draw(sceneTexture);
