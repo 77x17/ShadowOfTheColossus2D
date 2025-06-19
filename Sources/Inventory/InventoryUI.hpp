@@ -8,18 +8,41 @@ class InventoryUI {
 private:
     bool visible = false;
 
-    std::vector<BagSlot> bagSlots;
-    std::vector<EquipSlot> equipSlots;
+    const float slotSize     = 32.0f;
+    const float textSize     = 12.0f;
+    const float slotPadding  = 4.0f;
+    const float groupPadding = 25.0f;
+    const int   cols = 10, rows = 4;
 
+    sf::RectangleShape containBox;
+
+    sf::Text inventoryText;
+    std::vector<BagSlot> bagSlots;
+    
+    sf::Text equipmentText;
+    std::vector<sf::Text> equipLabels;
+    std::vector<EquipSlot> equipSlots;
+    
     int previousDraggedItemID = -1;
     Item* draggedItem         = nullptr;
     sf::Vector2f dreggedPos;
 
-    sf::RectangleShape containBox;
-    std::vector<sf::Text> equipLabels;
+    sf::Text itemInformationText;
+    sf::RectangleShape bagItemInformationBox;
+    sf::RectangleShape equipItemInformationBox;
+    sf::Text selectedBagItemInfomation;
+    sf::Text selectedEquipItemInfomation;
+
+    sf::Text totalStatsText;
+    float totalDamage;
+    float totalHealth;
+    sf::RectangleShape equipmentStatsBox;
+    sf::Text equipmentStats;
 
 public:
     InventoryUI(const sf::Vector2f& windowSize);
+
+    void updatePosition(const sf::Vector2f& windowSize);
 
     void toggle() {
         visible = !visible;
@@ -27,7 +50,8 @@ public:
 
     bool addItem(Item* newItem);
     
-    void update(sf::Vector2f mousePos);
+    void updateDrag(sf::Vector2f mousePos);
+    void updateStats();
     void handleClick(const sf::Vector2f& mousePos);
     void handleRelease(const sf::Vector2f& mousePos);
     void draw(sf::RenderTarget& target);

@@ -29,13 +29,71 @@ public:
         sprite.setTexture(TextureManager::get(_textureName));
         sprite.setScale(2.0f, 2.0f);
     }
+
+    virtual std::string getInformation() const {
+        return name;
+    }
+
+    virtual float getDamage() const = 0;
+    virtual float getHealth() const = 0;
+};
+
+class Helmet : public Item {
+public:
+    float health;
+    int   levelRequired;
+
+    Helmet(const std::string& _name, const std::string& textureName, float _health, int _levelRequired) 
+    : Item(_name, ItemType::Helmet, textureName), health(_health), levelRequired(_levelRequired) {
+
+    }
+
+    std::string getInformation() const override {
+        std::string healthString = "Health: " + std::to_string(health);
+        healthString = healthString.substr(0, healthString.find('.') + 3);
+
+        std::string levelRequiredString = "Lv.Minimum: " + std::to_string(levelRequired);
+
+        return Item::getInformation() + "\n\n" 
+             + healthString + "\n\n" 
+             + levelRequiredString;
+    }
+
+    float getDamage() const override {
+        return 0.0f;
+    }
+
+    float getHealth() const override {
+        return health;
+    }
 };
 
 class Bow : public Item {
 public:
     float damage;
-    Bow(const std::string& _name, float _damage) 
-    : Item(_name, ItemType::Weapon, "bow"), damage(_damage) {
+    int   levelRequired;
 
+    Bow(const std::string& _name, const std::string& textureName, float _damage, int _levelRequired) 
+    : Item(_name, ItemType::Weapon, textureName), damage(_damage), levelRequired(_levelRequired) {
+
+    }
+
+    std::string getInformation() const override {
+        std::string damageString = "Damage: " + std::to_string(damage);
+        damageString = damageString.substr(0, damageString.find('.') + 3);
+
+        std::string levelRequiredString = "Lv.Minimum: " + std::to_string(levelRequired);
+
+        return Item::getInformation() + "\n\n" 
+             + damageString + "\n\n" 
+             + levelRequiredString;
+    }
+
+    float getDamage() const override {
+        return damage;
+    }
+
+    float getHealth() const override {
+        return 0.0f;
     }
 };

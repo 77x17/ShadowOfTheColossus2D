@@ -38,5 +38,9 @@ void TextureManager::loadSprite() {
     load("npc_02", "Assets/Sprites/npc_02.png");
     load("npc_03", "Assets/Sprites/npc_03.png");
 
-    load("bow", "Assets/Items/bow.png");
+    load("bow_00"       , "Assets/Items/bow_00.png");
+    load("helmet_00"    , "Assets/Items/helmet_00.png");
+    load("chestplate_00", "Assets/Items/chestplate_00.png");
+    load("leggings_00"  , "Assets/Items/leggings_00.png");
+    load("boots_00"     , "Assets/Items/boots_00.png");
 }

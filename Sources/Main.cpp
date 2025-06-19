@@ -194,7 +194,7 @@ int main() {
     loadQuests(quests);
 
     sf::Vector2f PlayerTiles = sf::Vector2f( 78, 110);
-    Player player(PlayerTiles.x * TILE_SIZE, PlayerTiles.y * TILE_SIZE, 5000.0f, std::move(quests));
+    Player player(PlayerTiles.x * TILE_SIZE, PlayerTiles.y * TILE_SIZE, 10.0f, std::move(quests));
     UI ui;
     ui.generateMinimapTexture(map);
 
@@ -220,10 +220,16 @@ int main() {
         naturalEffects.addLight(lightPosition);
     }
 
-    Item* bow = new Bow("Old Bow", 1.0f);
+    Item* bow_00    = new Bow("Old Bow", "bow_00", 1.0f, 1);
+    Item* bow_01    = new Bow("Wooden Bow", "bow_00", 2.0f, 1);
+    Item* helmet_00 = new Helmet("Old Helmet", "helmet_00", 2.0f, 1);
+    Item* helmet_01 = new Helmet("Copper Helmet", "helmet_00", 4.0f, 1);
 
     InventoryUI inventoryUI(static_cast<sf::Vector2f>(window.getSize()));
-    inventoryUI.addItem(bow);
+    inventoryUI.addItem(bow_00);
+    inventoryUI.addItem(bow_01);
+    inventoryUI.addItem(helmet_00);
+    inventoryUI.addItem(helmet_01);
 
     // [End] - Loading
 
@@ -279,6 +285,8 @@ int main() {
                     view.setCenter(player.getCenterPosition());
 
                     uiView = window.getDefaultView();
+
+                    inventoryUI.updatePosition(static_cast<sf::Vector2f>(window.getSize()));
                 }
                 else if (event.key.code == sf::Keyboard::Q) {
                     ui.updateQuestsBox();
@@ -368,7 +376,7 @@ int main() {
 
         if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
             sf::Vector2f mousePos = static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
-            inventoryUI.update(mousePos);
+            inventoryUI.updateDrag(mousePos);
         }
 
         // --- [End] Update ---

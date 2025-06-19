@@ -48,8 +48,8 @@ private:
     std::unique_ptr<sf::Shader> lightShader;
     
     // Cấu hình hệ thống
-    static constexpr int MAX_LIGHTS = 8;               // Số lượng light tối đa render cùng lúc
-    static constexpr float CULLING_DISTANCE = 1000.0f; // Khoảng cách tối đa để xem xét
+    static constexpr int MAX_LIGHTS = 8;              // Số lượng light tối đa render cùng lúc
+    static constexpr float CULLING_DISTANCE = 700.0f; // Khoảng cách tối đa để xem xét
     
     // Shader uniforms cho multiple lights
     mutable std::vector<sf::Vector2f> lightPositions;

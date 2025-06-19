@@ -13,6 +13,8 @@
 
 #include "Npc.hpp"
 
+
+
 enum class PlayerState {
     DYING = -2,
     DEAD  = -1,
@@ -46,9 +48,11 @@ private:
     
     float RESPAWN_TIME;
     float respawnCooldownTimer;
-        
+    
+    float baseHealthPoints;
     float maxHealthPoints;
     float healthPoints;
+    float damage;
     float BASE_EXPERIENCE;
     int   level;
     float xp;

@@ -14,11 +14,13 @@ Player::Player(const float& x, const float& y, const float& hp, std::vector<Ques
     position        = basePosition;
     movingDirection = sf::Vector2f(0.f, 0.f);
 
-    maxHealthPoints = hp;
-    healthPoints    = hp;
-    BASE_EXPERIENCE = 10.0f;
-    level           = 1;
-    xp              = 0.0;
+    baseHealthPoints = hp;
+    maxHealthPoints  = baseHealthPoints;
+    healthPoints     = maxHealthPoints;
+    damage           = 0.0f;
+    BASE_EXPERIENCE  = 10.0f;
+    level            = 1;
+    xp               = 0.0;
 
     DYING_TIME         = 1.0f;
     dyingCooldownTimer = 0.0f;
