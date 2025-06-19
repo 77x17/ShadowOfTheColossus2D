@@ -7,6 +7,8 @@
 #include "Player.hpp"
 #include "SoundManager.hpp"
 #include "Font.hpp"
+#include "ItemData.hpp"
+#include "Item.hpp"
 
 class Enemy {
 protected:
@@ -58,11 +60,14 @@ protected:
     float KNOCKBACK_COOLDOWN;
     float knockbackCooldownTimer;
 
+    std::vector<std::pair<float, std::shared_ptr<ItemData>>> inventory; // rate - item
+
 public:
     Enemy(const sf::Vector2f& position, 
           const sf::Vector2f& size, 
           const float&        hp, 
-          const std::string&  nameAndLevel);
+          const std::string&  nameAndLevel,
+          const std::vector<std::pair<float, std::shared_ptr<ItemData>>>& _inventory);
 
     virtual ~Enemy() = default;
 
@@ -81,8 +86,9 @@ public:
     void updateThinking(Player& player);
     void updatePosition(const float& dt, const std::vector<sf::FloatRect>& collisionRects);
     void updateHitbox();
+    void dropItems(std::vector<Item>& items);
     virtual void updateAnimation() = 0;
-    virtual void update(const float& dt, Player& player, const std::vector<sf::FloatRect>& collisionRects);
+    virtual void update(const float& dt, Player& player, const std::vector<sf::FloatRect>& collisionRects, std::vector<Item>& items);
 
     virtual void draw(sf::RenderTarget& target);
 

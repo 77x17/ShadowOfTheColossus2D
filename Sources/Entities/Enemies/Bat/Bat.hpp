@@ -16,7 +16,7 @@ private:
     float ATTACK_RANGE;
     
 public:
-    Bat(const sf::Vector2f& position);
+    Bat(const sf::Vector2f& position, const std::vector<std::pair<float, std::shared_ptr<ItemData>>>& _inventory);
 
     void followPlayer(const Player& player) override;
 

@@ -8,8 +8,9 @@
 Enemy::Enemy(const sf::Vector2f& position, 
              const sf::Vector2f& size, 
              const float&        hp, 
-             const std::string&  nameAndLevel) 
-: hitbox(position, size)
+             const std::string&  nameAndLevel,
+             const std::vector<std::pair<float, std::shared_ptr<ItemData>>>& _inventory) 
+: hitbox(position, size), inventory(_inventory)
 {
     state           = 0;
     MOVE_SPEED      = 100.0f; 
@@ -343,7 +344,21 @@ void Enemy::updateHitbox() {
     healthPointsBar.setSize(sf::Vector2f(HEALTH_POINTS_BAR_WIDTH * healthRatio, HEALTH_POINTS_BAR_HEIGHT)); 
 }
 
-void Enemy::update(const float& dt, Player& player, const std::vector<sf::FloatRect>& collisionRects) {
+void Enemy::dropItems(std::vector<Item>& items) {
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    static std::uniform_real_distribution<float> chance(0.0f, 1.0f);
+
+    for (auto& pair : inventory) {
+        if (chance(gen) <= pair.first) {
+            sf::Vector2f center = hitbox.getPosition() + hitbox.getSize() / 2.0f;
+            sf::Vector2f offset = sf::Vector2f(rand() % static_cast<int>(hitbox.getSize().x), rand() % static_cast<int>(hitbox.getSize().y)) - hitbox.getSize() / 2.0f;
+            items.emplace_back(center + offset, pair.second);
+        }
+    }
+}
+
+void Enemy::update(const float& dt, Player& player, const std::vector<sf::FloatRect>& collisionRects, std::vector<Item>& items) {
     updateTimer(dt);
 
     if (!isAlive()) {
@@ -364,6 +379,8 @@ void Enemy::update(const float& dt, Player& player, const std::vector<sf::FloatR
 
         if (!isAlive()) {
             player.addVictim(label.getString());
+
+            dropItems(items);
         }
     }
 

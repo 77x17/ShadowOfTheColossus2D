@@ -4,8 +4,8 @@
 
 #include <cmath>
 
-Eye::Eye(const sf::Vector2f& position) 
-: Enemy(position, sf::Vector2f(TILE_SIZE, TILE_SIZE), 5.0f, "Eye Lv.5") {
+Eye::Eye(const sf::Vector2f& position, const std::vector<std::pair<float, std::shared_ptr<ItemData>>>& _inventory) 
+: Enemy(position, sf::Vector2f(TILE_SIZE, TILE_SIZE), 5.0f, "Eye Lv.5", _inventory) {
     MOVE_SPEED     = 80.0f; 
     DETECION_RANGE = 250.0f;
 
@@ -124,8 +124,8 @@ void Eye::updateProjectiles(const float& dt, Player& player) {
     }
 }   
 
-void Eye::update(const float& dt, Player& player, const std::vector<sf::FloatRect>& collisionRects) {
-    Enemy::update(dt, player,collisionRects);
+void Eye::update(const float& dt, Player& player, const std::vector<sf::FloatRect>& collisionRects, std::vector<Item>& items) {
+    Enemy::update(dt, player,collisionRects, items);
     
     if (invincibleCooldownTimer <= 0 && projectile) {
         updateProjectiles(dt, player);

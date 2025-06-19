@@ -23,7 +23,7 @@ private:
     float shootCooldownTimer;
 
 public:
-    Eye(const sf::Vector2f& position);
+    Eye(const sf::Vector2f& position, const std::vector<std::pair<float, std::shared_ptr<ItemData>>>& _inventory);
 
     void respawn() override;
     void kill() override;
@@ -32,7 +32,7 @@ public:
     void followPlayer(const Player& player) override;
     void updateAnimation() override;
     void updateProjectiles(const float& dt, Player& player);
-    void update(const float& dt, Player& player, const std::vector<sf::FloatRect>& collisionRects) override;
+    void update(const float& dt, Player& player, const std::vector<sf::FloatRect>& collisionRects, std::vector<Item>& items) override;
 
     void draw(sf::RenderTarget& target) override;
 

@@ -48,13 +48,27 @@ float SoundManager::fadeVolume   = 100.0f;
 std::unordered_map<std::string, std::unique_ptr<sf::Shader>> EntityEffects::shaders;
 
 void loadEnemy(std::vector<std::unique_ptr<Enemy>>& enemies, const std::unordered_map<std::string, std::vector<sf::FloatRect>>& enemyRects) {
+    // Mythic	  = 0.0001  - 1 / 10000
+    // Legendary  = 0.001   - 1 / 1000
+    // Rare	      = 0.01    - 1 / 100
+    // Unique     = 0.05    - 1 / 20
+    // Normal     = 0.1     - 1 / 10
+
+    std::vector<std::pair<float, std::shared_ptr<ItemData>>> batInventory;
+    batInventory.emplace_back(0.1, std::make_shared<Bow>("Old Bow", "bow_00", 1.0f, 1));
+    batInventory.emplace_back(0.1, std::make_shared<Helmet>("Old Helmet", "helmet_00", 2.0f, 1));
+    
+    std::vector<std::pair<float, std::shared_ptr<ItemData>>> eyeInventory;
+    eyeInventory.emplace_back(0.05, std::make_shared<Bow>("Wooden Bow", "bow_00", 2.5f, 1));
+    eyeInventory.emplace_back(0.05, std::make_shared<Helmet>("Copper Helmet", "helmet_00", 4.0f, 1));
+
     for (const auto& pair : enemyRects) {
         for (const sf::FloatRect& rect : pair.second) {
             if (pair.first == "Bat Lv.1") {
-                enemies.push_back(std::make_unique<Bat>(rect.getPosition()));
+                enemies.push_back(std::make_unique<Bat>(rect.getPosition(), batInventory));
             }
             else if (pair.first == "Eye Lv.5") {
-                enemies.push_back(std::make_unique<Eye>(rect.getPosition()));
+                enemies.push_back(std::make_unique<Eye>(rect.getPosition(), eyeInventory));
             }
             else {
                 std::cerr << "[Bug] - Main.cpp - loadEnemy()\n";
@@ -323,7 +337,7 @@ int main() {
         player.updateView(dt, view);
         
         for (auto& enemy : enemies) {
-            enemy->update(dt, player, map.getCollisionRects());
+            enemy->update(dt, player, map.getCollisionRects(), items);
         }
 
         for (auto& npc : npcs) {
