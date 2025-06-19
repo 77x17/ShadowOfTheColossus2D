@@ -115,6 +115,8 @@ void Enemy::hurt(const float& damage) {
         SoundManager::playSound("enemyHurt");
 
         if (healthPoints <= 0) {
+            healthPoints = 0.0f;
+            
             kill();
         }
     }
@@ -363,7 +365,7 @@ void Enemy::update(const float& dt, Player& player, const std::vector<sf::FloatR
     }
 
     if (player.isCollisionProjectiles(hitbox.getGlobalBounds())) {
-        hurt(1.0f);
+        hurt(player.getDamage());
         knockback(player.getPosition());
 
         if (!isAlive()) {

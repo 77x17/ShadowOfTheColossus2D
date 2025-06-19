@@ -4,6 +4,8 @@
 
 #include <vector>
 
+#include "Player.hpp"
+
 class InventoryUI {
 private:
     bool visible = false;
@@ -17,11 +19,11 @@ private:
     sf::RectangleShape containBox;
 
     sf::Text inventoryText;
-    std::vector<BagSlot> bagSlots;
+    std::vector<BagSlot>* bagSlots = nullptr;
     
     sf::Text equipmentText;
     std::vector<sf::Text> equipLabels;
-    std::vector<EquipSlot> equipSlots;
+    std::vector<EquipSlot>* equipSlots = nullptr;
     
     int previousDraggedItemID = -1;
     Item* draggedItem         = nullptr;
@@ -40,22 +42,21 @@ private:
     sf::Text equipmentStats;
 
 public:
-    InventoryUI(const sf::Vector2f& windowSize);
+    InventoryUI(const sf::Vector2f& windowSize, Player& player);
 
     void updatePosition(const sf::Vector2f& windowSize);
 
     void toggle() {
         visible = !visible;
     }
-
-    bool addItem(Item* newItem);
     
     void updateDrag(sf::Vector2f mousePos);
-    void updateStats();
     void handleClick(const sf::Vector2f& mousePos);
-    void handleRelease(const sf::Vector2f& mousePos);
+    void handleRelease(const sf::Vector2f& mousePos, Player& player);
     void draw(sf::RenderTarget& target);
     
     bool isVisible() const;
+    
+    void updateStats(Player &player);
 
 };

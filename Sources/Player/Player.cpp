@@ -6,7 +6,7 @@
 
 #include <cmath>
 
-Player::Player(const float& x, const float& y, const float& hp, std::vector<Quest>&& _quests) {
+Player::Player(const float& x, const float& y, const float& baseHp, std::vector<Quest>&& _quests) {
     state           = 0;
     MOVE_SPEED      = 200.0f; 
     size            = sf::Vector2f(TILE_SIZE, TILE_SIZE);
@@ -14,10 +14,24 @@ Player::Player(const float& x, const float& y, const float& hp, std::vector<Ques
     position        = basePosition;
     movingDirection = sf::Vector2f(0.f, 0.f);
 
-    baseHealthPoints = hp;
-    maxHealthPoints  = baseHealthPoints;
-    healthPoints     = maxHealthPoints;
-    damage           = 0.0f;
+    // --- [Begin] - Inventory ---
+    equipmentHealth = 0.0f;
+    equipmentDamage = 0.0f;
+    
+    BagSlot bagSlot;
+    for (int cnt = 0; cnt < 40; ++cnt) {
+        bagSlots.push_back(bagSlot);
+    }
+    
+    EquipSlot equipSlot; 
+    for (int i = 0; i < 8; ++i) {
+        equipSlots.push_back(equipSlot);
+    }
+    // --- [End] - Inventory ---
+
+    baseHealthPoints = baseHp;
+    healthPoints     = baseHealthPoints + equipmentHealth;
+    damage           = equipmentDamage;
     BASE_EXPERIENCE  = 10.0f;
     level            = 1;
     xp               = 0.0;
@@ -171,6 +185,10 @@ void Player::handleDash(const sf::RenderWindow& window) {
 }
 
 void Player::handleProjectiles(const sf::RenderWindow& window) {
+    if (damage <= 0.0f) {
+        return;
+    }
+
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && shootCooldownTimer <= 0.f && !isDashing) {
         shootCooldownTimer = SHOOT_COOLDOWN; 
         
@@ -312,6 +330,7 @@ void Player::hurt(const float& damage) {
         SoundManager::playSound("playerHurt");
 
         if (healthPoints <= 0) {
+            healthPoints = 0.0f;
             kill();
         }
     }
@@ -351,7 +370,7 @@ void Player::respawn() {
         
         state = 0;
 
-        healthPoints = maxHealthPoints;
+        healthPoints = baseHealthPoints + equipmentHealth;
 
         invincibleCooldownTimer = INVINCIBLE_TIME;
     }
@@ -684,8 +703,8 @@ sf::Vector2f Player::getPosition() const {
 void Player::levelUp() {
     level++;
 
-    maxHealthPoints++;
-    healthPoints = maxHealthPoints;
+    baseHealthPoints++;
+    healthPoints = baseHealthPoints + equipmentHealth;
 
     SoundManager::playSound("levelUp");
 }
@@ -720,7 +739,10 @@ void Player::addVictim(const std::string& label) {
 }
 
 float Player::getHealthRatio() const {
-    return healthPoints / maxHealthPoints;
+    if (baseHealthPoints + equipmentHealth == 0) {
+        return 1.0f;
+    }
+    return healthPoints / (baseHealthPoints + equipmentHealth);
 }
 
 std::string format2Decimals(float value) {
@@ -729,7 +751,7 @@ std::string format2Decimals(float value) {
 }
 
 std::string Player::getHealthPointsString() const {
-    return format2Decimals(healthPoints) + '/' + format2Decimals(maxHealthPoints);
+    return format2Decimals(healthPoints) + '/' + format2Decimals(baseHealthPoints + equipmentHealth);
 }
 
 float Player::getXPRatio() const {
@@ -779,3 +801,61 @@ int Player::getCollisionRegionID() const {
 sf::FloatRect Player::getFloatRect() const {
     return sf::FloatRect(position, size);
 }
+
+// --- [Begin] - Inventory --- 
+bool Player::addItem(Item* newItem) {
+    for (auto& slot : bagSlots) {
+        if (!slot.item) {
+            slot.item = newItem;
+            return true;
+        }
+    }
+    return false; // Hết chỗ
+}
+
+void Player::updateEquipmentStats() {
+    equipmentHealth = 0.0f;
+    equipmentDamage = 0.0f;
+    for (const auto& slot : equipSlots) if (slot.item) {
+        equipmentHealth += slot.item->getHealth();
+        equipmentDamage += slot.item->getDamage();
+    }
+
+    if (healthPoints > baseHealthPoints + equipmentHealth) {
+        healthPoints = baseHealthPoints + equipmentHealth;
+    }
+    damage = equipmentDamage;
+}
+
+std::vector<BagSlot>* Player::getBagSlots() {
+    return &bagSlots;
+}
+
+std::vector<EquipSlot>* Player::getEquipSlots() {
+    return &equipSlots;
+}
+
+std::string Player::getStats() const {
+    std::string healthString          = "HP      : " + getHealthPointsString();
+    std::string baseHealthString      = "Base HP : " + std::to_string(baseHealthPoints);
+    std::string equipmentHealthString = "Equip HP: " + std::to_string(equipmentHealth);
+    std::string damageString          = "Damage  : " + std::to_string(equipmentDamage);
+    std::string xpString              = "EXP     : " + getXPString();
+
+    baseHealthString      = baseHealthString.substr(0, baseHealthString.find('.') + 3);
+    equipmentHealthString = equipmentHealthString.substr(0, equipmentHealthString.find('.') + 3);
+    damageString          = damageString.substr(0, damageString.find('.') + 3);
+    
+    return healthString + "\n"
+         + baseHealthString + "\n" 
+         + equipmentHealthString + "\n" 
+         + damageString + "\n\n"
+         + xpString;
+}
+// --- [End] - Inventory --- 
+
+// --- [Begin] - Enemy --- 
+const float& Player::getDamage() const {
+    return damage;
+};
+// --- [End] - Enemy --- 

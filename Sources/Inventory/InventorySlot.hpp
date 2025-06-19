@@ -17,7 +17,7 @@ public:
 
 class BagSlot : public InventorySlot {
 public:
-    BagSlot(const float& slotSize) {
+    void init(const float& slotSize) {
         slotBox.setSize(sf::Vector2f(slotSize, slotSize));
         slotBox.setFillColor(sf::Color(100, 100, 100));
         slotBox.setOutlineThickness(1.f);
@@ -27,7 +27,7 @@ public:
 
 class EquipSlot : public InventorySlot {
 public:
-    EquipSlot(const float& slotSize) {
+    void init(const float& slotSize) {
         slotBox.setSize(sf::Vector2f(slotSize, slotSize));
         slotBox.setFillColor(sf::Color(80, 80, 80));
         slotBox.setOutlineThickness(1.f);

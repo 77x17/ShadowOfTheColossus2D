@@ -221,16 +221,16 @@ int main() {
     }
 
     Item* bow_00    = new Bow("Old Bow", "bow_00", 1.0f, 1);
-    Item* bow_01    = new Bow("Wooden Bow", "bow_00", 2.0f, 1);
+    Item* bow_01    = new Bow("Wooden Bow", "bow_00", 2.5f, 1);
     Item* helmet_00 = new Helmet("Old Helmet", "helmet_00", 2.0f, 1);
     Item* helmet_01 = new Helmet("Copper Helmet", "helmet_00", 4.0f, 1);
 
-    InventoryUI inventoryUI(static_cast<sf::Vector2f>(window.getSize()));
-    inventoryUI.addItem(bow_00);
-    inventoryUI.addItem(bow_01);
-    inventoryUI.addItem(helmet_00);
-    inventoryUI.addItem(helmet_01);
+    player.addItem(bow_00);
+    player.addItem(bow_01);
+    player.addItem(helmet_00);
+    player.addItem(helmet_01);
 
+    InventoryUI inventoryUI(static_cast<sf::Vector2f>(window.getSize()), player);
     // [End] - Loading
 
     while (window.isOpen()) {
@@ -304,17 +304,13 @@ int main() {
                     inventoryUI.toggle();
                 }
             }
-            else if (event.type == sf::Event::MouseButtonPressed 
-                  && event.mouseButton.button == sf::Mouse::Left) {
-
+            else if (inventoryUI.isVisible() && event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
                 sf::Vector2f mousePos = window.mapPixelToCoords({event.mouseButton.x, event.mouseButton.y});
                 inventoryUI.handleClick(mousePos);
             }
-            else if (event.type == sf::Event::MouseButtonReleased 
-                  && event.mouseButton.button == sf::Mouse::Left) {
-
+            else if (inventoryUI.isVisible() && event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left) {
                 sf::Vector2f mousePos = window.mapPixelToCoords({event.mouseButton.x, event.mouseButton.y});
-                inventoryUI.handleRelease(mousePos);
+                inventoryUI.handleRelease(mousePos, player);
             }
         }
 
@@ -374,9 +370,13 @@ int main() {
             naturalEffects.updateSmartLighting(player.getCenterPosition(), view);
         }
 
-        if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+        if (inventoryUI.isVisible() && sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
             sf::Vector2f mousePos = static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
             inventoryUI.updateDrag(mousePos);
+        }
+
+        if (inventoryUI.isVisible()) {
+            inventoryUI.updateStats(player);
         }
 
         // --- [End] Update ---
@@ -429,7 +429,10 @@ int main() {
         // --- [End] Add natural shader ---
         
         ui.draw(window);
-        inventoryUI.draw(window);
+
+        if (inventoryUI.isVisible()) {
+            inventoryUI.draw(window);
+        }
 
         window.display();
     }

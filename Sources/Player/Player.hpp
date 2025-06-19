@@ -13,7 +13,7 @@
 
 #include "Npc.hpp"
 
-
+#include "InventorySlot.hpp"
 
 enum class PlayerState {
     DYING = -2,
@@ -45,12 +45,10 @@ private:
     float DYING_TIME;
     float dyingCooldownTimer;
     
-    
     float RESPAWN_TIME;
     float respawnCooldownTimer;
     
     float baseHealthPoints;
-    float maxHealthPoints;
     float healthPoints;
     float damage;
     float BASE_EXPERIENCE;
@@ -95,8 +93,16 @@ private:
     bool               updateQuest;
     int                collisionRegionID;
 
+    // --- [Begin] - Inventory --- 
+    float equipmentHealth;
+    float equipmentDamage;
+
+    std::vector<BagSlot> bagSlots;      // 10 x 4 = 40
+    std::vector<EquipSlot> equipSlots;  // 8
+    // --- [End] - Inventory --- 
+
 public:
-    Player(const float& x, const float& y, const float& hp, std::vector<Quest>&& _quests);
+    Player(const float& x, const float& y, const float& baseHp, std::vector<Quest>&& _quests);
 
     void handleMove(const sf::RenderWindow& window);
     void handleDash(const sf::RenderWindow& window);
@@ -154,4 +160,16 @@ public:
     void updateView(const float& dt, sf::View& view) const;
 
     sf::FloatRect getFloatRect() const;
+
+    // --- [Begin] - Inventory --- 
+    bool addItem(Item* newItem);
+    void updateEquipmentStats();
+    std::vector<BagSlot>* getBagSlots();
+    std::vector<EquipSlot>* getEquipSlots();
+    std::string getStats() const;
+    // --- [End] - Inventory --- 
+
+    // --- [Begin] - Enemy --- 
+    const float& getDamage() const;
+    // --- [End] - Enemy --- 
 };
