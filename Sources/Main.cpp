@@ -30,7 +30,7 @@
 #include "Npc.hpp"
 
 #include "EntityEffects.hpp"
-#include "NaturalEffects.hpp"
+// #include "NaturalEffects.hpp"
 #include "ParticleManager.hpp"
 #include "TextureManager.hpp"
 
@@ -211,9 +211,9 @@ int main() {
     TextureManager::loadSprite();
     EntityEffects::loadShader();
 
-    NaturalEffects naturalEffects;
-    naturalEffects.load("Assets/Shaders/naturalEffects.frag");
-    naturalEffects.loadSmartLightingShader("Assets/Shaders/smartLighting.frag");
+    // NaturalEffects naturalEffects;
+    // naturalEffects.load("Assets/Shaders/naturalEffects.frag");
+    // naturalEffects.loadSmartLightingShader("Assets/Shaders/smartLighting.frag");
 
     SoundManager::loadSound();
 
@@ -251,10 +251,10 @@ int main() {
 
     Clock gameClock(6 * 60.0f);
 
-    int playerLightID = naturalEffects.addLight(player.getPosition(), 350.0f, sf::Vector3f(1.0f, 1.0f, 1.0f), 1.0f, 1);
-    for (const sf::Vector2f lightPosition : map.getLights()) {
-        naturalEffects.addLight(lightPosition);
-    }
+    // int playerLightID = naturalEffects.addLight(player.getPosition(), 350.0f, sf::Vector3f(1.0f, 1.0f, 1.0f), 1.0f, 1);
+    // for (const sf::Vector2f lightPosition : map.getLights()) {
+    //     naturalEffects.addLight(lightPosition);
+    // }
     
     std::vector<Item> items;
     items.emplace_back(player.getPosition() + sf::Vector2f(100.0f, 0), std::make_shared<Bow>("God Bow", "bow_00", 10.0f, 1));
@@ -394,21 +394,21 @@ int main() {
         }
         particleManager.isCollisionWithRain(player.getCollisionRegionID());
         
-        {
-            sf::Vector2f playerScreenPos = sf::Vector2f(window.mapCoordsToPixel(player.getCenterPosition(), view));
-            sf::Vector2f windowSize = sf::Vector2f(window.getSize());
+        // {
+        //     sf::Vector2f playerScreenPos = sf::Vector2f(window.mapCoordsToPixel(player.getCenterPosition(), view));
+        //     sf::Vector2f windowSize = sf::Vector2f(window.getSize());
             
-            sf::Vector2f lightNorm = {
-                playerScreenPos.x / windowSize.x,
-                playerScreenPos.y / windowSize.y
-            };
+        //     sf::Vector2f lightNorm = {
+        //         playerScreenPos.x / windowSize.x,
+        //         playerScreenPos.y / windowSize.y
+        //     };
             
-            float aspectRatio = windowSize.x / windowSize.y;
+        //     float aspectRatio = windowSize.x / windowSize.y;
             
-            naturalEffects.update(dt, player.getCollisionRegionID(), lightNorm, aspectRatio, gameClock);
-            naturalEffects.updateLightPosition(playerLightID, player.getCenterPosition()); 
-            naturalEffects.updateSmartLighting(player.getCenterPosition(), view);
-        }
+        //     naturalEffects.update(dt, player.getCollisionRegionID(), lightNorm, aspectRatio, gameClock);
+        //     naturalEffects.updateLightPosition(playerLightID, player.getCenterPosition()); 
+        //     naturalEffects.updateSmartLighting(player.getCenterPosition(), view);
+        // }
 
         if (inventoryUI.isVisible()) {
             sf::Vector2f mousePos = static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
@@ -463,15 +463,16 @@ int main() {
 
         // --- [Begin] Add natural shader --- 
         sf::Sprite sceneSprite(sceneTexture.getTexture());
-        if (naturalEffects.shouldApplySmartLighting()) {
-            window.draw(sceneSprite, naturalEffects.getSmartLightingShader());
-        }
-        else if (naturalEffects.shouldApplyShader()) {
-            window.draw(sceneSprite, naturalEffects.get());
-        }
-        else {
-            window.draw(sceneSprite); 
-        }
+        // if (naturalEffects.shouldApplySmartLighting()) {
+        //     window.draw(sceneSprite, naturalEffects.getSmartLightingShader());
+        // }
+        // else if (naturalEffects.shouldApplyShader()) {
+        //     window.draw(sceneSprite, naturalEffects.get());
+        // }
+        // else {
+        //     window.draw(sceneSprite); 
+        // }
+        window.draw(sceneSprite); 
         // --- [End] Add natural shader ---
         
         ui.draw(window);

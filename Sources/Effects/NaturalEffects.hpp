@@ -49,7 +49,7 @@ public:
     bool shouldApplySmartLighting() const;
 
     // Quản lý lights
-    int addLight(const sf::Vector2f& position, float radius = 700.0f, 
+    int addLight(const sf::Vector2f& position, float radius = 1000.0f, 
                  const sf::Vector3f& color = sf::Vector3f(1.0f, 1.0f, 1.0f),
                  float intensity = 1.0f, int priority = 0);
     void removeLight(int lightID);
