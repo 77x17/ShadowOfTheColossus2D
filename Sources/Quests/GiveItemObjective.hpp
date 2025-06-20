@@ -5,12 +5,11 @@
 class GiveItemObjective : public QuestObjective {
 private:
     std::string itemName;
-    int  requiredAmount;
-    int  npcID;
-    bool finishedGiveItem;
+    int         requiredAmount;
+    int         currentAmount;
 
 public:
-    GiveItemObjective(const std::string& name, int amount, int npcID);
+    GiveItemObjective(const std::string& name, int amount);
 
     void updateProgress(const QuestEventData& data) override;
 

@@ -1,31 +1,28 @@
 #include "GiveItemObjective.hpp"
 
-GiveItemObjective::GiveItemObjective(const std::string& name, int amount, int _npcID) {
-    itemName         = name;
-    requiredAmount   = amount;
-    npcID            = _npcID;
-    finishedGiveItem = true;
+GiveItemObjective::GiveItemObjective(const std::string& name, int amount) {
+    itemName       = name;
+    requiredAmount = amount;
+    currentAmount  = 0;
 }
 
 void GiveItemObjective::updateProgress(const QuestEventData& data) {
-    if (data.eventType == "finishedGiveItem" && data.targetName == itemName && !isFinished()) {
-        finishedGiveItem = true;
+    if (data.eventType == "giveItem" && data.targetName == itemName && !isFinished()) {
+        currentAmount++;
     }
 }
 
 bool GiveItemObjective::isFinished() const {
-    return finishedGiveItem == true;
+    return currentAmount >= requiredAmount;
 }
 
 std::string GiveItemObjective::getDescription() const {
-    return "Collect " + std::to_string(requiredAmount) + " " + itemName;
+    return "Collect " + std::to_string(currentAmount) + "/" + std::to_string(requiredAmount) + " " + itemName;
 }
 
 QuestEventData GiveItemObjective::getQuestEventData() const {
     QuestEventData data;
     data.eventType  = "giveItem";
     data.targetName = itemName;
-    data.amount     = requiredAmount;
     return data;
-
 }

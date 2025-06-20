@@ -253,7 +253,35 @@ void Player::handleQuests(const float& dt, const sf::RenderWindow& window, std::
                                     quest.update(dataPack);
                                 }
                                 else {
-                                    interactText.setString("I need your support");
+                                    // --- [Begin] - giveItemObjective ---
+                                    std::vector<std::shared_ptr<QuestObjective>> questObjectives = quest.getQuestObjectives();
+                                    for (auto& objective : questObjectives) if (!objective->isFinished()) {
+                                        QuestEventData objectiveData = objective->getQuestEventData();
+                                        if (objectiveData.eventType == "giveItem") {
+                                            for (auto& slot : bagSlots) if (slot.item) {
+                                                if (slot.item->name == objectiveData.targetName) {
+                                                    QuestEventData giveItemData;
+                                                    giveItemData.eventType  = "giveItem";
+                                                    giveItemData.targetName = slot.item->name;
+                                                    quest.update(giveItemData);
+                                                    
+                                                    slot.item = nullptr; // take item from player
+
+                                                    if (objective->isFinished()) {
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    if (quest.isFinishObjectives()) {
+                                        interactText.setString("Good, that's all of them. I appreciate it");
+                                    }
+                                    else {
+                                        interactText.setString("I need your support");
+                                    }
+                                    // --- [End] - giveItemObjective ---
 
                                     continue;
                                 }

@@ -14,6 +14,7 @@ Build/Main.o: Sources/Main.cpp Sources/Configuration/Constants.hpp \
  Sources/Inventory/InventoryUI.hpp \
  Sources/Quests/KillMonsterObjective.hpp \
  Sources/Quests/FinishObjective.hpp Sources/Quests/TalkObjective.hpp \
- Sources/Quests/ExploreObjective.hpp Sources/Effects/NaturalEffects.hpp \
+ Sources/Quests/ExploreObjective.hpp Sources/Quests/GiveItemObjective.hpp \
+ Sources/Effects/NaturalEffects.hpp \
  Sources/LightSource/SmartLightSource.hpp \
  Sources/ParticleManager/ParticleManager.hpp

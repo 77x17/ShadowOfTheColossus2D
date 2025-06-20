@@ -26,6 +26,7 @@
 #include "FinishObjective.hpp"
 #include "TalkObjective.hpp"
 #include "ExploreObjective.hpp"
+#include "GiveItemObjective.hpp"
 #include "Npc.hpp"
 
 #include "EntityEffects.hpp"
@@ -172,15 +173,13 @@ void loadQuests(std::vector<Quest>& quests) {
     quests.back().addDialogue   (1, "[5/5] Bring them here, and I'll tell you what really happened to Darkwood");
     quests.back().addDescription(1, "Head deeper into the forest and find Bren");
     quests.back().addObjective  (1, std::make_shared<TalkObjective>(3));
-
-    quests.back().addNpcID      (2, -1);
+    // Stage 2: Kiếm đồ
+    quests.back().addNpcID      (2, 3);
     quests.back().addDialogue   (2, std::string());
     quests.back().addDescription(2, "Collect materials for Bren");
-    quests.back().addObjective  (2, std::make_shared<KillMonsterObjective>("Bat Lv.1", 20));
-    quests.back().addObjective  (2, std::make_shared<KillMonsterObjective>("Eye Lv.5", 10));
-    // quests.back().addObjective  (1, std::make_shared<GiveItemObjective>("Shadow Spore", 3));
-    // quests.back().addObjective  (1, std::make_shared<GiveItemObjective>("Black Leaf", 2));
-    // Stage 2: Trả đồ, nghe kể chuyện
+    quests.back().addObjective  (2, std::make_shared<GiveItemObjective>("Wooden Bow", 2));
+    quests.back().addObjective  (2, std::make_shared<GiveItemObjective>("Copper Helmet", 2));
+    // Stage 3: Trả đồ, nghe kể chuyện
     quests.back().addNpcID      (3, 3);
     quests.back().addDialogue   (3, "[1/6] Ah, you've returned. Good. Let me see...");
     quests.back().addDialogue   (3, "[2/6] These spores... they reek of corruption");
@@ -258,10 +257,8 @@ int main() {
     }
     
     std::vector<Item> items;
-    items.emplace_back(player.getPosition() + sf::Vector2f(100.0f, 0), std::make_shared<Bow>("Old Bow", "bow_00", 1.0f, 1));
-    items.emplace_back(player.getPosition() + sf::Vector2f(200.0f, 0), std::make_shared<Bow>("Wooden Bow", "bow_00", 2.5f, 1));
-    items.emplace_back(player.getPosition() + sf::Vector2f(300.0f, 0), std::make_shared<Helmet>("Old Helmet", "helmet_00", 2.0f, 1));
-    items.emplace_back(player.getPosition() + sf::Vector2f(400.0f, 0), std::make_shared<Helmet>("Copper Helmet", "helmet_00", 4.0f, 1));
+    items.emplace_back(player.getPosition() + sf::Vector2f(100.0f, 0), std::make_shared<Bow>("God Bow", "bow_00", 10.0f, 1));
+    items.emplace_back(player.getPosition() + sf::Vector2f(300.0f, 0), std::make_shared<Helmet>("God Helmet", "helmet_00", 20.0f, 1));
 
     InventoryUI inventoryUI(static_cast<sf::Vector2f>(window.getSize()), player);
     // [End] - Loading

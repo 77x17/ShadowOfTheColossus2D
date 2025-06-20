@@ -182,6 +182,10 @@ std::vector<std::shared_ptr<ItemData>> Quest::getNpcItem() const {
     return npcItems;
 }
 
+const std::vector<std::shared_ptr<QuestObjective>>& Quest::getQuestObjectives() const {
+    return objectives[stage];
+}
+
 int Quest::getRewardExp() {
     if (state != QuestState::COMPLETED) {
         return 0;
