@@ -249,6 +249,8 @@ void Player::handleQuests(const float& dt, const sf::RenderWindow& window, std::
                             else if (quest.isFinishedDialogue()) {
                                 if (quest.accept()) {
                                     updateQuest = true;
+
+                                    quest.update(dataPack);
                                 }
                                 else {
                                     interactText.setString("I need your support");
@@ -580,26 +582,20 @@ void Player::updateProjectiles(const float& dt) {
 
 void Player::updateQuests() {
     for (auto it = quests.begin(); it != quests.end(); /**/) {
-        if (it->isUpdateStage()) {
+        if (it->shouldGiveItemForPlayer()) {
+            std::vector<std::shared_ptr<ItemData>> npcItems = it->getNpcItem();
+            for (auto& item : npcItems) {
+                addItem(item);
+            }
+        }
+        if (it->updateStage()) {
             updateQuest = true;
         }
-        if (it->getID() == -1) {
-            if (it->accept()) {
-
-            }
-            else {
-                it->update(QuestEventData());
-            }
-            ++it;
-        }
-        else if (it->isCompleted() && !it->isReceiveReward()) {
+        if (it->isCompleted() && !it->isReceiveReward()) {
             updateXP(it->getRewardExp());
             ++it;
-
-            SoundManager::playSound("finishedQuest");
         }
         else {
-            it->update(QuestEventData());
             ++it;
         }
     }
@@ -608,8 +604,12 @@ void Player::updateQuests() {
 void Player::updateCollisionItems(std::vector<Item>& items) {
     for (auto it = items.begin(); it != items.end(); ) {
         if (it->canPickup() && isCollision(it->getHitbox())) {
-            addItem(it->getItem());
-            it = items.erase(it); 
+            if (addItem(it->getItem())) {
+                it = items.erase(it); 
+            }
+            else {
+                ++it;
+            }
         } else {
             ++it; 
         }
@@ -708,6 +708,7 @@ void Player::updateLevel() {
     }
 }
 
+
 void Player::updateXP(const float& amount) {
     xp += amount;
 
@@ -761,7 +762,6 @@ bool Player::isUpdateQuest() {
     if (updateQuest) {
         updateQuest = false;
     
-        SoundManager::playSound("updateQuest");
         return true;
     }
 

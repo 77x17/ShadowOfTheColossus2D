@@ -134,7 +134,7 @@ void ParticleManager::isCollisionWithRain(int regionID) {
             makeRain = false;
             break;
         case 2:
-            makeRain = true;
+            makeRain = false;
             break;
         default:
             makeRain = false;

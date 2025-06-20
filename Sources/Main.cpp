@@ -108,68 +108,98 @@ void loadQuests(std::vector<Quest>& quests) {
     // --- [Begin] - Explore strange path --- 
     quests.push_back(Quest("Explore strange paths", 40));
     quests.back().addRequiredLevel(1);
-
+    quests.back().addRequiredDescription("Find Elder Thorne. Min Lv.1");
+    // Stage 0: Elder Thorne cảnh báo
     quests.back().addNpcID      (0, 0);
-    quests.back().addDialogue   (0, "[1/4] The forest has changed. It no longer feels safe");
-    quests.back().addDialogue   (0, "[2/4] Long ago, we sealed something deep beyond those hills");
-    quests.back().addDialogue   (0, "[3/4] But now... whispers return, and beasts creep closer each night");
-    quests.back().addDialogue   (0, "[4/4] You must go, find the truth. We're counting on you");
-    quests.back().addDescription(0, "Come see the road behind the wooden bridge");
+    quests.back().addDialogue   (0, "[1/4] Something stirs in the forest... It no longer feels safe");
+    quests.back().addDialogue   (0, "[2/4] Long ago, we sealed away a dark presence beyond the hills");
+    quests.back().addDialogue   (0, "[3/4] But now... the whispers return, and creatures creep closer each night");
+    quests.back().addDialogue   (0, "[4/4] You must go, uncover the truth. Our hope rests with you");
+    quests.back().addDescription(0, "Investigate the road beyond the wooden bridge");
     quests.back().addObjective  (0, std::make_shared<ExploreObjective>(1));
-    
-    quests.back().addNpcID      (1, -1);
-    quests.back().addDialogue   (1, std::string());
-    quests.back().addDescription(1, "Return back to Elder Throne");
+    // Stage 1: Quay về Elder Thorne
+    quests.back().addNpcID      (1, 0);
+    quests.back().addDialogue   (1, "[1/3] You're back... I feared the worst");
+    quests.back().addDialogue   (1, "[2/3] This place was once peaceful. What have we awakened?");
+    quests.back().addDialogue   (1, "[3/3] Find Torren. He'll help you prepare for what lies ahead");
+    quests.back().addDescription(1, "Return to Elder Thorne");
     quests.back().addObjective  (1, std::make_shared<TalkObjective>(0));
-
-    quests.back().addNpcID      (2, 0);
-    quests.back().addDialogue   (2, "[1/3] Oh, you are back");
-    quests.back().addDialogue   (2, "[2/3] This place used to be very peaceful");
-    quests.back().addDialogue   (2, "[3/3] Talk to Torren to prepare for the journey");
-    quests.back().addDescription(2, "Return back to Elder Throne");
-    quests.back().addObjective  (2, std::make_shared<TalkObjective>(0));
-
+    // Stage 2: Gặp Torren, nhận cung
+    quests.back().addNpcID      (2, 1);
+    quests.back().addDialogue   (2, "[1/7] Elder Thorne sent you? Then it must be serious");
+    quests.back().addDialogue   (2, "[2/7] You're really heading out there? It's dangerous");
+    quests.back().addDialogue   (2, "[3/7] I've seen strange tracks by the river. They weren't left by any animal");
+    quests.back().addDialogue   (2, "[4/7] If you're going, take this bow. You'll need it");
+    quests.back().addDialogue   (2, "[5/7] Press [E] to open your inventory, then drag the bow into your weapon slot");
+    quests.back().addDialogue   (2, "[6/7] Press [Space] to use your bow. Stay sharp");
+    quests.back().addDialogue   (2, "[7/7] From now on, you fight as an archer. Help us drive back the darkness");
+    quests.back().addDescription(2, "Speak to Torren");
+    quests.back().addObjective  (2, std::make_shared<TalkObjective>(1));
+    quests.back().addItemFromNpc(2, std::make_shared<Bow>("Old Bow", "bow_00", 1.0f, 1));
+    // Stage 3: Diệt quái
     quests.back().addNpcID      (3, -1);
     quests.back().addDialogue   (3, std::string());
-    quests.back().addDescription(3, "Find Torren");
-    quests.back().addObjective  (3, std::make_shared<TalkObjective>(1));
-    
+    quests.back().addDescription(3, "Help the villages defeat the monsters");
+    quests.back().addObjective  (3, std::make_shared<KillMonsterObjective>("Bat Lv.1", 5));
+    quests.back().addObjective  (3, std::make_shared<KillMonsterObjective>("Eye Lv.5", 2));
+    // Stage 4: Trở lại Torren
     quests.back().addNpcID      (4, 1);
-    quests.back().addDialogue   (4, "[1/6] Oh, Elder Thorne told you to come here?");
-    quests.back().addDialogue   (4, "[2/6] You sure about leaving? It's dangerous out there");
-    quests.back().addDialogue   (4, "[3/6] I've seen strange tracks near the river, not animal ones");
-    quests.back().addDialogue   (4, "[4/6] If you're going, take this bow. Just in case");
-    quests.back().addDialogue   (4, "[5/6] Press [Space] to use that bow");
-    quests.back().addDialogue   (4, "[6/6] Now, as an archer, help us defeat the monsters around here");
-    quests.back().addDescription(4, "Find Torren");
+    quests.back().addDialogue   (4, "[1/3] Back already? I see you've made it through");
+    quests.back().addDialogue   (4, "[2/3] That bow served you well, huh? Told you it'd come in handy");
+    quests.back().addDialogue   (4, "[3/3] You're stronger now. Maybe ready to carve your own legend");
+    quests.back().addDescription(4, "Return to Torren");
     quests.back().addObjective  (4, std::make_shared<TalkObjective>(1));
-    
-    quests.back().addNpcID      (5, -1);
-    quests.back().addDialogue   (5, std::string());
-    quests.back().addDescription(5, "Help the villages defeat the monsters");
-    quests.back().addObjective  (5, std::make_shared<KillMonsterObjective>("Bat Lv.1", 5));
-    quests.back().addObjective  (5, std::make_shared<KillMonsterObjective>("Eye Lv.5", 2));
-
-    quests.back().addNpcID      (6, -1);
-    quests.back().addDialogue   (6, std::string());
-    quests.back().addDescription(6, "Return back to Torren");
-    quests.back().addObjective  (6, std::make_shared<TalkObjective>(1));
-
-    quests.back().addNpcID      (7, 1);
-    quests.back().addDialogue   (7, "[1/3] Oh, you are back");
-    quests.back().addDialogue   (7, "[2/3] You like the bow I gave you, no problem");
-    quests.back().addDialogue   (7, "[3/3] I see, you are strong enough to write your journey");
-    quests.back().addDescription(7, "Return back to Torren");
-    quests.back().addObjective  (7, std::make_shared<TalkObjective>(1));
     // --- [End] - Explore strange path --- 
     
-    // quests.push_back(Quest("...", exp));
-    // quests.back().addRequiredLevel(playerLevel);
+    // --- [Begin] - Into the Darkwood ---
+    quests.push_back(Quest("Into the Darkwood", 100));
+    quests.back().addRequiredLevel(3);
+    quests.back().addRequiredDescription("Find Mira. Min Lv.3");
+    // Stage 0: Mira khởi đầu
+    quests.back().addNpcID      (0, 2);
+    quests.back().addDialogue   (0, "[1/4] I've heard strange noises deeper in the forest lately...");
+    quests.back().addDialogue   (0, "[2/4] Something's not right. The animals are restless, the wind feels heavy");
+    quests.back().addDialogue   (0, "[3/4] I think it's time you meet someone who knows more-Bren, the forest keeper");
+    quests.back().addDialogue   (0, "[4/4] You'll find him beyond the old stone gate, deeper in the woods");
+    quests.back().addDescription(0, "Head deeper into the forest and find Bren");
+    quests.back().addObjective  (0, std::make_shared<TalkObjective>(2));
+    // Stage 1: Gặp Bren
+    quests.back().addNpcID      (1, 3);
+    quests.back().addDialogue   (1, "[1/5] Mira sent you? Hmph... Then things must be worse than I thought");
+    quests.back().addDialogue   (1, "[2/5] This forest holds secrets-old, dangerous ones");
+    quests.back().addDialogue   (1, "[3/5] Before I trust you with more, bring me some samples from the creatures nearby");
+    quests.back().addDialogue   (1, "[4/5] I need 3 Shadow Spores and 2 Black Leaves. You'll know them when you see them");
+    quests.back().addDialogue   (1, "[5/5] Bring them here, and I'll tell you what really happened to Darkwood");
+    quests.back().addDescription(1, "Head deeper into the forest and find Bren");
+    quests.back().addObjective  (1, std::make_shared<TalkObjective>(3));
 
-    // quests.back().addNpcID      (stage, npcID);
-    // quests.back().addDialogue   (stage, "...");
-    // quests.back().addDescription(stage, "...");
-    // quests.back().addObjective  (stage, objective);
+    quests.back().addNpcID      (2, -1);
+    quests.back().addDialogue   (2, std::string());
+    quests.back().addDescription(2, "Collect materials for Bren");
+    quests.back().addObjective  (2, std::make_shared<KillMonsterObjective>("Bat Lv.1", 20));
+    quests.back().addObjective  (2, std::make_shared<KillMonsterObjective>("Eye Lv.5", 10));
+    // quests.back().addObjective  (1, std::make_shared<GiveItemObjective>("Shadow Spore", 3));
+    // quests.back().addObjective  (1, std::make_shared<GiveItemObjective>("Black Leaf", 2));
+    // Stage 2: Trả đồ, nghe kể chuyện
+    quests.back().addNpcID      (3, 3);
+    quests.back().addDialogue   (3, "[1/6] Ah, you've returned. Good. Let me see...");
+    quests.back().addDialogue   (3, "[2/6] These spores... they reek of corruption");
+    quests.back().addDialogue   (3, "[3/6] Decades ago, this forest was pure. But something came-something ancient");
+    quests.back().addDialogue   (3, "[4/6] It twisted the trees, poisoned the roots, and consumed the heart of the woods");
+    quests.back().addDialogue   (3, "[5/6] We tried to fight back, but the deeper we went, the darker it became");
+    quests.back().addDialogue   (3, "[6/6] If you truly want to help, we must go further. Into the shadows");
+    quests.back().addDescription(3, "Return to Bren with the items and listen to his tale");
+    quests.back().addObjective  (3, std::make_shared<TalkObjective>(3));
+    // --- [End] - Into the Darkwood ---
+
+    // quests.push_back(Quest(<name>, <exp>));
+    // quests.back().addRequiredLevel(<playerLevel>);
+    // quests.back().addRequiredDescription(<description>);
+
+    // quests.back().addNpcID      (<stage>, <npcID>);
+    // quests.back().addDialogue   (<stage>, <dialogue>);
+    // quests.back().addDescription(<stage>, <description>);
+    // quests.back().addObjective  (<stage>, <objective>);
 }
 
 int main() {

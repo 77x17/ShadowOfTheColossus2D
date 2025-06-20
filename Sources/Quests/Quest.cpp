@@ -1,5 +1,7 @@
 #include "Quest.hpp"
 
+#include "SoundManager.hpp"
+
 Quest::Quest(const std::string& _title, int exp) {
     title = _title;
     npcIDs.clear();
@@ -14,11 +16,14 @@ Quest::Quest(const std::string& _title, int exp) {
 
     stage         = 0;
     dialogueIndex = 0;
-    updateStage   = false;
 }
 
 void Quest::addRequiredLevel(int level) {
     requiredLevel = level;
+}
+
+void Quest::addRequiredDescription(const std::string& description) {
+    requiredDescription = description;
 }
 
 void Quest::addNpcID(int _stage, int ID) {
@@ -30,7 +35,9 @@ void Quest::addDialogue(int _stage, const std::string& dialogue) {
         dialogues.push_back(std::vector<std::string>());
     }
     
-    dialogues[_stage].push_back(dialogue);
+    if (dialogue != std::string()) {
+        dialogues[_stage].push_back(dialogue);
+    }
 }
 
 void Quest::addDescription(int _stage, const std::string& description) {
@@ -43,6 +50,10 @@ void Quest::addObjective(int _stage, const std::shared_ptr<QuestObjective>& obje
     }
 
     objectives[_stage].push_back(objective);
+}
+
+void Quest::addItemFromNpc(int _stage, const std::shared_ptr<ItemData>& item) {
+    itemFromNpc.emplace_back(_stage, item);
 }
 
 bool Quest::isSuitableForGivingQuest(int playerLevel) {
@@ -68,27 +79,15 @@ bool Quest::isReceiveReward() const {
 }
 
 bool Quest::isFinishedDialogue() const {
-    if (npcIDs[stage] == -1) {
-        return true;
-    }
     return dialogueIndex >= static_cast<int>(dialogues[stage].size());
-}
-
-bool Quest::isUpdateStage() {
-    if (updateStage) {
-        updateStage = false;
-
-        return true;
-    }
-    
-    return false;
 }
 
 bool Quest::accept() {
     if (state == QuestState::NOT_ACCEPTED) {
         state = QuestState::IN_PROGRESS;
 
-        std::cerr << "Quest accepted: '" << title << "' " << "stage: " << stage << "\n";
+        SoundManager::playSound("updateQuest");
+        // std::cerr << "Quest accepted: '" << title << "' " << "stage: " << stage << "\n";
 
         return true;
     }
@@ -96,17 +95,35 @@ bool Quest::accept() {
     return false;
 }
 
-void Quest::nextStage() {
-    stage++;
-    
-    if (stage == static_cast<int>(npcIDs.size())) {
-        state = QuestState::COMPLETED;
-    }
-    else {
-        dialogueIndex = 0;
+bool Quest::updateStage() {
+    if (state == QuestState::IN_PROGRESS && isFinishedDialogue() && isFinishObjectives()) {
+        ++stage;
+        
+        if (stage == static_cast<int>(npcIDs.size())) {
+            state = QuestState::COMPLETED;
+        }
+        else {
+            dialogueIndex = 0;
+        }
+
+        SoundManager::playSound("updateQuest");
+        
+        return true;
     }
 
-    updateStage = true;
+    return false;
+}
+
+bool Quest::shouldGiveItemForPlayer() const {
+    if (state == QuestState::IN_PROGRESS && isFinishedDialogue() && isFinishObjectives()) {
+        for (const auto& pair : itemFromNpc) {
+            if (pair.first == stage) {
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 void Quest::update(const QuestEventData& data) {
@@ -117,10 +134,6 @@ void Quest::update(const QuestEventData& data) {
     for (std::shared_ptr<QuestObjective>& objective : objectives[stage]) {
         objective->updateProgress(data);
     }
-
-    if (state == QuestState::IN_PROGRESS && isFinishedDialogue() && isFinishObjectives()) {
-        nextStage();
-    }
 }
 
 std::string Quest::getQuestInformation(const int& idx) const {
@@ -129,7 +142,8 @@ std::string Quest::getQuestInformation(const int& idx) const {
     switch (state) {
         case QuestState::NOT_ACCEPTED: {
             display += "[Not accepted]\n";
-
+            display += "    " + requiredDescription + "\n";
+            
             break;
         }
         case QuestState::IN_PROGRESS: {
@@ -156,12 +170,26 @@ std::string Quest::getQuestInformation(const int& idx) const {
     return display;
 }
 
+std::vector<std::shared_ptr<ItemData>> Quest::getNpcItem() const {
+    std::vector<std::shared_ptr<ItemData>> npcItems;
+    if (state == QuestState::IN_PROGRESS && isFinishedDialogue() && isFinishObjectives()) {
+        for (const auto& pair : itemFromNpc) {
+            if (pair.first == stage) {
+                npcItems.push_back(pair.second);
+            }
+        }
+    }
+    return npcItems;
+}
+
 int Quest::getRewardExp() {
     if (state != QuestState::COMPLETED) {
         return 0;
     }
 
     rewardGiven = true;
+
+    SoundManager::playSound("finishedQuest");
 
     return rewardExp;
 }

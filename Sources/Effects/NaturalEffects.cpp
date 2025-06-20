@@ -36,7 +36,7 @@ void NaturalEffects::update(float dt, int regionID, const sf::Vector2f& lightNor
     
     std::string timeOfDay = gameClock.getTimeOfDay();
     if (timeOfDay == "Morning") {
-        targetDarkness    = 0.1f;
+        targetDarkness    = 0.0f;
         targetLightRadius = 0.3f;
 
         targetTintColor    = sf::Vector3f(1.2f, 1.1f, 0.9f); // smooth yellow
@@ -85,9 +85,9 @@ void NaturalEffects::update(float dt, int regionID, const sf::Vector2f& lightNor
             
             break;
         case 2: 
-            targetFogDensity = 0.8f;
+            targetFogDensity = 0.5f;
             targetFogColor = sf::Vector3f(0.8f, 0.8f, 0.85f);
-            targetClearRadius = 0.25f;
+            targetClearRadius = 0.4f;
             
             break;
         case 4:
