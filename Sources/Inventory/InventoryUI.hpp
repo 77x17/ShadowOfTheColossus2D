@@ -41,6 +41,8 @@ private:
     sf::RectangleShape equipmentStatsBox;
     sf::Text equipmentStats;
 
+    sf::Text hoveredItemInfo;
+
 public:
     InventoryUI(const sf::Vector2f& windowSize, Player& player);
 
@@ -50,13 +52,13 @@ public:
         visible = !visible;
     }
     
-    void updateDrag(sf::Vector2f mousePos);
+    void updateHover(const sf::Vector2f& mousePos);
+    void updateDrag(const sf::Vector2f& mousePos);
     void handleClick(const sf::Vector2f& mousePos);
-    void handleRelease(const sf::Vector2f& mousePos, Player& player);
+    void handleRelease(const sf::Vector2f& mousePos, Player& player, std::vector<Item>& items);
     void draw(sf::RenderTarget& target);
     
     bool isVisible() const;
     
     void updateStats(Player &player);
-
 };

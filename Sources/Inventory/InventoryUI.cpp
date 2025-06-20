@@ -121,6 +121,12 @@ InventoryUI::InventoryUI(const sf::Vector2f& windowSize, Player& player) {
     equipmentStats.setFillColor(sf::Color::White);
     equipmentStats.setPosition(equipStart + sf::Vector2f(slotPadding, 4 * (slotSize + slotPadding) + groupPadding));
     player.updateEquipmentStats();
+
+    hoveredItemInfo.setFont(Font::font);
+    hoveredItemInfo.setCharacterSize(textSize);
+    hoveredItemInfo.setFillColor(sf::Color::White);
+    hoveredItemInfo.setOutlineThickness(1.0f);
+    hoveredItemInfo.setOutlineColor(sf::Color::Black);
 }
 
 void InventoryUI::updatePosition(const sf::Vector2f& windowSize) {
@@ -166,9 +172,32 @@ void InventoryUI::updatePosition(const sf::Vector2f& windowSize) {
     equipmentStats.setPosition(equipStart + sf::Vector2f(slotPadding, 4 * (slotSize + slotPadding) + groupPadding));
 }
 
-void InventoryUI::updateDrag(sf::Vector2f mousePos) {
+void InventoryUI::updateHover(const sf::Vector2f& mousePos) {
+    hoveredItemInfo.setString(std::string());
+    for (auto& slot : *bagSlots) {
+        if (slot.contains(mousePos) && slot.item) {
+            hoveredItemInfo.setString(slot.item->name);
+            hoveredItemInfo.setPosition(mousePos);
+            hoveredItemInfo.setOrigin(hoveredItemInfo.getLocalBounds().left + hoveredItemInfo.getLocalBounds().width, hoveredItemInfo.getLocalBounds().top + hoveredItemInfo.getLocalBounds().height);
+            
+            return;
+        }
+    }
+    for (auto& slot : *equipSlots) {
+        if (slot.contains(mousePos) && slot.item) {
+            hoveredItemInfo.setString(slot.item->name);
+            hoveredItemInfo.setPosition(mousePos);
+            hoveredItemInfo.setOrigin(hoveredItemInfo.getLocalBounds().left + hoveredItemInfo.getLocalBounds().width, hoveredItemInfo.getLocalBounds().top + hoveredItemInfo.getLocalBounds().height);
+            
+            return;
+        }
+    }
+}
+
+void InventoryUI::updateDrag(const sf::Vector2f& mousePos) {
     if (!visible) return;
 
+    hoveredItemInfo.setString(std::string());
     if (draggedItem) {
         dreggedPos = mousePos;
     }
@@ -208,7 +237,7 @@ void InventoryUI::handleClick(const sf::Vector2f& mousePos) {
     }
 }
 
-void InventoryUI::handleRelease(const sf::Vector2f& mousePos, Player& player) {
+void InventoryUI::handleRelease(const sf::Vector2f& mousePos, Player& player, std::vector<Item>& items) {
     for (auto& slot : *bagSlots) {
         if (slot.contains(mousePos)) {
             if (draggedItem && !slot.item) {
@@ -249,38 +278,87 @@ void InventoryUI::handleRelease(const sf::Vector2f& mousePos, Player& player) {
         }
     }
 
-    if (previousDraggedItemID >= static_cast<int>((*bagSlots).size())) {
-        previousDraggedItemID -= static_cast<int>((*bagSlots).size());
+    if (containBox.getGlobalBounds().contains(mousePos)) {
+        if (previousDraggedItemID >= static_cast<int>((*bagSlots).size())) {
+            previousDraggedItemID -= static_cast<int>((*bagSlots).size());
 
-        for (auto& slot : *equipSlots) {
-            if (previousDraggedItemID == 0) {
-                if (draggedItem && !slot.item && slot.type == draggedItem->type) {
-                    slot.item = draggedItem;
-                    draggedItem = nullptr;
-                    return;
+            for (auto& slot : *equipSlots) {
+                if (previousDraggedItemID == 0) {
+                    if (draggedItem && !slot.item && slot.type == draggedItem->type) {
+                        slot.item = draggedItem;
+                        draggedItem = nullptr;
+                        return;
+                    }
+                    else if (draggedItem) {
+                        std::cerr << "[Bug] - InventoryUI.cpp - handleRelease()\n";
+                    }
                 }
-                else if (draggedItem) {
-                    std::cerr << "[Bug] - InventoryUI.cpp - handleRelease()\n";
-                }
+
+                --previousDraggedItemID;
             }
+        } 
+        else {
+            for (auto& slot : *bagSlots) {
+                if (previousDraggedItemID == 0) {
+                    if (draggedItem && !slot.item) {
+                        slot.item = draggedItem;
+                        draggedItem = nullptr;
+                        return;
+                    }
+                    else if (draggedItem) {
+                        std::cerr << "[Bug] - InventoryUI.cpp - handleRelease()\n";
+                    }
+                }
 
-            --previousDraggedItemID;
+                --previousDraggedItemID;
+            }
         }
-    } 
-    else {
-        for (auto& slot : *bagSlots) {
-            if (previousDraggedItemID == 0) {
-                if (draggedItem && !slot.item) {
-                    slot.item = draggedItem;
-                    draggedItem = nullptr;
-                    return;
+    }
+    else if (draggedItem) {
+        if (player.dropItem(draggedItem, items)) {
+            draggedItem = nullptr;
+            if (previousDraggedItemID < static_cast<int>((*bagSlots).size())) {
+                selectedBagItemInfomation.setString(std::string());
+            }
+            else {
+                selectedEquipItemInfomation.setString(std::string());
+            }
+        }
+        else {
+            if (previousDraggedItemID >= static_cast<int>((*bagSlots).size())) {
+                previousDraggedItemID -= static_cast<int>((*bagSlots).size());
+
+                for (auto& slot : *equipSlots) {
+                    if (previousDraggedItemID == 0) {
+                        if (draggedItem && !slot.item && slot.type == draggedItem->type) {
+                            slot.item = draggedItem;
+                            draggedItem = nullptr;
+                            return;
+                        }
+                        else if (draggedItem) {
+                            std::cerr << "[Bug] - InventoryUI.cpp - handleRelease()\n";
+                        }
+                    }
+
+                    --previousDraggedItemID;
                 }
-                else if (draggedItem) {
-                    std::cerr << "[Bug] - InventoryUI.cpp - handleRelease()\n";
+            } 
+            else {
+                for (auto& slot : *bagSlots) {
+                    if (previousDraggedItemID == 0) {
+                        if (draggedItem && !slot.item) {
+                            slot.item = draggedItem;
+                            draggedItem = nullptr;
+                            return;
+                        }
+                        else if (draggedItem) {
+                            std::cerr << "[Bug] - InventoryUI.cpp - handleRelease()\n";
+                        }
+                    }
+
+                    --previousDraggedItemID;
                 }
             }
-
-            --previousDraggedItemID;
         }
     }
 }
@@ -306,6 +384,8 @@ void InventoryUI::draw(sf::RenderTarget& target) {
     target.draw(totalStatsText);
     target.draw(equipmentStatsBox);
     target.draw(equipmentStats);
+
+    target.draw(hoveredItemInfo);
 
     if (draggedItem) {
         sf::Sprite sprite = draggedItem->sprite;

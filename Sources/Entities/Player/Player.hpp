@@ -166,6 +166,7 @@ public:
     std::vector<BagSlot>* getBagSlots();
     std::vector<EquipSlot>* getEquipSlots();
     std::string getStats() const;
+    bool dropItem(const std::shared_ptr<ItemData>& item, std::vector<Item>& items);
     // --- [End] - Inventory --- 
 
     // --- [Begin] - Enemy --- 

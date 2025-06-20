@@ -55,13 +55,13 @@ void Npc::draw(sf::RenderTarget& target) {
     target.draw(labelBackground);
     target.draw(label);
 
-    sf::RectangleShape hitboxShape;
-    hitboxShape.setPosition(hitbox.getPosition());
-    hitboxShape.setSize(hitbox.getSize());
-    hitboxShape.setOutlineColor(sf::Color::Green);
-    hitboxShape.setOutlineThickness(1.f);
-    hitboxShape.setFillColor(sf::Color::Transparent);
-    target.draw(hitboxShape);
+    // sf::RectangleShape hitboxShape;
+    // hitboxShape.setPosition(hitbox.getPosition());
+    // hitboxShape.setSize(hitbox.getSize());
+    // hitboxShape.setOutlineColor(sf::Color::Green);
+    // hitboxShape.setOutlineThickness(1.f);
+    // hitboxShape.setFillColor(sf::Color::Transparent);
+    // target.draw(hitboxShape);
     
     shadow.draw(target);
 

@@ -313,7 +313,7 @@ int main() {
             }
             else if (inventoryUI.isVisible() && event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left) {
                 sf::Vector2f mousePos = window.mapPixelToCoords({event.mouseButton.x, event.mouseButton.y});
-                inventoryUI.handleRelease(mousePos, player);
+                inventoryUI.handleRelease(mousePos, player, items);
             }
         }
 
@@ -353,11 +353,17 @@ int main() {
         for (const auto& enemy : enemies) {
             map.updateOverlayTransparency(enemy->getHitbox());
         }
+        for (const Item& item : items) {
+            map.updateOverlayTransparency(item.getHitbox());
+        }
         
         particleManager.update(dt, view);
         particleManager.isCollisionWithCloud(player.getHitbox());
         for (const auto& enemy : enemies) {
             particleManager.isCollisionWithCloud(enemy->getHitbox());
+        }
+        for (const Item& item : items) {
+            particleManager.isCollisionWithCloud(item.getHitbox());
         }
         particleManager.isCollisionWithRain(player.getCollisionRegionID());
         
@@ -377,12 +383,14 @@ int main() {
             naturalEffects.updateSmartLighting(player.getCenterPosition(), view);
         }
 
-        if (inventoryUI.isVisible() && sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-            sf::Vector2f mousePos = static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
-            inventoryUI.updateDrag(mousePos);
-        }
-
         if (inventoryUI.isVisible()) {
+            sf::Vector2f mousePos = static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+                inventoryUI.updateDrag(mousePos);
+            }
+            else {
+                inventoryUI.updateHover(mousePos);    
+            }
             inventoryUI.updateStats(player);
         }
 

@@ -400,13 +400,13 @@ void Enemy::draw(sf::RenderTarget& target) {
     target.draw(healthPointsBarBackground);
     target.draw(healthPointsBar);
 
-    sf::RectangleShape hitboxShape;
-    hitboxShape.setPosition(hitbox.getPosition());
-    hitboxShape.setSize(hitbox.getSize());
-    hitboxShape.setOutlineColor(sf::Color::Red);
-    hitboxShape.setOutlineThickness(1.f);
-    hitboxShape.setFillColor(sf::Color::Transparent);
-    target.draw(hitboxShape);
+    // sf::RectangleShape hitboxShape;
+    // hitboxShape.setPosition(hitbox.getPosition());
+    // hitboxShape.setSize(hitbox.getSize());
+    // hitboxShape.setOutlineColor(sf::Color::Red);
+    // hitboxShape.setOutlineThickness(1.f);
+    // hitboxShape.setFillColor(sf::Color::Transparent);
+    // target.draw(hitboxShape);
     // target.draw(detectionBox);
     
     shadow.draw(target);

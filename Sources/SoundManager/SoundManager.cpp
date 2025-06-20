@@ -122,10 +122,13 @@ void SoundManager::loadSound() {
     loadSound("playerDie" , "Assets/Sounds/playerDie.wav");
     loadSound("enemyHurt" , "Assets/Sounds/enemyHurt.wav");
     loadSound("enemyDie"  , "Assets/Sounds/enemyDie.wav");
+    loadSound("levelUp"   , "Assets/Sounds/levelUp.wav");
     loadSound("talk"      , "Assets/Sounds/talk.wav");
+    loadSound("updateQuest", "Assets/Sounds/updateQuest.wav");
+    loadSound("finishedQuest", "Assets/Sounds/finishedQuest.wav");
     loadSound("menuOpen"  , "Assets/Sounds/menu-open.wav");
     loadSound("menuClose" , "Assets/Sounds/menu-close.wav");
-    loadSound("levelUp"   , "Assets/Sounds/levelUp.wav");
+    loadSound("pickupItem", "Assets/Sounds/pickupItem.wav");
     // loadMusic("region0"   , "Assets/Sounds/Salted - Wynn OST - 05 Detlas Suburb.ogg");
     // loadMusic("region1"   , "Assets/Sounds/Salted - Wynn OST - 04 Gavel Journey.ogg");
     // setMusicVolume("region0", 50.0f);

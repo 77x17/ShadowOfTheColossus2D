@@ -595,6 +595,8 @@ void Player::updateQuests() {
         else if (it->isCompleted() && !it->isReceiveReward()) {
             updateXP(it->getRewardExp());
             ++it;
+
+            SoundManager::playSound("finishedQuest");
         }
         else {
             it->update(QuestEventData());
@@ -651,13 +653,13 @@ void Player::update(const float& dt,
 }
 
 void Player::draw(sf::RenderTarget& target) {
-    sf::RectangleShape hitboxShape;
-    hitboxShape.setPosition(hitbox.getPosition());
-    hitboxShape.setSize(hitbox.getSize());
-    hitboxShape.setOutlineColor(sf::Color::Red);
-    hitboxShape.setOutlineThickness(1.f);
-    hitboxShape.setFillColor(sf::Color::Transparent);
-    target.draw(hitboxShape);
+    // sf::RectangleShape hitboxShape;
+    // hitboxShape.setPosition(hitbox.getPosition());
+    // hitboxShape.setSize(hitbox.getSize());
+    // hitboxShape.setOutlineColor(sf::Color::Red);
+    // hitboxShape.setOutlineThickness(1.f);
+    // hitboxShape.setFillColor(sf::Color::Transparent);
+    // target.draw(hitboxShape);
     // target.draw(loadingBox);
 
     shadow.draw(target);
@@ -759,7 +761,7 @@ bool Player::isUpdateQuest() {
     if (updateQuest) {
         updateQuest = false;
     
-        SoundManager::playSound("menuOpen");
+        SoundManager::playSound("updateQuest");
         return true;
     }
 
@@ -788,6 +790,9 @@ bool Player::addItem(const std::shared_ptr<ItemData>& newItem) {
     for (auto& slot : bagSlots) {
         if (!slot.item) {
             slot.item = newItem;
+
+            SoundManager::playSound("pickupItem");
+
             return true;
         }
     }
@@ -832,6 +837,19 @@ std::string Player::getStats() const {
          + equipmentHealthString + "\n" 
          + damageString + "\n\n"
          + xpString;
+}
+
+bool Player::dropItem(const std::shared_ptr<ItemData>& item, std::vector<Item>& items) {
+    if (isAlive()) {
+        items.emplace_back(getCenterPosition(), item);
+        updateEquipmentStats();
+
+        SoundManager::playSound("pickupItem");
+
+        return true;
+    }
+
+    return false;
 }
 // --- [End] - Inventory --- 
 

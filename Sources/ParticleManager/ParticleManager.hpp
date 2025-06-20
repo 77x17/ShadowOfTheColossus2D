@@ -92,7 +92,7 @@ private:
     float rainsSpawnCooldownTimer    = 0.0f;
     bool  makeRain                   = false;
 
-    float CLOUDS_SPAWN_COOLDOWN_TIME = 15.0f;
+    float CLOUDS_SPAWN_COOLDOWN_TIME = 30.0f;
     float cloudsSpawnCooldownTimer   = 0.0f;
 
 public:
