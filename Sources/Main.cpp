@@ -16,7 +16,7 @@
 #include "Eye.hpp"
 #include "Player.hpp"
 #include "Item.hpp"
-// --- [End] - Entities ---
+// --- [End] ---
 
 #include "UI.hpp"
 #include "InventoryUI.hpp"
@@ -27,13 +27,16 @@
 #include "TalkObjective.hpp"
 #include "ExploreObjective.hpp"
 #include "GiveItemObjective.hpp"
+
+// --- [Begin] - Npcs ---
 #include "Npc.hpp"
+#include "QuestNpc.hpp"
+// --- [End] ---
 
 #include "EntityEffects.hpp"
 // #include "NaturalEffects.hpp"
 #include "ParticleManager.hpp"
 #include "TextureManager.hpp"
-
 
 sf::Font Font::font;
 
@@ -52,12 +55,15 @@ void loadEnemy(std::vector<std::unique_ptr<Enemy>>& enemies, const std::unordere
     // Mythic	  = 0.0001  - 1 / 10000
     // Legendary  = 0.001   - 1 / 1000
     // Rare	      = 0.01    - 1 / 100
-    // Unique     = 0.05    - 1 / 20
-    // Normal     = 0.1     - 1 / 10
+    // Unique     = 0.03    - 1 / 20
+    // Normal     = 0.05    - 1 / 20
 
     std::vector<std::pair<float, std::shared_ptr<ItemData>>> batInventory;
-    batInventory.emplace_back(0.1, std::make_shared<Bow>("Old Bow", "bow_00", 1.0f, 1));
-    batInventory.emplace_back(0.1, std::make_shared<Helmet>("Old Helmet", "helmet_00", 2.0f, 1));
+    batInventory.emplace_back(0.05, std::make_shared<Bow>("Old Bow", "bow_00", 1.0f, 1));
+    batInventory.emplace_back(0.05, std::make_shared<Helmet>("Old Helmet", "helmet_00", 2.0f, 1));
+    batInventory.emplace_back(0.05, std::make_shared<Chestplate>("Old Chestplate", "chestplate_00", 2.0f, 1));
+    batInventory.emplace_back(0.05, std::make_shared<Leggings>("Old Leggings", "leggings_00", 2.0f, 1));
+    batInventory.emplace_back(0.05, std::make_shared<Boots>("Old Boots", "boots_00", 2.0f, 1));
     
     std::vector<std::pair<float, std::shared_ptr<ItemData>>> eyeInventory;
     eyeInventory.emplace_back(0.05, std::make_shared<Bow>("Wooden Bow", "bow_00", 2.5f, 1));
@@ -66,6 +72,9 @@ void loadEnemy(std::vector<std::unique_ptr<Enemy>>& enemies, const std::unordere
     for (const auto& pair : enemyRects) {
         for (const sf::FloatRect& rect : pair.second) {
             if (pair.first == "Bat Lv.1") {
+                enemies.push_back(std::make_unique<Bat>(rect.getPosition(), batInventory));
+            }
+            else if (pair.first == "Bat Lv.3") {
                 enemies.push_back(std::make_unique<Bat>(rect.getPosition(), batInventory));
             }
             else if (pair.first == "Eye Lv.5") {
@@ -78,31 +87,31 @@ void loadEnemy(std::vector<std::unique_ptr<Enemy>>& enemies, const std::unordere
     }
 }
 
-void loadNpc(std::vector<Npc>& npcs, const std::unordered_map<int, sf::FloatRect>& npcRects) {
-    npcs.emplace_back(
+void loadNpc(std::vector<std::unique_ptr<Npc>>& npcs, const TileMap& map) {
+    npcs.emplace_back(std::make_unique<QuestNpc>(
         0,
-        npcRects.at(0),
+        map.getQuestNpcRects().at(0),
         "Elder Thorne",
         "npc_00"
-    );
-    npcs.emplace_back(
+    ));
+    npcs.emplace_back(std::make_unique<QuestNpc>(
         1,
-        npcRects.at(1),
+        map.getQuestNpcRects().at(1),
         "Torren",
         "npc_01"
-    );
-    npcs.emplace_back(
+    ));
+    npcs.emplace_back(std::make_unique<QuestNpc>(
         2,
-        npcRects.at(2),
+        map.getQuestNpcRects().at(2),
         "Mira",
         "npc_02"
-    );
-    npcs.emplace_back(
+    ));
+    npcs.emplace_back(std::make_unique<QuestNpc>(
         3,
-        npcRects.at(3),
+        map.getQuestNpcRects().at(3),
         "Bren",
         "npc_03"
-    );
+    ));
 }
 
 void loadQuests(std::vector<Quest>& quests) {
@@ -150,7 +159,7 @@ void loadQuests(std::vector<Quest>& quests) {
     quests.back().addDialogue   (4, "[3/3] You're stronger now. Maybe ready to carve your own legend");
     quests.back().addDescription(4, "Return to Torren");
     quests.back().addObjective  (4, std::make_shared<TalkObjective>(1));
-    // --- [End] - Explore strange path --- 
+    // --- [End] ---
     
     // --- [Begin] - Into the Darkwood ---
     quests.push_back(Quest("Into the Darkwood", 100));
@@ -189,7 +198,7 @@ void loadQuests(std::vector<Quest>& quests) {
     quests.back().addDialogue   (3, "[6/6] If you truly want to help, we must go further. Into the shadows");
     quests.back().addDescription(3, "Return to Bren with the items and listen to his tale");
     quests.back().addObjective  (3, std::make_shared<TalkObjective>(3));
-    // --- [End] - Into the Darkwood ---
+    // --- [End] ---
 
     // quests.push_back(Quest(<name>, <exp>));
     // quests.back().addRequiredLevel(<playerLevel>);
@@ -206,7 +215,7 @@ int main() {
     // window.setFramerateLimit(60);
     window.setVerticalSyncEnabled(true);
 
-    // [Begin] - Loading
+    //  --- [Begin] - Loading ---
     Font::font.loadFromFile("Assets/Fonts/Roboto_Mono.ttf");
     TextureManager::loadSprite();
     EntityEffects::loadShader();
@@ -223,8 +232,8 @@ int main() {
     std::vector<std::unique_ptr<Enemy>> enemies;
     loadEnemy(enemies, map.getEnemyRects());
 
-    std::vector<Npc> npcs;
-    loadNpc(npcs, map.getNpcRects());
+    std::vector<std::unique_ptr<Npc>> npcs;
+    loadNpc(npcs, map);
     
     std::vector<Quest> quests;
     loadQuests(quests);
@@ -261,7 +270,7 @@ int main() {
     items.emplace_back(player.getPosition() + sf::Vector2f(300.0f, 0), std::make_shared<Helmet>("God Helmet", "helmet_00", 20.0f, 1));
 
     InventoryUI inventoryUI(static_cast<sf::Vector2f>(window.getSize()), player);
-    // [End] - Loading
+    // --- [End] ---
 
     while (window.isOpen()) {
         float dt = clock.restart().asSeconds();
@@ -354,13 +363,42 @@ int main() {
             continue;
         }
         
-        // --- [Begin] update --- 
+        // --- [Begin] Update --- 
         gameClock.update(dt);
 
-        player.update(dt, window, map.getCollisionRects(), map.getRegionRects(), npcs, items);
+        // Player collision Npcs
+        player.isCollisionNpc = false;
+        for (const std::unique_ptr<Npc>& npc : npcs) {
+            if (player.isCollision(npc->getHitbox())) {
+                player.isCollisionNpc = true;
+                // Canh giữa text so với npc, ngay trên đỉnh đầu
+                player.setInteractTextPosition(npc->getHitbox().getPosition() + sf::Vector2f(npc->getHitbox().getSize().x / 2, -npc->getHitbox().getSize().y));
+                
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::F)) {
+                    player.handleQuest(npc);
+                }
+            }
+        }
+        //
+        // Player collision Items
+        for (auto it = items.begin(); it != items.end(); ) {
+            if (it->canPickup() && player.isCollision(it->getHitbox())) {
+                if (player.addItem(it->getItem())) {
+                    it = items.erase(it); 
+                }
+                else {
+                    ++it;
+                }
+            } else {
+                ++it; 
+            }
+        }
+        //
+
+        player.update(dt, window, map.getCollisionRects(), map.getRegionRects());
+        
         ui.update(dt, player, uiView.getSize(), gameClock);
         
-        // Điều chỉnh camera theo player
         player.updateView(dt, view);
         
         for (auto& enemy : enemies) {
@@ -368,7 +406,7 @@ int main() {
         }
 
         for (auto& npc : npcs) {
-            npc.update();
+            npc->update();
         }
 
         for (Item& item : items) {
@@ -421,7 +459,7 @@ int main() {
             inventoryUI.updateStats(player);
         }
 
-        // --- [End] Update ---
+        // --- [End] ---
 
         sceneTexture.clear(sf::Color::White);
         sceneTexture.setView(view);
@@ -434,7 +472,7 @@ int main() {
         }
 
         for (auto& npc : npcs) {
-            npc.draw(sceneTexture);
+            npc->draw(sceneTexture);
         }
 
         for (auto& item : items) {
@@ -446,7 +484,7 @@ int main() {
         map.drawOverlay(sceneTexture);
 
         sceneTexture.draw(particleManager);
-        // --- [End] Draw layer 1 ---
+        // --- [End] ---
 
         // --- [Begin] Draw layer 2 ---
         sceneTexture.setView(uiView);
@@ -454,15 +492,16 @@ int main() {
 
         sceneTexture.setView(view);
         player.drawInteractText(sceneTexture);
-        // --- [End] Draw layer 2 ---
+        // --- [End] ---
 
         sceneTexture.display(); 
 
         window.clear();
         window.setView(uiView);
 
-        // --- [Begin] Add natural shader --- 
         sf::Sprite sceneSprite(sceneTexture.getTexture());
+
+        // --- [Begin] Add natural shader --- 
         // if (naturalEffects.shouldApplySmartLighting()) {
         //     window.draw(sceneSprite, naturalEffects.getSmartLightingShader());
         // }
@@ -472,8 +511,9 @@ int main() {
         // else {
         //     window.draw(sceneSprite); 
         // }
+        // --- [End] --- 
+        
         window.draw(sceneSprite); 
-        // --- [End] Add natural shader ---
         
         ui.draw(window);
 

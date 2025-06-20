@@ -100,6 +100,8 @@ private:
     std::vector<BagSlot> bagSlots;      // 10 x 4 = 40
     std::vector<EquipSlot> equipSlots;  // 8
     // --- [End] - Inventory --- 
+public:
+    bool isCollisionNpc = false;
 
 public:
     Player(const sf::Vector2f& position, const float& baseHp, std::vector<Quest>&& _quests);
@@ -107,8 +109,7 @@ public:
     void handleMove(const sf::RenderWindow& window);
     void handleDash(const sf::RenderWindow& window);
     void handleProjectiles(const sf::RenderWindow& window);
-    void handleQuests(const float& dt, const sf::RenderWindow& window, std::vector<Npc>& npcs);
-    void handleInput(const float& dt, const sf::RenderWindow& window, std::vector<Npc>& npcs);
+    void handleInput(const float& dt, const sf::RenderWindow& window);
 
     bool isCollisionProjectiles(const sf::FloatRect& rect);
     bool isCollision(const sf::FloatRect& rect) const;
@@ -122,22 +123,18 @@ public:
     sf::FloatRect getHitbox() const;
 
     void updateTimer(const float &dt);
-    void updateCollisionArea(const float& dt, const std::vector<Npc>& npcs, const std::unordered_map<int, sf::FloatRect>& regionRects);
+    void updateCollisionArea(const float& dt, const std::unordered_map<int, sf::FloatRect>& regionRects);
     void updatePosition(const float& dt, const std::vector<sf::FloatRect>& collisionRects);
     void updateHitbox();
     void updateAnimation();
     void updateProjectiles(const float& dt);
     void updateQuests();
-    void updateCollisionItems(std::vector<Item>& items);
     void update(const float& dt, 
                 const sf::RenderWindow& window, 
                 const std::vector<sf::FloatRect>& collisionRects, 
-                const std::unordered_map<int, sf::FloatRect>& regionRects, 
-                std::vector<Npc>& npcs,
-                std::vector<Item>& items);
+                const std::unordered_map<int, sf::FloatRect>& regionRects);
 
     void draw(sf::RenderTarget& target);
-    void drawInteractText(sf::RenderTarget& target);
 
     sf::Vector2f getPosition() const;
 
@@ -147,7 +144,7 @@ public:
     void  updateXP(const float& amount);
     void  addVictim(const std::string& label);
 
-    // for UI
+    // --- [Begin] - UI ---
     float                     getHealthRatio() const;
     std::string               getHealthPointsString() const;
     float                     getXPRatio() const;
@@ -157,6 +154,7 @@ public:
     bool                      isUpdateQuest();
     sf::Vector2f              getCenterPosition() const;
     int                       getCollisionRegionID() const;
+    // --- [End]
 
     void updateView(const float& dt, sf::View& view) const;
 
@@ -167,9 +165,15 @@ public:
     std::vector<EquipSlot>* getEquipSlots();
     std::string getStats() const;
     bool dropItem(const std::shared_ptr<ItemData>& item, std::vector<Item>& items);
-    // --- [End] - Inventory --- 
+    // --- [End]
+
+    // --- [Begin] - Npc ---
+    void setInteractTextPosition(sf::Vector2f position);
+    void handleQuest(const std::unique_ptr<Npc>& npc);
+    void drawInteractText(sf::RenderTarget& target);
+    // --- [End]
 
     // --- [Begin] - Enemy --- 
     const float& getDamage() const;
-    // --- [End] - Enemy --- 
+    // --- [End]
 };

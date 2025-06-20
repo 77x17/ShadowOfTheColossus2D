@@ -6,6 +6,7 @@
 #include "TextureManager.hpp"
 
 enum class ItemType {
+    Armor,
     Helmet,
     Chestplate,
     Leggings,
@@ -38,15 +39,13 @@ public:
     virtual float getHealth() const = 0;
 };
 
-class Helmet : public ItemData {
+class Armor : public ItemData {
 public:
     float health;
     int   levelRequired;
 
-    Helmet(const std::string& _name, const std::string& textureName, float _health, int _levelRequired) 
-    : ItemData(_name, ItemType::Helmet, textureName), health(_health), levelRequired(_levelRequired) {
-
-    }
+    Armor(const std::string& _name, ItemType armorType, const std::string& textureName, float _health, int _levelRequired) 
+    : ItemData(_name, armorType, textureName), health(_health), levelRequired(_levelRequired) {}
 
     std::string getInformation() const override {
         std::string healthString = "Health: " + std::to_string(health);
@@ -68,15 +67,37 @@ public:
     }
 };
 
+class Helmet : public Armor {
+public:
+    Helmet(const std::string& _name, const std::string& textureName, float _health, int _levelRequired) 
+    : Armor(_name, ItemType::Helmet, textureName, _health, _levelRequired) {}
+};
+
+class Chestplate : public Armor {
+public:
+    Chestplate(const std::string& _name, const std::string& textureName, float _health, int _levelRequired) 
+    : Armor(_name, ItemType::Chestplate, textureName, _health, _levelRequired) {}
+};
+
+class Leggings : public Armor {
+public:
+    Leggings(const std::string& _name, const std::string& textureName, float _health, int _levelRequired) 
+    : Armor(_name, ItemType::Leggings, textureName, _health, _levelRequired) {}
+};
+
+class Boots : public Armor {
+public:
+    Boots(const std::string& _name, const std::string& textureName, float _health, int _levelRequired) 
+    : Armor(_name, ItemType::Boots, textureName, _health, _levelRequired) {}
+};
+
 class Bow : public ItemData {
 public:
     float damage;
     int   levelRequired;
 
     Bow(const std::string& _name, const std::string& textureName, float _damage, int _levelRequired) 
-    : ItemData(_name, ItemType::Weapon, textureName), damage(_damage), levelRequired(_levelRequired) {
-
-    }
+    : ItemData(_name, ItemType::Weapon, textureName), damage(_damage), levelRequired(_levelRequired) {}
 
     std::string getInformation() const override {
         std::string damageString = "Damage: " + std::to_string(damage);

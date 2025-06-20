@@ -31,7 +31,7 @@ Npc::Npc(int                  _ID,
     // --- [Begin] - Animation --- 
     animationManager.addAnimation(0, TextureManager::get(spriteName), 16, 16, 4, 0, 0.5f, false);
     
-    shadow = Animation(TextureManager::get("playerShadow"), 13, 5, 1, 0, 0.f, false);
+    shadow.setTexture(TextureManager::get("playerShadow"));
     // --- [Begin] - Animation --- 
 }
 
@@ -55,15 +55,15 @@ void Npc::draw(sf::RenderTarget& target) {
     target.draw(labelBackground);
     target.draw(label);
 
-    // sf::RectangleShape hitboxShape;
-    // hitboxShape.setPosition(hitbox.getPosition());
-    // hitboxShape.setSize(hitbox.getSize());
-    // hitboxShape.setOutlineColor(sf::Color::Green);
-    // hitboxShape.setOutlineThickness(1.f);
-    // hitboxShape.setFillColor(sf::Color::Transparent);
-    // target.draw(hitboxShape);
+    sf::RectangleShape hitboxShape;
+    hitboxShape.setPosition(hitbox.getPosition());
+    hitboxShape.setSize(hitbox.getSize());
+    hitboxShape.setOutlineColor(sf::Color::Green);
+    hitboxShape.setOutlineThickness(1.f);
+    hitboxShape.setFillColor(sf::Color::Transparent);
+    target.draw(hitboxShape);
     
-    shadow.draw(target);
+    target.draw(shadow);
 
     animationManager.draw(target);
 }

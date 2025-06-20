@@ -230,86 +230,7 @@ void Player::handleProjectiles(const sf::RenderWindow& window) {
     }
 }
 
-void Player::handleQuests(const float& dt, const sf::RenderWindow& window, std::vector<Npc>& npcs) {
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::F) && interactCooldownTimer <= 0) {
-        for (Npc& npc : npcs) {
-            if (isCollision(npc.getHitbox())) {
-                for (Quest& quest : quests) {
-                    QuestEventData dataPack;
-                    dataPack.eventType = "talk";
-                    dataPack.npcID     = npc.getID();
-                    quest.update(dataPack);
-
-                    if (npc.getID() == quest.getID()) {
-                        if (quest.isSuitableForGivingQuest(getLevel())) {
-                            if (quest.isCompleted()) {
-                                interactText.setString("Thanks for your help!");
-                                continue;
-                            }
-                            else if (quest.isFinishedDialogue()) {
-                                if (quest.accept()) {
-                                    updateQuest = true;
-
-                                    quest.update(dataPack);
-                                }
-                                else {
-                                    // --- [Begin] - giveItemObjective ---
-                                    std::vector<std::shared_ptr<QuestObjective>> questObjectives = quest.getQuestObjectives();
-                                    for (auto& objective : questObjectives) if (!objective->isFinished()) {
-                                        QuestEventData objectiveData = objective->getQuestEventData();
-                                        if (objectiveData.eventType == "giveItem") {
-                                            for (auto& slot : bagSlots) if (slot.item) {
-                                                if (slot.item->name == objectiveData.targetName) {
-                                                    QuestEventData giveItemData;
-                                                    giveItemData.eventType  = "giveItem";
-                                                    giveItemData.targetName = slot.item->name;
-                                                    quest.update(giveItemData);
-                                                    
-                                                    slot.item = nullptr; // take item from player
-
-                                                    if (objective->isFinished()) {
-                                                        break;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    if (quest.isFinishObjectives()) {
-                                        interactText.setString("Good, that's all of them. I appreciate it");
-                                    }
-                                    else {
-                                        interactText.setString("I need your support");
-                                    }
-                                    // --- [End] - giveItemObjective ---
-
-                                    continue;
-                                }
-                            }
-                            else {
-                                interactText.setString(quest.getDialogue());
-                            }
-                        }
-                        else {
-                            interactText.setString(quest.getRequired());
-                        }
-
-                        break;
-                    }
-                }
-
-                interactText.setOrigin(interactText.getLocalBounds().left + interactText.getLocalBounds().width / 2, 
-                                       interactText.getLocalBounds().top + interactText.getLocalBounds().height / 2);
-
-                SoundManager::playSound("talk");
-            }
-        }
-
-        interactCooldownTimer = INTERACT_COOLDOWN;
-    }
-}
-
-void Player::handleInput(const float& dt, const sf::RenderWindow& window, std::vector<Npc>& npcs) {
+void Player::handleInput(const float& dt, const sf::RenderWindow& window) {
     if (knockbackCooldownTimer <= 0) {
         movingDirection = sf::Vector2f(0, 0);
     }
@@ -324,8 +245,6 @@ void Player::handleInput(const float& dt, const sf::RenderWindow& window, std::v
     handleDash(window);
 
     handleProjectiles(window);
-
-    handleQuests(dt, window, npcs);
 }
 
 bool Player::isCollisionProjectiles(const sf::FloatRect& rect) {
@@ -441,15 +360,14 @@ void Player::updateTimer(const float &dt) {
     }
 }
 
-void Player::updateCollisionArea(const float& dt, const std::vector<Npc>& npcs, const std::unordered_map<int, sf::FloatRect>& regionRects) {
-    bool isCollisionNpc = false;
-    for (const Npc& npc : npcs) {
-        sf::FloatRect npcRect = npc.getHitbox();
-        if (isCollision(npcRect)) {
-            interactText.setPosition(npcRect.getPosition() + sf::Vector2f(npcRect.getSize().x / 2, -npcRect.getSize().y));
-            isCollisionNpc = true;
-        }
-    }
+void Player::updateCollisionArea(const float& dt, const std::unordered_map<int, sf::FloatRect>& regionRects) {
+    // for (const Npc& npc : npcs) {
+    //     sf::FloatRect npcRect = npc.getHitbox();
+    //     if (isCollision(npcRect)) {
+    //         interactText.setPosition(npcRect.getPosition() + sf::Vector2f(npcRect.getSize().x / 2, -npcRect.getSize().y));
+    //         isCollisionNpc = true;
+    //     }
+    // }
 
     if (isCollisionNpc) {
         interactTextOpacity += (255 - interactTextOpacity) * FADE_SPEED * dt;
@@ -616,40 +534,23 @@ void Player::updateQuests() {
                 addItem(item);
             }
         }
+
         if (it->updateStage()) {
             updateQuest = true;
         }
+        
         if (it->isCompleted() && !it->isReceiveReward()) {
             updateXP(it->getRewardExp());
-            ++it;
         }
-        else {
-            ++it;
-        }
-    }
-}
 
-void Player::updateCollisionItems(std::vector<Item>& items) {
-    for (auto it = items.begin(); it != items.end(); ) {
-        if (it->canPickup() && isCollision(it->getHitbox())) {
-            if (addItem(it->getItem())) {
-                it = items.erase(it); 
-            }
-            else {
-                ++it;
-            }
-        } else {
-            ++it; 
-        }
+        ++it;
     }
 }
 
 void Player::update(const float& dt, 
                     const sf::RenderWindow& window, 
                     const std::vector<sf::FloatRect>& collisionRects, 
-                    const std::unordered_map<int, sf::FloatRect>& npcRects,
-                    std::vector<Npc>& npcs,
-                    std::vector<Item>& items) {
+                    const std::unordered_map<int, sf::FloatRect>& regionRects) {
 
     updateTimer(dt);
 
@@ -663,9 +564,9 @@ void Player::update(const float& dt,
         return;
     }
     
-    updateCollisionArea(dt, npcs, npcRects);
+    updateCollisionArea(dt, regionRects);
 
-    handleInput(dt, window, npcs);
+    handleInput(dt, window);
 
     updatePosition(dt, collisionRects);
 
@@ -675,9 +576,7 @@ void Player::update(const float& dt,
 
     updateProjectiles(dt); 
 
-    updateQuests(); 
-
-    updateCollisionItems(items);
+    updateQuests();
 }
 
 void Player::draw(sf::RenderTarget& target) {
@@ -880,6 +779,88 @@ bool Player::dropItem(const std::shared_ptr<ItemData>& item, std::vector<Item>& 
     return false;
 }
 // --- [End] - Inventory --- 
+
+// --- [Begin] - Npc ---
+void Player::setInteractTextPosition(sf::Vector2f position) {
+    interactText.setPosition(position);
+}
+
+void Player::handleQuest(const std::unique_ptr<Npc>& npc) {
+    if (interactCooldownTimer > 0) {
+        return;
+    }
+    for (Quest& quest : quests) {
+        QuestEventData dataPack;
+        dataPack.eventType = "talk";
+        dataPack.npcID     = npc->getID();
+        quest.update(dataPack);
+
+        if (npc->getID() == quest.getID()) {
+            if (quest.isSuitableForGivingQuest(getLevel())) {
+                if (quest.isCompleted()) {
+                    interactText.setString("Thanks for your help!");
+                    continue;
+                }
+                else if (quest.isFinishedDialogue()) {
+                    if (quest.accept()) {
+                        updateQuest = true;
+
+                        quest.update(dataPack);
+                    }
+                    else {
+                        // --- [Begin] - giveItemObjective ---
+                        std::vector<std::shared_ptr<QuestObjective>> questObjectives = quest.getQuestObjectives();
+                        for (auto& objective : questObjectives) if (!objective->isFinished()) {
+                            QuestEventData objectiveData = objective->getQuestEventData();
+                            if (objectiveData.eventType == "giveItem") {
+                                for (auto& slot : bagSlots) if (slot.item) {
+                                    if (slot.item->name == objectiveData.targetName) {
+                                        QuestEventData giveItemData;
+                                        giveItemData.eventType  = "giveItem";
+                                        giveItemData.targetName = slot.item->name;
+                                        quest.update(giveItemData);
+                                        
+                                        slot.item = nullptr; // take item from player
+
+                                        if (objective->isFinished()) {
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        if (quest.isFinishObjectives()) {
+                            interactText.setString("Good, that's all of them. I appreciate it");
+                        }
+                        else {
+                            interactText.setString("I need your support");
+                        }
+                        // --- [End] - giveItemObjective ---
+
+                        continue;
+                    }
+                }
+                else {
+                    interactText.setString(quest.getDialogue());
+                }
+            }
+            else {
+                interactText.setString(quest.getRequired());
+            }
+
+            break;
+        }
+    }
+
+    interactText.setOrigin(interactText.getLocalBounds().left + interactText.getLocalBounds().width / 2, 
+                            interactText.getLocalBounds().top + interactText.getLocalBounds().height / 2);
+
+    SoundManager::playSound("talk");
+
+    interactCooldownTimer = INTERACT_COOLDOWN;
+}
+// --- [End] - Npc ---
 
 // --- [Begin] - Enemy --- 
 const float& Player::getDamage() const {

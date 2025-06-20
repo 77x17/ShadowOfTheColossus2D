@@ -44,7 +44,8 @@ private:
     std::vector<std::pair<std::string, sf::VertexArray>> m_layerData; // texture name + layer
 
     std::vector<sf::FloatRect> m_collisionRects;
-    std::unordered_map<int, sf::FloatRect> m_NPCRects;
+    std::unordered_map<int, sf::FloatRect> m_questNpcRects;
+    std::vector<sf::FloatRect> m_merchantNpcRects;
     std::unordered_map<std::string, std::vector<sf::FloatRect>> m_enemyRects;
     std::unordered_map<int, sf::FloatRect> m_RegionRects;
     std::vector<sf::Vector2f> m_lights;
@@ -77,7 +78,8 @@ public:
     void drawMinimap(sf::RenderTarget& target, sf::RenderStates states = sf::RenderStates::Default) const;
 
     const std::vector<sf::FloatRect>& getCollisionRects() const;
-    const std::unordered_map<int, sf::FloatRect>& getNpcRects() const;
+    const std::unordered_map<int, sf::FloatRect>& getQuestNpcRects() const;
+    const std::vector<sf::FloatRect>& getMerchantNpcRects() const;
     const std::unordered_map<std::string, std::vector<sf::FloatRect>>& getEnemyRects() const;
     const std::unordered_map<int, sf::FloatRect>& getRegionRects() const;
     const std::vector<sf::Vector2f>& getLights() const;

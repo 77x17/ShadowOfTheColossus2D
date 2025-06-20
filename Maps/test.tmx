@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="256" height="256" tilewidth="16" tileheight="16" infinite="0" nextlayerid="24" nextobjectid="310">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="256" height="256" tilewidth="16" tileheight="16" infinite="0" nextlayerid="26" nextobjectid="311">
  <tileset firstgid="1" source="overworld.tsx"/>
  <tileset firstgid="1481" name="CastleWalls" tilewidth="16" tileheight="16" tilecount="1024" columns="32">
   <image source="CastleWalls.png" width="512" height="512"/>
@@ -1077,30 +1077,8 @@
    <object id="309" x="2416" y="2160" width="16" height="16"/>
   </objectgroup>
  </group>
- <group id="11" name="Collision" visible="0">
-  <objectgroup id="13" name="Npc" locked="1">
-   <object id="113" x="1296" y="1744" width="16" height="16">
-    <properties>
-     <property name="npc_id" type="int" value="0"/>
-    </properties>
-   </object>
-   <object id="114" x="1296" y="1808" width="16" height="16">
-    <properties>
-     <property name="npc_id" type="int" value="1"/>
-    </properties>
-   </object>
-   <object id="179" x="2080" y="2080" width="16" height="16">
-    <properties>
-     <property name="npc_id" type="int" value="3"/>
-    </properties>
-   </object>
-   <object id="180" x="1392" y="1744" width="16" height="16">
-    <properties>
-     <property name="npc_id" type="int" value="2"/>
-    </properties>
-   </object>
-  </objectgroup>
-  <objectgroup id="5" name="CollisionObjects">
+ <group id="11" name="Collision">
+  <objectgroup id="5" name="CollisionObjects" visible="0">
    <object id="63" x="1826.5" y="1797.5" width="27" height="14.1667"/>
    <object id="64" x="1698.5" y="1843" width="26.5" height="15.1667"/>
    <object id="65" x="1571" y="1846" width="27" height="12"/>
@@ -1268,6 +1246,33 @@
    <object id="262" x="2288" y="2304" width="16" height="16"/>
    <object id="263" x="2432" y="2240" width="16" height="16"/>
    <object id="264" x="2464" y="2096" width="16" height="16"/>
+  </objectgroup>
+ </group>
+ <group id="25" name="Npc" visible="0" locked="1">
+  <objectgroup id="13" name="QuestNpc">
+   <object id="113" x="1296" y="1744" width="16" height="16">
+    <properties>
+     <property name="npc_id" type="int" value="0"/>
+    </properties>
+   </object>
+   <object id="114" x="1296" y="1808" width="16" height="16">
+    <properties>
+     <property name="npc_id" type="int" value="1"/>
+    </properties>
+   </object>
+   <object id="179" x="2080" y="2080" width="16" height="16">
+    <properties>
+     <property name="npc_id" type="int" value="3"/>
+    </properties>
+   </object>
+   <object id="180" x="1392" y="1744" width="16" height="16">
+    <properties>
+     <property name="npc_id" type="int" value="2"/>
+    </properties>
+   </object>
+  </objectgroup>
+  <objectgroup id="24" name="MerchantNpc">
+   <object id="310" x="1392" y="1808" width="16" height="16"/>
   </objectgroup>
  </group>
 </map>

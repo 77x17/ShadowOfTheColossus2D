@@ -8,7 +8,7 @@
 #include "TextureManager.hpp"
 
 class Npc {
-private:
+protected:
     int           ID;
     sf::FloatRect hitbox;
 
@@ -18,13 +18,10 @@ private:
     sf::RectangleShape labelBackground;
     
     AnimationManager   animationManager;
-    Animation          shadow;
+    sf::Sprite         shadow;
 
 public:
-    Npc(int                  _id, 
-        const sf::FloatRect& _hitbox, 
-        const std::string&   name, 
-        const std::string&   spriteName);
+    Npc(int _id, const sf::FloatRect& _hitbox, const std::string& name, const std::string& spriteName);
 
     int getID() const;
     
@@ -33,4 +30,5 @@ public:
     void draw(sf::RenderTarget& target);
     
     sf::FloatRect getHitbox() const;
-} ;
+
+};

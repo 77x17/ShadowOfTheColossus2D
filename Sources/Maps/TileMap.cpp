@@ -290,14 +290,6 @@ bool TileMap::load(const std::string& tmxPath, const std::vector<std::pair<std::
                     if (objectGroupName == "CollisionObjects") {
                         m_collisionRects.emplace_back(x, y, width, height);
                     }
-                    else if (objectGroupName == "Npc") {
-                        auto prop = objectNode.child("properties").find_child_by_attribute("property", "name", "npc_id");
-                        int id = -1;
-                        if (prop) {
-                            id = prop.attribute("value").as_int();
-                        }
-                        m_NPCRects[id] = sf::FloatRect(x, y, width, height);
-                    }
                     else if (objectGroupName == "Region") {
                         auto prop = objectNode.child("properties").find_child_by_attribute("property", "name", "region_id");
                         int id = -1;
@@ -307,7 +299,23 @@ bool TileMap::load(const std::string& tmxPath, const std::vector<std::pair<std::
                         m_RegionRects[id] = sf::FloatRect(x, y, width, height);
                     }
                     else {
-                        std::cerr << "[Bug] - TileMap.cpp - load() Npc\n";
+                        std::cerr << "[Bug] - TileMap.cpp - load() - Collision\n";
+                    }
+                }
+                else if (groupName == "Npc") {
+                    if (objectGroupName == "QuestNpc") {
+                        auto prop = objectNode.child("properties").find_child_by_attribute("property", "name", "npc_id");
+                        int id = -1;
+                        if (prop) {
+                            id = prop.attribute("value").as_int();
+                        }
+                        m_questNpcRects[id] = sf::FloatRect(x, y, width, height);
+                    }
+                    else if (objectGroupName == "MerchantNpc") {
+                        m_merchantNpcRects.emplace_back(x, y, width, height);
+                    }
+                    else {
+                        std::cerr << "[Bug] - TileMap.cpp - load() - Npc\n";
                     }
                 }
                 else if (groupName == "Enemy") {
@@ -318,7 +326,7 @@ bool TileMap::load(const std::string& tmxPath, const std::vector<std::pair<std::
                         m_enemyRects["Eye Lv.5"].emplace_back(x, y, width, height);
                     }
                     else {
-                        std::cerr << "[Bug] - TileMap.cpp - load() Enemy\n";
+                        std::cerr << "[Bug] - TileMap.cpp - load() - Enemy\n";
                     }
                 }
                 else if (groupName == "Light") {
@@ -345,7 +353,7 @@ void TileMap::updateObjects() {
         }
     }
 
-    for (auto& pair : m_NPCRects) {
+    for (auto& pair : m_questNpcRects) {
         pair.second = getTransform().transformRect(pair.second);
     }
 
@@ -420,7 +428,7 @@ void TileMap::draw(sf::RenderTarget& target, sf::RenderStates states) const {
     // }
 
     // hitbox.setOutlineColor(sf::Color::Green);
-    // for (auto& pair : m_NPCRects) {
+    // for (auto& pair : m_questNpcRects) {
     //     hitbox.setSize(pair.second.getSize());
     //     hitbox.setPosition(pair.second.getPosition());
     //     target.draw(hitbox);
@@ -503,7 +511,7 @@ void TileMap::drawMinimap(sf::RenderTarget& target, sf::RenderStates states) con
 
     hitbox.setOutlineColor(sf::Color::Green);
     hitbox.setFillColor(sf::Color::Green);
-    for (auto& pair : m_NPCRects) {
+    for (auto& pair : m_questNpcRects) {
         hitbox.setSize(pair.second.getSize());
         hitbox.setPosition(pair.second.getPosition());
         target.draw(hitbox);
@@ -522,8 +530,12 @@ const std::vector<sf::FloatRect>& TileMap::getCollisionRects() const {
     return m_collisionRects;
 }
 
-const std::unordered_map<int, sf::FloatRect>& TileMap::getNpcRects() const {
-    return m_NPCRects;
+const std::unordered_map<int, sf::FloatRect>& TileMap::getQuestNpcRects() const {
+    return m_questNpcRects;
+}
+
+const std::vector<sf::FloatRect>& TileMap::getMerchantNpcRects() const {
+    return m_merchantNpcRects;
 }
 
 const std::unordered_map<std::string, std::vector<sf::FloatRect>>& TileMap::getEnemyRects() const {
