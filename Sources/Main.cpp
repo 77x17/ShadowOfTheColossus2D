@@ -18,8 +18,11 @@
 #include "Item.hpp"
 // --- [End] ---
 
+// --- [Begin] - UI ---
 #include "UI.hpp"
 #include "InventoryUI.hpp"
+#include "MerchantUI.hpp"
+// --- [End] ---
 
 #include "Quest.hpp"
 #include "KillMonsterObjective.hpp"
@@ -31,6 +34,7 @@
 // --- [Begin] - Npcs ---
 #include "Npc.hpp"
 #include "QuestNpc.hpp"
+#include "MerchantNpc.hpp"
 // --- [End] ---
 
 #include "EntityEffects.hpp"
@@ -88,29 +92,35 @@ void loadEnemy(std::vector<std::unique_ptr<Enemy>>& enemies, const std::unordere
 }
 
 void loadNpc(std::vector<std::unique_ptr<Npc>>& npcs, const TileMap& map) {
-    npcs.emplace_back(std::make_unique<QuestNpc>(
+    npcs.push_back(std::make_unique<QuestNpc>(
         0,
         map.getQuestNpcRects().at(0),
         "Elder Thorne",
         "npc_00"
     ));
-    npcs.emplace_back(std::make_unique<QuestNpc>(
+    npcs.push_back(std::make_unique<QuestNpc>(
         1,
         map.getQuestNpcRects().at(1),
         "Torren",
         "npc_01"
     ));
-    npcs.emplace_back(std::make_unique<QuestNpc>(
+    npcs.push_back(std::make_unique<QuestNpc>(
         2,
         map.getQuestNpcRects().at(2),
         "Mira",
         "npc_02"
     ));
-    npcs.emplace_back(std::make_unique<QuestNpc>(
+    npcs.push_back(std::make_unique<QuestNpc>(
         3,
         map.getQuestNpcRects().at(3),
         "Bren",
         "npc_03"
+    ));
+
+    npcs.push_back(std::make_unique<MerchantNpc>(
+        map.getMerchantNpcRects().at(0),
+        "Merchant",
+        "npc_00"
     ));
 }
 
@@ -270,6 +280,7 @@ int main() {
     items.emplace_back(player.getPosition() + sf::Vector2f(300.0f, 0), std::make_shared<Helmet>("God Helmet", "helmet_00", 20.0f, 1));
 
     InventoryUI inventoryUI(static_cast<sf::Vector2f>(window.getSize()), player);
+    MerchantUI merchantUI(static_cast<sf::Vector2f>(window.getSize()), player);
     // --- [End] ---
 
     while (window.isOpen()) {
@@ -326,6 +337,7 @@ int main() {
                     uiView = window.getDefaultView();
 
                     inventoryUI.updatePosition(static_cast<sf::Vector2f>(window.getSize()));
+                    merchantUI.updatePosition(static_cast<sf::Vector2f>(window.getSize()));
                 }
                 else if (event.key.code == sf::Keyboard::Q) {
                     ui.updateQuestsBox();
@@ -351,6 +363,14 @@ int main() {
                 sf::Vector2f mousePos = window.mapPixelToCoords({event.mouseButton.x, event.mouseButton.y});
                 inventoryUI.handleRelease(mousePos, player, items);
             }
+            else if (merchantUI.isVisible() && event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
+                sf::Vector2f mousePos = window.mapPixelToCoords({event.mouseButton.x, event.mouseButton.y});
+                merchantUI.handleClick(mousePos);
+            }
+            else if (merchantUI.isVisible() && event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left) {
+                sf::Vector2f mousePos = window.mapPixelToCoords({event.mouseButton.x, event.mouseButton.y});
+                merchantUI.handleRelease(mousePos, player, items);
+            }
         }
 
         if (dt <= 0 || dt > 1.0f) {
@@ -367,15 +387,12 @@ int main() {
         gameClock.update(dt);
 
         // Player collision Npcs
-        player.isCollisionNpc = false;
         for (const std::unique_ptr<Npc>& npc : npcs) {
             if (player.isCollision(npc->getHitbox())) {
-                player.isCollisionNpc = true;
-                // Canh giữa text so với npc, ngay trên đỉnh đầu
-                player.setInteractTextPosition(npc->getHitbox().getPosition() + sf::Vector2f(npc->getHitbox().getSize().x / 2, -npc->getHitbox().getSize().y));
-                
+                player.collisionWithNpc  = true;
+                npc->collisionWithPlayer = true;
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::F)) {
-                    player.handleQuest(npc);
+                    npc->interactWithPlayer(player);
                 }
             }
         }
@@ -406,7 +423,7 @@ int main() {
         }
 
         for (auto& npc : npcs) {
-            npc->update();
+            npc->update(dt);
         }
 
         for (Item& item : items) {
@@ -458,6 +475,28 @@ int main() {
             }
             inventoryUI.updateStats(player);
         }
+        else {
+            if (inventoryUI.isDrag()) {
+                sf::Vector2f mousePos = static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
+                inventoryUI.handleRelease(mousePos, player, items);
+            }
+        }
+
+        if (merchantUI.isVisible()) {
+            sf::Vector2f mousePos = static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+                merchantUI.updateDrag(mousePos);
+            }
+            else {
+                merchantUI.updateHover(mousePos);    
+            }
+        }
+        else {
+            if (merchantUI.isDrag()) {
+                sf::Vector2f mousePos = static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
+                merchantUI.handleRelease(mousePos, player, items);
+            }
+        }
 
         // --- [End] ---
 
@@ -490,8 +529,25 @@ int main() {
         sceneTexture.setView(uiView);
         particleManager.drawScreen(sceneTexture);
 
-        sceneTexture.setView(view);
-        player.drawInteractText(sceneTexture);
+        for (auto& npc : npcs) {
+            bool merchantFlag = false;
+            if (const QuestNpc* questNpc = dynamic_cast<QuestNpc*>(npc.get())) {
+                sceneTexture.setView(view);
+                questNpc->drawInteractQuest(sceneTexture);
+            }
+            else if (const MerchantNpc* merchantNpc = dynamic_cast<MerchantNpc*>(npc.get())) {
+                if (merchantNpc->isInteractWithPlayer()) {
+                    merchantFlag = true;
+                }   
+            }
+            
+            if (inventoryUI.isVisible()) {
+                merchantFlag = false;
+            }
+
+            merchantUI.setVisible(merchantFlag);
+        }
+
         // --- [End] ---
 
         sceneTexture.display(); 
@@ -519,6 +575,9 @@ int main() {
 
         if (inventoryUI.isVisible()) {
             inventoryUI.draw(window);
+        }
+        if (merchantUI.isVisible()) {
+            merchantUI.draw(window);
         }
 
         window.display();

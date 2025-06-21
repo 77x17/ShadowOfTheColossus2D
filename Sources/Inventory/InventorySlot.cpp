@@ -6,8 +6,8 @@ bool InventorySlot::contains(const sf::Vector2f& point) const {
 
 void InventorySlot::draw(sf::RenderTarget& target) const {
     target.draw(slotBox);
-    if (item) {
-        item->sprite.setPosition(slotBox.getPosition());
-        target.draw(item->sprite);
+    if (item && *item) {
+        (*item)->sprite.setPosition(slotBox.getPosition());
+        target.draw((*item)->sprite);
     }
 }

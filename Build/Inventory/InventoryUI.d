@@ -6,5 +6,4 @@ Build/Inventory/InventoryUI.o: Sources/Inventory/InventoryUI.cpp \
  Sources/Entities/Projectile/Projectile.hpp \
  Sources/SoundManager/SoundManager.hpp Sources/Configuration/Font.hpp \
  Sources/Quests/Quest.hpp Sources/Quests/QuestObjective.hpp \
- Sources/Entities/Npc/Npc.hpp Sources/Entities/Item/Item.hpp \
- Sources/Effects/EntityEffects.hpp
+ Sources/Entities/Item/Item.hpp Sources/Effects/EntityEffects.hpp

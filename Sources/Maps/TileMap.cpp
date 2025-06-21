@@ -360,6 +360,10 @@ void TileMap::updateObjects() {
         pair.second = getTransform().transformRect(pair.second);
     }
 
+    for (sf::FloatRect& rect : m_merchantNpcRects) {
+        rect = getTransform().transformRect(rect);
+    }
+
     for (auto& pair : m_RegionRects) {
         pair.second = getTransform().transformRect(pair.second);
     }
@@ -428,13 +432,6 @@ void TileMap::draw(sf::RenderTarget& target, sf::RenderStates states) const {
     //         hitbox.setPosition(rect.getPosition());
     //         target.draw(hitbox);
     //     }
-    // }
-
-    // hitbox.setOutlineColor(sf::Color::Green);
-    // for (auto& pair : m_questNpcRects) {
-    //     hitbox.setSize(pair.second.getSize());
-    //     hitbox.setPosition(pair.second.getPosition());
-    //     target.draw(hitbox);
     // }
 
     // hitbox.setOutlineColor(sf::Color::Magenta);
@@ -517,6 +514,14 @@ void TileMap::drawMinimap(sf::RenderTarget& target, sf::RenderStates states) con
     for (auto& pair : m_questNpcRects) {
         hitbox.setSize(pair.second.getSize());
         hitbox.setPosition(pair.second.getPosition());
+        target.draw(hitbox);
+    }
+
+    hitbox.setOutlineColor(sf::Color::Blue);
+    hitbox.setFillColor(sf::Color::Blue);
+    for (const sf::FloatRect& rect : m_merchantNpcRects) {
+        hitbox.setSize(rect.getSize());
+        hitbox.setPosition(rect.getPosition());
         target.draw(hitbox);
     }
 

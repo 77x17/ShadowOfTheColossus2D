@@ -11,7 +11,6 @@
 
 #include "Quest.hpp"
 
-#include "Npc.hpp"
 #include "Item.hpp"
 
 #include "InventorySlot.hpp"
@@ -79,29 +78,26 @@ private:
     float                   PROJECTILE_LIFETIME;
     float                   shootCooldownTimer;
 
-    float    FADE_SPEED;
-    float    interactTextOpacity;
-    float    INTERACT_COOLDOWN;
-    float    interactCooldownTimer;
-    sf::Text interactText;
-
     float KNOCKBACK_STRENGTH;
     float KNOCKBACK_COOLDOWN;
     float knockbackCooldownTimer;
 
     std::vector<Quest> quests;
-    bool               updateQuest;
-    int                collisionRegionID;
+    float INTERUPTED_TIME;
+    float interuptedCooldownTimer;
+    
+    int collisionRegionID;
 
     // --- [Begin] - Inventory --- 
     float equipmentHealth;
     float equipmentDamage;
 
-    std::vector<BagSlot> bagSlots;      // 10 x 4 = 40
-    std::vector<EquipSlot> equipSlots;  // 8
+    std::vector<std::shared_ptr<ItemData>> inventory;   // 10 x 4 = 40
+    std::vector<std::shared_ptr<ItemData>> equipment;   // 8
     // --- [End] - Inventory --- 
 public:
-    bool isCollisionNpc = false;
+    bool collisionWithNpc = false;
+    bool updateQuest      = false;
 
 public:
     Player(const sf::Vector2f& position, const float& baseHp, std::vector<Quest>&& _quests);
@@ -145,15 +141,15 @@ public:
     void  addVictim(const std::string& label);
 
     // --- [Begin] - UI ---
-    float                     getHealthRatio() const;
-    std::string               getHealthPointsString() const;
-    float                     getXPRatio() const;
-    std::string               getXPString() const;
-    int                       getLevel() const;
-    const std::vector<Quest>& getQuests() const;
-    bool                      isUpdateQuest();
-    sf::Vector2f              getCenterPosition() const;
-    int                       getCollisionRegionID() const;
+    float               getHealthRatio() const;
+    std::string         getHealthPointsString() const;
+    float               getXPRatio() const;
+    std::string         getXPString() const;
+    int                 getLevel() const;
+    std::vector<Quest>& getQuests();
+    bool                isUpdateQuest();
+    sf::Vector2f        getCenterPosition() const;
+    int                 getCollisionRegionID() const;
     // --- [End]
 
     void updateView(const float& dt, sf::View& view) const;
@@ -161,16 +157,10 @@ public:
     // --- [Begin] - Inventory --- 
     bool addItem(const std::shared_ptr<ItemData>& newItem);
     void updateEquipmentStats();
-    std::vector<BagSlot>* getBagSlots();
-    std::vector<EquipSlot>* getEquipSlots();
+    std::vector<std::shared_ptr<ItemData>>* getInventory();
+    std::vector<std::shared_ptr<ItemData>>* getEquipment();
     std::string getStats() const;
     bool dropItem(const std::shared_ptr<ItemData>& item, std::vector<Item>& items);
-    // --- [End]
-
-    // --- [Begin] - Npc ---
-    void setInteractTextPosition(sf::Vector2f position);
-    void handleQuest(const std::unique_ptr<Npc>& npc);
-    void drawInteractText(sf::RenderTarget& target);
     // --- [End]
 
     // --- [Begin] - Enemy --- 

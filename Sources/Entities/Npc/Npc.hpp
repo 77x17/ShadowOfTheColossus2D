@@ -6,10 +6,10 @@
 
 #include "AnimationManager.hpp"
 #include "TextureManager.hpp"
+#include "Player.hpp"
 
 class Npc {
 protected:
-    int           ID;
     sf::FloatRect hitbox;
 
     int                TEXT_SIZE;
@@ -20,15 +20,20 @@ protected:
     AnimationManager   animationManager;
     sf::Sprite         shadow;
 
+    float INTERACT_COOLDOWN = 0.5f;
+    float interactCooldownTimer = 0.0f;
 public:
-    Npc(int _id, const sf::FloatRect& _hitbox, const std::string& name, const std::string& spriteName);
+    bool collisionWithPlayer;
+
+    Npc(const sf::FloatRect& _hitbox, const std::string& name, const std::string& spriteName);
 
     int getID() const;
     
-    void update();
+    virtual void update(const float& dt);
     
-    void draw(sf::RenderTarget& target);
+    void draw(sf::RenderTarget& target) const;
     
     sf::FloatRect getHitbox() const;
 
+    virtual void interactWithPlayer(Player& player) = 0;
 };

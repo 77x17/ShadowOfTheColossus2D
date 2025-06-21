@@ -18,14 +18,12 @@ Player::Player(const sf::Vector2f& position, const float& baseHp, std::vector<Qu
     equipmentHealth = 0.0f;
     equipmentDamage = 0.0f;
     
-    BagSlot bagSlot;
     for (int cnt = 0; cnt < 40; ++cnt) {
-        bagSlots.push_back(bagSlot);
+        inventory.push_back(nullptr);
     }
     
-    EquipSlot equipSlot; 
     for (int i = 0; i < 8; ++i) {
-        equipSlots.push_back(equipSlot);
+        equipment.push_back(nullptr);
     }
     // --- [End] - Inventory ---
 
@@ -87,27 +85,15 @@ Player::Player(const sf::Vector2f& position, const float& baseHp, std::vector<Qu
     PROJECTILE_LIFETIME = 1.0f;
     shootCooldownTimer  = 0.0f;
 
-    FADE_SPEED            = 5.0f;
-    interactTextOpacity   = 0.0f;
-    INTERACT_COOLDOWN     = 0.5f;
-    interactCooldownTimer = 0.0f;
-
-    interactText.setFont(Font::font);
-    interactText.setCharacterSize(12.5f);
-    interactText.setOutlineThickness(2.0f);
-    interactText.setFillColor(sf::Color(255, 255, 255, interactTextOpacity));
-    interactText.setOutlineColor(sf::Color(0, 0, 0, interactTextOpacity));
-    interactText.setString("Press [F] to talk");
-    interactText.setOrigin(interactText.getLocalBounds().left + interactText.getLocalBounds().width / 2, 
-                           interactText.getLocalBounds().top + interactText.getLocalBounds().height / 2);
-
     KNOCKBACK_STRENGTH     = 100.0f;
     KNOCKBACK_COOLDOWN     = 0.2f;
     knockbackCooldownTimer = 0.0f;
 
     quests.clear();
-    quests            = std::move(_quests);
-    updateQuest       = false;
+    quests = std::move(_quests);
+    INTERUPTED_TIME         = 1.0f;
+    interuptedCooldownTimer = -11.0f;
+
     collisionRegionID = -1;
 }
 
@@ -352,34 +338,27 @@ void Player::updateTimer(const float &dt) {
     if (shootCooldownTimer > 0) { 
         shootCooldownTimer -= dt;
     }
-    if (interactCooldownTimer > 0) {
-        interactCooldownTimer -= dt;
-    }
     if (knockbackCooldownTimer > 0) {
         knockbackCooldownTimer -= dt;
+    }
+    if (interuptedCooldownTimer > 0) {
+        interuptedCooldownTimer -= dt;
     }
 }
 
 void Player::updateCollisionArea(const float& dt, const std::unordered_map<int, sf::FloatRect>& regionRects) {
-    if (isCollisionNpc) {
-        interactTextOpacity += (255 - interactTextOpacity) * FADE_SPEED * dt;
+    if (collisionWithNpc) {
+        collisionWithNpc        = false;
+        interuptedCooldownTimer = INTERUPTED_TIME;
     }
-    else {
-        interactTextOpacity += (0   - interactTextOpacity) * FADE_SPEED * dt;
-
-        if (40 < interactTextOpacity && interactTextOpacity < 50) {
-            interactText.setString("Press [F] to talk");
-            interactText.setOrigin(interactText.getLocalBounds().left + interactText.getLocalBounds().width / 2, 
-                                   interactText.getLocalBounds().top + interactText.getLocalBounds().height / 2);
-
+    else if (interuptedCooldownTimer != -11.0f) {
+        if (interuptedCooldownTimer <= 0) {
             for (Quest& quest : quests) {
                 quest.isInterruptedGivingQuest();
             }
+            interuptedCooldownTimer = -11.0f;
         }
     }
-
-    interactText.setFillColor(sf::Color(255, 255, 255, interactTextOpacity));
-    interactText.setOutlineColor(sf::Color(0, 0, 0, interactTextOpacity));
 
     for (auto& regionRect : regionRects) {
         if (isCollision(regionRect.second)) {
@@ -598,10 +577,6 @@ void Player::draw(sf::RenderTarget& target) {
     }
 }
 
-void Player::drawInteractText(sf::RenderTarget& target) {
-    target.draw(interactText);
-}
-
 sf::Vector2f Player::getPosition() const {
     return hitbox.getPosition();
 }
@@ -673,7 +648,7 @@ int Player::getLevel() const {
     return level;
 }
 
-const std::vector<Quest>& Player::getQuests() const {
+std::vector<Quest>& Player::getQuests() {
     return quests;
 }
 
@@ -706,9 +681,9 @@ int Player::getCollisionRegionID() const {
 
 // --- [Begin] - Inventory --- 
 bool Player::addItem(const std::shared_ptr<ItemData>& newItem) {
-    for (auto& slot : bagSlots) {
-        if (!slot.item) {
-            slot.item = newItem;
+    for (auto& item : inventory) {
+        if (!item) {
+            item = newItem;
 
             SoundManager::playSound("pickupItem");
 
@@ -721,9 +696,9 @@ bool Player::addItem(const std::shared_ptr<ItemData>& newItem) {
 void Player::updateEquipmentStats() {
     equipmentHealth = 0.0f;
     equipmentDamage = 0.0f;
-    for (const auto& slot : equipSlots) if (slot.item) {
-        equipmentHealth += slot.item->getHealth();
-        equipmentDamage += slot.item->getDamage();
+    for (const auto& item : equipment) if (item) {
+        equipmentHealth += item->getHealth();
+        equipmentDamage += item->getDamage();
     }
 
     if (healthPoints > baseHealthPoints + equipmentHealth) {
@@ -732,12 +707,12 @@ void Player::updateEquipmentStats() {
     damage = equipmentDamage;
 }
 
-std::vector<BagSlot>* Player::getBagSlots() {
-    return &bagSlots;
+std::vector<std::shared_ptr<ItemData>>* Player::getInventory() {
+    return &inventory;
 }
 
-std::vector<EquipSlot>* Player::getEquipSlots() {
-    return &equipSlots;
+std::vector<std::shared_ptr<ItemData>>* Player::getEquipment() {
+    return &equipment;
 }
 
 std::string Player::getStats() const {
@@ -771,88 +746,6 @@ bool Player::dropItem(const std::shared_ptr<ItemData>& item, std::vector<Item>& 
     return false;
 }
 // --- [End] - Inventory --- 
-
-// --- [Begin] - Npc ---
-void Player::setInteractTextPosition(sf::Vector2f position) {
-    interactText.setPosition(position);
-}
-
-void Player::handleQuest(const std::unique_ptr<Npc>& npc) {
-    if (interactCooldownTimer > 0) {
-        return;
-    }
-    for (Quest& quest : quests) {
-        QuestEventData dataPack;
-        dataPack.eventType = "talk";
-        dataPack.npcID     = npc->getID();
-        quest.update(dataPack);
-
-        if (npc->getID() == quest.getID()) {
-            if (quest.isSuitableForGivingQuest(getLevel())) {
-                if (quest.isCompleted()) {
-                    interactText.setString("Thanks for your help!");
-                    continue;
-                }
-                else if (quest.isFinishedDialogue()) {
-                    if (quest.accept()) {
-                        updateQuest = true;
-
-                        quest.update(dataPack);
-                    }
-                    else {
-                        // --- [Begin] - giveItemObjective ---
-                        std::vector<std::shared_ptr<QuestObjective>> questObjectives = quest.getQuestObjectives();
-                        for (auto& objective : questObjectives) if (!objective->isFinished()) {
-                            QuestEventData objectiveData = objective->getQuestEventData();
-                            if (objectiveData.eventType == "giveItem") {
-                                for (auto& slot : bagSlots) if (slot.item) {
-                                    if (slot.item->name == objectiveData.targetName) {
-                                        QuestEventData giveItemData;
-                                        giveItemData.eventType  = "giveItem";
-                                        giveItemData.targetName = slot.item->name;
-                                        quest.update(giveItemData);
-                                        
-                                        slot.item = nullptr; // take item from player
-
-                                        if (objective->isFinished()) {
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        if (quest.isFinishObjectives()) {
-                            interactText.setString("Good, that's all of them. I appreciate it");
-                        }
-                        else {
-                            interactText.setString("I need your support");
-                        }
-                        // --- [End] - giveItemObjective ---
-
-                        continue;
-                    }
-                }
-                else {
-                    interactText.setString(quest.getDialogue());
-                }
-            }
-            else {
-                interactText.setString(quest.getRequired());
-            }
-
-            break;
-        }
-    }
-
-    interactText.setOrigin(interactText.getLocalBounds().left + interactText.getLocalBounds().width / 2, 
-                            interactText.getLocalBounds().top + interactText.getLocalBounds().height / 2);
-
-    SoundManager::playSound("talk");
-
-    interactCooldownTimer = INTERACT_COOLDOWN;
-}
-// --- [End] - Npc ---
 
 // --- [Begin] - Enemy --- 
 const float& Player::getDamage() const {

@@ -8,7 +8,7 @@
 class InventorySlot {
 public:
     sf::RectangleShape slotBox;
-    std::shared_ptr<ItemData> item = nullptr;
+    std::shared_ptr<ItemData>* item = nullptr;
 
     bool contains(const sf::Vector2f& point) const;
 

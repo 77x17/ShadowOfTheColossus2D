@@ -3,11 +3,10 @@
 #include "Font.hpp"
 #include <iostream>
 
-Npc::Npc(int                  _ID, 
-         const sf::FloatRect& _hitbox, 
+Npc::Npc(const sf::FloatRect& newHitbox, 
          const std::string&   name, 
          const std::string&   spriteName) 
-: ID(_ID), hitbox(_hitbox) {
+: hitbox(newHitbox) {
     // --- [Begin] - Nametag --- 
     TEXT_SIZE          = 10;
     BACKGROUND_PADDING = 5.0f;
@@ -33,25 +32,27 @@ Npc::Npc(int                  _ID,
     
     shadow.setTexture(TextureManager::get("playerShadow"));
     // --- [Begin] - Animation --- 
-}
 
-int Npc::getID() const {
-    return ID;
+    collisionWithPlayer = false;
 }
 
 sf::FloatRect Npc::getHitbox() const {
     return hitbox;
 }
 
-void Npc::update() {
+void Npc::update(const float& dt) {
     animationManager.setState(0, true);
     animationManager.setPosition(hitbox.getPosition() + sf::Vector2f(0, -4));
     animationManager.update();
 
     shadow.setPosition(hitbox.getPosition() + sf::Vector2f(0, hitbox.getPosition().y - 8));
+
+    if (interactCooldownTimer > 0) {
+        interactCooldownTimer -= dt;
+    }
 }
 
-void Npc::draw(sf::RenderTarget& target) {
+void Npc::draw(sf::RenderTarget& target) const {
     target.draw(labelBackground);
     target.draw(label);
 

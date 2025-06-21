@@ -19,11 +19,11 @@ private:
     sf::RectangleShape containBox;
 
     sf::Text inventoryText;
-    std::vector<BagSlot>* bagSlots = nullptr;
+    std::vector<BagSlot> bagSlots;
     
     sf::Text equipmentText;
     std::vector<sf::Text> equipLabels;
-    std::vector<EquipSlot>* equipSlots = nullptr;
+    std::vector<EquipSlot> equipSlots;
     
     int previousDraggedItemID = -1;
     std::shared_ptr<ItemData> draggedItem = nullptr;
@@ -41,6 +41,7 @@ private:
     sf::RectangleShape equipmentStatsBox;
     sf::Text equipmentStats;
 
+    sf::RectangleShape hoveredItemInfoBox;
     sf::Text hoveredItemInfo;
 
 public:
@@ -59,6 +60,8 @@ public:
     void draw(sf::RenderTarget& target);
     
     bool isVisible() const;
+    bool isDrag() const;
     
     void updateStats(Player &player);
+
 };
