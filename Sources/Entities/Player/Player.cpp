@@ -361,14 +361,6 @@ void Player::updateTimer(const float &dt) {
 }
 
 void Player::updateCollisionArea(const float& dt, const std::unordered_map<int, sf::FloatRect>& regionRects) {
-    // for (const Npc& npc : npcs) {
-    //     sf::FloatRect npcRect = npc.getHitbox();
-    //     if (isCollision(npcRect)) {
-    //         interactText.setPosition(npcRect.getPosition() + sf::Vector2f(npcRect.getSize().x / 2, -npcRect.getSize().y));
-    //         isCollisionNpc = true;
-    //     }
-    // }
-
     if (isCollisionNpc) {
         interactTextOpacity += (255 - interactTextOpacity) * FADE_SPEED * dt;
     }

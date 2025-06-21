@@ -306,7 +306,20 @@ void InventoryUI::handleRelease(const sf::Vector2f& mousePos, Player& player, st
                         return;
                     }
                     else if (draggedItem) {
-                        std::cerr << "[Bug] - InventoryUI.cpp - handleRelease()\n";
+                        for (auto& o_slot : *bagSlots) {
+                            if (draggedItem && !o_slot.item) {
+                                o_slot.item = draggedItem;
+                                draggedItem = nullptr;
+                                return;
+                            }
+                        }
+                        
+                        if (player.dropItem(draggedItem, items)) {
+                            selectedBagItemInfomation.setString(std::string());
+                        }
+                        else {
+                            std::cerr << "[Bug] - InventoryUI.cpp - handleRelease()\n";
+                        }
                     }
                 }
 
