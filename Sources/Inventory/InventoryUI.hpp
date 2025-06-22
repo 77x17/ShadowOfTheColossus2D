@@ -32,8 +32,8 @@ private:
     sf::Text itemInformationText;
     sf::RectangleShape bagItemInformationBox;
     sf::RectangleShape equipItemInformationBox;
-    sf::Text selectedBagItemInfomation;
-    sf::Text selectedEquipItemInfomation;
+    // sf::Text selectedBagItemInfomation;
+    // sf::Text selectedEquipItemInfomation;
 
     sf::Text totalStatsText;
     float totalDamage;
@@ -43,6 +43,8 @@ private:
 
     sf::RectangleShape hoveredItemInfoBox;
     sf::Text hoveredItemInfo;
+    sf::Text hoveredItemName;
+    sf::Text hoveredItemRarity;
 
 public:
     InventoryUI(const sf::Vector2f& windowSize, Player& player);

@@ -31,6 +31,8 @@ private:
 
     sf::RectangleShape hoveredItemInfoBox;
     sf::Text hoveredItemInfo;
+    sf::Text hoveredItemName;
+    sf::Text hoveredItemRarity;
 
 public:
     MerchantUI(const sf::Vector2f& windowSize, Player& player);

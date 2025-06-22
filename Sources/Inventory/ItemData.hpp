@@ -64,10 +64,38 @@ public:
         return std::string();
     }
 
+    sf::Color getItemRarityColor() const {
+        switch (rarity) {
+            case ItemRarity::Normal:
+                return sf::Color::White;
+                break;
+            case ItemRarity::Unique:
+                return sf::Color::Yellow;
+                break;
+            case ItemRarity::Rare:
+                return sf::Color::Magenta;
+                break;
+            case ItemRarity::Legendary:
+                return sf::Color::Cyan;
+                break;
+            case ItemRarity::Mythic:
+                return sf::Color::Red;
+                break;
+            default:
+                std::cerr << "[Bug] - ItemData.hpp - getInformation()\n";
+                break;
+        }
+        return sf::Color::Black;
+    }
+
     std::string getInformation() const {
-        return name + "\n\n"
+        // return name + "\n\n"
+        //      + getDetails() + "\n\n"
+        //      + getItemRarityString();
+        std::string name_padding(static_cast<int>(name.size()), ' ');
+        return name_padding + "\n\n"
              + getDetails() + "\n\n"
-             + getItemRarityString();
+             + "";
     }
 
     virtual std::string getDetails() const = 0;

@@ -65,6 +65,16 @@ MerchantUI::MerchantUI(const sf::Vector2f& windowSize, Player& player) {
     hoveredItemInfo.setFillColor(sf::Color::White);
     hoveredItemInfo.setOutlineThickness(1.0f);
     hoveredItemInfo.setOutlineColor(sf::Color::Black);
+
+    hoveredItemName.setFont(Font::font);
+    hoveredItemName.setCharacterSize(textSize);
+    hoveredItemName.setOutlineThickness(1.0f);
+    hoveredItemName.setOutlineColor(sf::Color::Black);
+
+    hoveredItemRarity.setFont(Font::font);
+    hoveredItemRarity.setCharacterSize(textSize);
+    hoveredItemRarity.setOutlineThickness(1.0f);
+    hoveredItemRarity.setOutlineColor(sf::Color::Black);
 }
 
 void MerchantUI::updatePosition(const sf::Vector2f& windowSize) {
@@ -81,12 +91,24 @@ void MerchantUI::updatePosition(const sf::Vector2f& windowSize) {
 
 void MerchantUI::updateHover(const sf::Vector2f& mousePos) {
     hoveredItemInfo.setString(std::string());
+    hoveredItemName.setString(std::string());
+    hoveredItemRarity.setString(std::string());
     for (auto& slot : playerBagSlots) {
         if (slot.contains(mousePos) && (*slot.item)) {
             hoveredItemInfo.setString((*slot.item)->getInformation());
             hoveredItemInfo.setPosition(mousePos);
             hoveredItemInfo.setOrigin(hoveredItemInfo.getLocalBounds().left + hoveredItemInfo.getLocalBounds().width, hoveredItemInfo.getLocalBounds().top + hoveredItemInfo.getLocalBounds().height);
+                        
+            hoveredItemName.setString((*slot.item)->name);
+            hoveredItemName.setPosition(hoveredItemInfo.getPosition() + sf::Vector2f(hoveredItemInfo.getLocalBounds().getSize().x / 2.0f, 0.0f));
+            hoveredItemName.setOrigin(hoveredItemInfo.getOrigin() + sf::Vector2f(hoveredItemName.getLocalBounds().left + hoveredItemName.getLocalBounds().width / 2.0f, 0.0f));
+            hoveredItemName.setFillColor((*slot.item)->getItemRarityColor());
             
+            hoveredItemRarity.setString((*slot.item)->getItemRarityString());
+            hoveredItemRarity.setPosition(hoveredItemInfo.getPosition() + sf::Vector2f(hoveredItemInfo.getLocalBounds().getSize().x, hoveredItemInfo.getLocalBounds().getSize().y));
+            hoveredItemRarity.setOrigin(hoveredItemInfo.getOrigin() + sf::Vector2f(hoveredItemRarity.getLocalBounds().left + hoveredItemRarity.getLocalBounds().width, hoveredItemRarity.getLocalBounds().top + hoveredItemRarity.getLocalBounds().height));
+            hoveredItemRarity.setFillColor((*slot.item)->getItemRarityColor());
+
             hoveredItemInfoBox.setSize(hoveredItemInfo.getLocalBounds().getSize() + sf::Vector2f(slotPadding, slotPadding) * 2.0f);
             hoveredItemInfoBox.setPosition(hoveredItemInfo.getPosition() - sf::Vector2f(slotPadding, slotPadding));           
             hoveredItemInfoBox.setOrigin(hoveredItemInfo.getOrigin());
@@ -97,8 +119,18 @@ void MerchantUI::updateHover(const sf::Vector2f& mousePos) {
         if (slot.contains(mousePos) && (*slot.item)) {
             hoveredItemInfo.setString((*slot.item)->getInformation());
             hoveredItemInfo.setPosition(mousePos);
-            hoveredItemInfo.setOrigin(hoveredItemInfo.getLocalBounds().left + hoveredItemInfo.getLocalBounds().width, hoveredItemInfo.getLocalBounds().top + hoveredItemInfo.getLocalBounds().height);
+            hoveredItemInfo.setOrigin(hoveredItemInfo.getLocalBounds().left + hoveredItemInfo.getLocalBounds().width, hoveredItemInfo.getLocalBounds().top + hoveredItemInfo.getLocalBounds().height);            
+
+            hoveredItemName.setString((*slot.item)->name);
+            hoveredItemName.setPosition(hoveredItemInfo.getPosition() + sf::Vector2f(hoveredItemInfo.getLocalBounds().getSize().x / 2.0f, 0.0f));
+            hoveredItemName.setOrigin(hoveredItemInfo.getOrigin() + sf::Vector2f(hoveredItemName.getLocalBounds().left + hoveredItemName.getLocalBounds().width / 2.0f, 0.0f));
+            hoveredItemName.setFillColor((*slot.item)->getItemRarityColor());
             
+            hoveredItemRarity.setString((*slot.item)->getItemRarityString());
+            hoveredItemRarity.setPosition(hoveredItemInfo.getPosition() + sf::Vector2f(hoveredItemInfo.getLocalBounds().getSize().x, hoveredItemInfo.getLocalBounds().getSize().y));
+            hoveredItemRarity.setOrigin(hoveredItemInfo.getOrigin() + sf::Vector2f(hoveredItemRarity.getLocalBounds().left + hoveredItemRarity.getLocalBounds().width, hoveredItemRarity.getLocalBounds().top + hoveredItemRarity.getLocalBounds().height));
+            hoveredItemRarity.setFillColor((*slot.item)->getItemRarityColor());
+
             hoveredItemInfoBox.setSize(hoveredItemInfo.getLocalBounds().getSize() + sf::Vector2f(slotPadding, slotPadding) * 2.0f);
             hoveredItemInfoBox.setPosition(hoveredItemInfo.getPosition() - sf::Vector2f(slotPadding, slotPadding));           
             hoveredItemInfoBox.setOrigin(hoveredItemInfo.getOrigin());
@@ -111,6 +143,8 @@ void MerchantUI::updateDrag(const sf::Vector2f& mousePos) {
     if (!visible) return;
 
     hoveredItemInfo.setString(std::string());
+    hoveredItemName.setString(std::string());
+    hoveredItemRarity.setString(std::string());
     if (draggedItem) {
         dreggedPos = mousePos;
     }
@@ -303,6 +337,8 @@ void MerchantUI::draw(sf::RenderTarget& target) {
     if (hoveredItemInfo.getString() != std::string()) {
         target.draw(hoveredItemInfoBox);
         target.draw(hoveredItemInfo);
+        target.draw(hoveredItemName);
+        target.draw(hoveredItemRarity);
     }
 
     if (draggedItem) {

@@ -98,10 +98,10 @@ InventoryUI::InventoryUI(const sf::Vector2f& windowSize, Player& player) {
     bagItemInformationBox.setOutlineColor(sf::Color::White);
     bagItemInformationBox.setPosition(startPos + sf::Vector2f(0.0f, 4 * (slotSize + slotPadding) - slotPadding + groupPadding));
 
-    selectedBagItemInfomation.setFont(Font::font);
-    selectedBagItemInfomation.setCharacterSize(textSize);
-    selectedBagItemInfomation.setFillColor(sf::Color::White);
-    selectedBagItemInfomation.setPosition(startPos + sf::Vector2f(slotPadding, 4 * (slotSize + slotPadding) + groupPadding));
+    // selectedBagItemInfomation.setFont(Font::font);
+    // selectedBagItemInfomation.setCharacterSize(textSize);
+    // selectedBagItemInfomation.setFillColor(sf::Color::White);
+    // selectedBagItemInfomation.setPosition(startPos + sf::Vector2f(slotPadding, 4 * (slotSize + slotPadding) + groupPadding));
 
     equipItemInformationBox.setSize(sf::Vector2f(5 * (slotSize + slotPadding) - slotPadding, 4 * (slotSize + slotPadding) - slotPadding));
     equipItemInformationBox.setFillColor(sf::Color::Transparent);
@@ -109,10 +109,10 @@ InventoryUI::InventoryUI(const sf::Vector2f& windowSize, Player& player) {
     equipItemInformationBox.setOutlineColor(sf::Color::White);
     equipItemInformationBox.setPosition(startPos + sf::Vector2f(5 * (slotSize + slotPadding), 4 * (slotSize + slotPadding) - slotPadding + groupPadding));
 
-    selectedEquipItemInfomation.setFont(Font::font);
-    selectedEquipItemInfomation.setCharacterSize(textSize);
-    selectedEquipItemInfomation.setFillColor(sf::Color::White);
-    selectedEquipItemInfomation.setPosition(startPos + sf::Vector2f(5 * (slotSize + slotPadding) + slotPadding, 4 * (slotSize + slotPadding) + groupPadding));
+    // selectedEquipItemInfomation.setFont(Font::font);
+    // selectedEquipItemInfomation.setCharacterSize(textSize);
+    // selectedEquipItemInfomation.setFillColor(sf::Color::White);
+    // selectedEquipItemInfomation.setPosition(startPos + sf::Vector2f(5 * (slotSize + slotPadding) + slotPadding, 4 * (slotSize + slotPadding) + groupPadding));
 
     totalStatsText.setFont(Font::font);
     totalStatsText.setCharacterSize(textSize);
@@ -136,12 +136,22 @@ InventoryUI::InventoryUI(const sf::Vector2f& windowSize, Player& player) {
     hoveredItemInfoBox.setFillColor(sf::Color(0, 0, 0, 160));
     hoveredItemInfoBox.setOutlineThickness(1.f);
     hoveredItemInfoBox.setOutlineColor(sf::Color::White);
-
+    
     hoveredItemInfo.setFont(Font::font);
     hoveredItemInfo.setCharacterSize(textSize);
     hoveredItemInfo.setFillColor(sf::Color::White);
     hoveredItemInfo.setOutlineThickness(1.0f);
     hoveredItemInfo.setOutlineColor(sf::Color::Black);
+
+    hoveredItemName.setFont(Font::font);
+    hoveredItemName.setCharacterSize(textSize);
+    hoveredItemName.setOutlineThickness(1.0f);
+    hoveredItemName.setOutlineColor(sf::Color::Black);
+
+    hoveredItemRarity.setFont(Font::font);
+    hoveredItemRarity.setCharacterSize(textSize);
+    hoveredItemRarity.setOutlineThickness(1.0f);
+    hoveredItemRarity.setOutlineColor(sf::Color::Black);
 }
 
 void InventoryUI::updatePosition(const sf::Vector2f& windowSize) {
@@ -174,11 +184,11 @@ void InventoryUI::updatePosition(const sf::Vector2f& windowSize) {
 
     bagItemInformationBox.setPosition(startPos + sf::Vector2f(0.0f, 4 * (slotSize + slotPadding) - slotPadding + groupPadding));
 
-    selectedBagItemInfomation.setPosition(startPos + sf::Vector2f(slotPadding, 4 * (slotSize + slotPadding) + groupPadding));
+    // selectedBagItemInfomation.setPosition(startPos + sf::Vector2f(slotPadding, 4 * (slotSize + slotPadding) + groupPadding));
 
     equipItemInformationBox.setPosition(startPos + sf::Vector2f(5 * (slotSize + slotPadding), 4 * (slotSize + slotPadding) - slotPadding + groupPadding));
 
-    selectedEquipItemInfomation.setPosition(startPos + sf::Vector2f(5 * (slotSize + slotPadding) + slotPadding, 4 * (slotSize + slotPadding) + groupPadding));
+    // selectedEquipItemInfomation.setPosition(startPos + sf::Vector2f(5 * (slotSize + slotPadding) + slotPadding, 4 * (slotSize + slotPadding) + groupPadding));
 
     totalStatsText.setPosition(equipStart + sf::Vector2f(0.0f, 4 * (slotSize + slotPadding) - 2 * slotPadding + groupPadding));
 
@@ -189,12 +199,24 @@ void InventoryUI::updatePosition(const sf::Vector2f& windowSize) {
 
 void InventoryUI::updateHover(const sf::Vector2f& mousePos) {
     hoveredItemInfo.setString(std::string());
+    hoveredItemName.setString(std::string());
+    hoveredItemRarity.setString(std::string());
     for (auto& slot : bagSlots) {
         if (slot.contains(mousePos) && (*slot.item)) {
             hoveredItemInfo.setString((*slot.item)->getInformation());
             hoveredItemInfo.setPosition(mousePos);
             hoveredItemInfo.setOrigin(hoveredItemInfo.getLocalBounds().left + hoveredItemInfo.getLocalBounds().width, hoveredItemInfo.getLocalBounds().top + hoveredItemInfo.getLocalBounds().height);
             
+            hoveredItemName.setString((*slot.item)->name);
+            hoveredItemName.setPosition(hoveredItemInfo.getPosition() + sf::Vector2f(hoveredItemInfo.getLocalBounds().getSize().x / 2.0f, 0.0f));
+            hoveredItemName.setOrigin(hoveredItemInfo.getOrigin() + sf::Vector2f(hoveredItemName.getLocalBounds().left + hoveredItemName.getLocalBounds().width / 2.0f, 0.0f));
+            hoveredItemName.setFillColor((*slot.item)->getItemRarityColor());
+            
+            hoveredItemRarity.setString((*slot.item)->getItemRarityString());
+            hoveredItemRarity.setPosition(hoveredItemInfo.getPosition() + sf::Vector2f(hoveredItemInfo.getLocalBounds().getSize().x, hoveredItemInfo.getLocalBounds().getSize().y));
+            hoveredItemRarity.setOrigin(hoveredItemInfo.getOrigin() + sf::Vector2f(hoveredItemRarity.getLocalBounds().left + hoveredItemRarity.getLocalBounds().width, hoveredItemRarity.getLocalBounds().top + hoveredItemRarity.getLocalBounds().height));
+            hoveredItemRarity.setFillColor((*slot.item)->getItemRarityColor());
+
             hoveredItemInfoBox.setSize(hoveredItemInfo.getLocalBounds().getSize() + sf::Vector2f(slotPadding, slotPadding) * 2.0f);
             hoveredItemInfoBox.setPosition(hoveredItemInfo.getPosition() - sf::Vector2f(slotPadding, slotPadding));           
             hoveredItemInfoBox.setOrigin(hoveredItemInfo.getOrigin());
@@ -207,6 +229,16 @@ void InventoryUI::updateHover(const sf::Vector2f& mousePos) {
             hoveredItemInfo.setPosition(mousePos);
             hoveredItemInfo.setOrigin(hoveredItemInfo.getLocalBounds().left + hoveredItemInfo.getLocalBounds().width, hoveredItemInfo.getLocalBounds().top + hoveredItemInfo.getLocalBounds().height);
             
+            hoveredItemName.setString((*slot.item)->name);
+            hoveredItemName.setPosition(hoveredItemInfo.getPosition() + sf::Vector2f(hoveredItemInfo.getLocalBounds().getSize().x / 2.0f, 0.0f));
+            hoveredItemName.setOrigin(hoveredItemInfo.getOrigin() + sf::Vector2f(hoveredItemName.getLocalBounds().left + hoveredItemName.getLocalBounds().width / 2.0f, 0.0f));
+            hoveredItemName.setFillColor((*slot.item)->getItemRarityColor());
+            
+            hoveredItemRarity.setString((*slot.item)->getItemRarityString());
+            hoveredItemRarity.setPosition(hoveredItemInfo.getPosition() + sf::Vector2f(hoveredItemInfo.getLocalBounds().getSize().x, hoveredItemInfo.getLocalBounds().getSize().y));
+            hoveredItemRarity.setOrigin(hoveredItemInfo.getOrigin() + sf::Vector2f(hoveredItemRarity.getLocalBounds().left + hoveredItemRarity.getLocalBounds().width, hoveredItemRarity.getLocalBounds().top + hoveredItemRarity.getLocalBounds().height));
+            hoveredItemRarity.setFillColor((*slot.item)->getItemRarityColor());
+
             hoveredItemInfoBox.setSize(hoveredItemInfo.getLocalBounds().getSize() + sf::Vector2f(slotPadding, slotPadding) * 2.0f);
             hoveredItemInfoBox.setPosition(hoveredItemInfo.getPosition() - sf::Vector2f(slotPadding, slotPadding));           
             hoveredItemInfoBox.setOrigin(hoveredItemInfo.getOrigin());
@@ -219,6 +251,8 @@ void InventoryUI::updateHover(const sf::Vector2f& mousePos) {
 void InventoryUI::updateDrag(const sf::Vector2f& mousePos) {
     if (!visible) return;
 
+    hoveredItemName.setString(std::string());
+    hoveredItemRarity.setString(std::string());
     hoveredItemInfo.setString(std::string());
     if (draggedItem) {
         dreggedPos = mousePos;
@@ -236,7 +270,7 @@ void InventoryUI::handleClick(const sf::Vector2f& mousePos) {
                 draggedItem  = (*slot.item);
                 (*slot.item) = nullptr;
 
-                selectedBagItemInfomation.setString(draggedItem->getInformation());
+                // selectedBagItemInfomation.setString(draggedItem->getInformation());
 
                 return;
             }
@@ -251,7 +285,7 @@ void InventoryUI::handleClick(const sf::Vector2f& mousePos) {
                 draggedItem  = (*slot.item);
                 (*slot.item) = nullptr;
                 
-                selectedEquipItemInfomation.setString(draggedItem->getInformation());
+                // selectedEquipItemInfomation.setString(draggedItem->getInformation());
 
                 return;
             }
@@ -264,8 +298,8 @@ void InventoryUI::handleRelease(const sf::Vector2f& mousePos, Player& player, st
         if (slot.contains(mousePos)) {
             if (draggedItem && !(*slot.item)) {
                 if (previousDraggedItemID >= static_cast<int>((bagSlots).size())) {
-                    selectedBagItemInfomation.setString(draggedItem->getInformation());
-                    selectedEquipItemInfomation.setString(std::string());
+                    // selectedBagItemInfomation.setString(draggedItem->getInformation());
+                    // selectedEquipItemInfomation.setString(std::string());
                 }
                 
                 (*slot.item) = draggedItem;
@@ -284,8 +318,8 @@ void InventoryUI::handleRelease(const sf::Vector2f& mousePos, Player& player, st
         if (slot.contains(mousePos)) {
             if (draggedItem && !(*slot.item) && slot.type == draggedItem->type) {
                 if (previousDraggedItemID < static_cast<int>((bagSlots).size())) {
-                    selectedBagItemInfomation.setString(std::string());
-                    selectedEquipItemInfomation.setString(draggedItem->getInformation());
+                    // selectedBagItemInfomation.setString(std::string());
+                    // selectedEquipItemInfomation.setString(draggedItem->getInformation());
                 }
 
                 (*slot.item) = draggedItem;
@@ -338,7 +372,7 @@ void InventoryUI::handleRelease(const sf::Vector2f& mousePos, Player& player, st
                         
                         if (player.dropItem(draggedItem, items)) {
                             draggedItem = nullptr;
-                            selectedBagItemInfomation.setString(std::string());
+                            // selectedBagItemInfomation.setString(std::string());
                         }
                         else {
                             std::cerr << "[Bug] - InventoryUI.cpp - handleRelease()\n";
@@ -354,10 +388,10 @@ void InventoryUI::handleRelease(const sf::Vector2f& mousePos, Player& player, st
         if (player.dropItem(draggedItem, items)) {
             draggedItem = nullptr;
             if (previousDraggedItemID < static_cast<int>((bagSlots).size())) {
-                selectedBagItemInfomation.setString(std::string());
+                // selectedBagItemInfomation.setString(std::string());
             }
             else {
-                selectedEquipItemInfomation.setString(std::string());
+                // selectedEquipItemInfomation.setString(std::string());
             }
         }
         else {
@@ -413,9 +447,9 @@ void InventoryUI::draw(sf::RenderTarget& target) {
 
     target.draw(itemInformationText);
     target.draw(bagItemInformationBox);
-    target.draw(selectedBagItemInfomation);
+    // target.draw(selectedBagItemInfomation);
     target.draw(equipItemInformationBox);
-    target.draw(selectedEquipItemInfomation);
+    // target.draw(selectedEquipItemInfomation);
     
     target.draw(totalStatsText);
     target.draw(equipmentStatsBox);
@@ -424,6 +458,8 @@ void InventoryUI::draw(sf::RenderTarget& target) {
     if (hoveredItemInfo.getString() != std::string()) {
         target.draw(hoveredItemInfoBox);
         target.draw(hoveredItemInfo);
+        target.draw(hoveredItemName);
+        target.draw(hoveredItemRarity);
     }
 
     if (draggedItem) {
