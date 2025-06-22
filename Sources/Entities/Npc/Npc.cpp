@@ -27,6 +27,22 @@ Npc::Npc(const sf::FloatRect& newHitbox,
     labelBackground.setOrigin(label.getOrigin() + sf::Vector2f(BACKGROUND_PADDING / 2, -2.0f + BACKGROUND_PADDING / 2));
     // --- [End] - Nametag --- 
     
+    // --- [Begin] - Interact text --- 
+    FADE_SPEED                  = 5.0f;
+    interactTextOpacity         = 0.0f;
+    previousInteractTextOpacity = 0.0f;
+    
+    interactText.setFont(Font::font);
+    interactText.setCharacterSize(12.5f);
+    interactText.setOutlineThickness(2.0f);
+    interactText.setFillColor(sf::Color(255, 255, 255, interactTextOpacity));
+    interactText.setOutlineColor(sf::Color(0, 0, 0, interactTextOpacity));
+    interactText.setString("Press [F] to talk");
+    interactText.setOrigin(interactText.getLocalBounds().left + interactText.getLocalBounds().width / 2, 
+                           interactText.getLocalBounds().top  + interactText.getLocalBounds().height / 2);
+    interactText.setPosition(hitbox.getPosition() + sf::Vector2f(hitbox.getSize().x / 2, -hitbox.getSize().y));
+    // --- [End] ---
+
     // --- [Begin] - Animation --- 
     animationManager.addAnimation(0, TextureManager::get(spriteName), 16, 16, 4, 0, 0.5f, false);
     
@@ -56,15 +72,19 @@ void Npc::draw(sf::RenderTarget& target) const {
     target.draw(labelBackground);
     target.draw(label);
 
-    sf::RectangleShape hitboxShape;
-    hitboxShape.setPosition(hitbox.getPosition());
-    hitboxShape.setSize(hitbox.getSize());
-    hitboxShape.setOutlineColor(sf::Color::Green);
-    hitboxShape.setOutlineThickness(1.f);
-    hitboxShape.setFillColor(sf::Color::Transparent);
-    target.draw(hitboxShape);
+    // sf::RectangleShape hitboxShape;
+    // hitboxShape.setPosition(hitbox.getPosition());
+    // hitboxShape.setSize(hitbox.getSize());
+    // hitboxShape.setOutlineColor(sf::Color::Green);
+    // hitboxShape.setOutlineThickness(1.f);
+    // hitboxShape.setFillColor(sf::Color::Transparent);
+    // target.draw(hitboxShape);
     
     target.draw(shadow);
 
     animationManager.draw(target);
+}
+
+void Npc::drawInteractText(sf::RenderTarget& target) const {
+    target.draw(interactText);
 }

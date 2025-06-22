@@ -46,4 +46,5 @@ void TextureManager::loadSprite() {
     load("chestplate_00", "Assets/Items/chestplate_00.png");
     load("leggings_00"  , "Assets/Items/leggings_00.png");
     load("boots_00"     , "Assets/Items/boots_00.png");
+    load("orb"          , "Assets/Items/orb.png");
 }

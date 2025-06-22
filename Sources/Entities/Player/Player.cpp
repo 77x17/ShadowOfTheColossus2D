@@ -5,6 +5,8 @@
 #include "Region.hpp"
 #include "Normalize.hpp"
 
+#include <cmath>
+
 Player::Player(const sf::Vector2f& position, const float& baseHp, std::vector<Quest>&& _quests) 
 : hitbox(position, sf::Vector2f(TILE_SIZE, TILE_SIZE))
 {
@@ -91,7 +93,7 @@ Player::Player(const sf::Vector2f& position, const float& baseHp, std::vector<Qu
 
     quests.clear();
     quests = std::move(_quests);
-    INTERUPTED_TIME         = 1.0f;
+    INTERUPTED_TIME         = 0.5f;
     interuptedCooldownTimer = -11.0f;
 
     collisionRegionID = -1;

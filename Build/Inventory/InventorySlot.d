@@ -1,3 +1,4 @@
 Build/Inventory/InventorySlot.o: Sources/Inventory/InventorySlot.cpp \
- Sources/Inventory/InventorySlot.hpp Sources/Inventory/ItemData.hpp \
- Sources/TextureManager/TextureManager.hpp
+ Sources/Inventory/InventorySlot.hpp Sources/Inventory/Items/AllItems.hpp \
+ Sources/Inventory/Items/Armor.hpp Sources/Inventory/Items/ItemData.hpp \
+ Sources/Inventory/Items/Weapon.hpp Sources/Inventory/Items/Material.hpp

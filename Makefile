@@ -7,6 +7,7 @@ SFML_LIBS = -lsfml-system -lsfml-graphics -lsfml-window -lsfml-audio
 
 INCLUDES = -I"./Sources" \
 		   -I"./Sources/AnimationManager" \
+		   -I"./Sources/BossAltar" \
 		   -I"./Sources/Clock" \
 		   -I"./Sources/Configuration" \
 		   -I"./Sources/Effects" \
@@ -19,6 +20,7 @@ INCLUDES = -I"./Sources" \
 		   -I"./Sources/Entities/Player" \
 		   -I"./Sources/Entities/Projectile" \
 		   -I"./Sources/Inventory" \
+		   -I"./Sources/Inventory/Items" \
 		   -I"./Sources/LightSource" \
 		   -I"./Sources/Maps" \
 		   -I"./Sources/ParticleManager" \
@@ -35,6 +37,7 @@ TARGET    = ./Build/Demo.exe
 # Find all .cpp files in SRC_DIR
 SRCS := $(wildcard $(SRC_DIR)/*.cpp) \
         $(wildcard $(SRC_DIR)/AnimationManager/*.cpp) \
+        $(wildcard $(SRC_DIR)/BossAltar/*.cpp) \
         $(wildcard $(SRC_DIR)/Clock/*.cpp) \
         $(wildcard $(SRC_DIR)/Configuration/*.cpp) \
         $(wildcard $(SRC_DIR)/Effects/*.cpp) \
@@ -47,6 +50,7 @@ SRCS := $(wildcard $(SRC_DIR)/*.cpp) \
         $(wildcard $(SRC_DIR)/Entities/Player/*.cpp) \
         $(wildcard $(SRC_DIR)/Entities/Projectile/*.cpp) \
         $(wildcard $(SRC_DIR)/Inventory/*.cpp) \
+        $(wildcard $(SRC_DIR)/Inventory/Items/*.cpp) \
         $(wildcard $(SRC_DIR)/LightSource/*.cpp) \
         $(wildcard $(SRC_DIR)/Maps/*.cpp) \
         $(wildcard $(SRC_DIR)/ParticleManager/*.cpp) \

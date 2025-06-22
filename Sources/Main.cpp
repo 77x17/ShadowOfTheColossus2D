@@ -43,6 +43,8 @@
 #include "ParticleManager.hpp"
 #include "TextureManager.hpp"
 
+#include "BossAltar.hpp"
+
 sf::Font Font::font;
 
 std::unordered_map<std::string, std::unique_ptr<sf::Texture>> TextureManager::textures;
@@ -69,6 +71,7 @@ void loadEnemy(std::vector<std::unique_ptr<Enemy>>& enemies, const std::unordere
     batInventory.emplace_back(0.05, std::make_shared<Chestplate>("Old Chestplate", "chestplate_00", 2.0f, 1, ItemRarity::Normal));
     batInventory.emplace_back(0.05, std::make_shared<Leggings>("Old Leggings", "leggings_00", 2.0f, 1, ItemRarity::Normal));
     batInventory.emplace_back(0.05, std::make_shared<Boots>("Old Boots", "boots_00", 2.0f, 1, ItemRarity::Normal));
+    batInventory.emplace_back(0.1, std::make_shared<Orb>("Bat Orb", "orb", ItemRarity::Rare));
     
     std::vector<std::pair<float, std::shared_ptr<ItemData>>> eyeInventory;
     eyeInventory.emplace_back(0.05, std::make_shared<Bow>("Wooden Bow", "bow_00", 2.5f, 3, ItemRarity::Unique));
@@ -76,6 +79,7 @@ void loadEnemy(std::vector<std::unique_ptr<Enemy>>& enemies, const std::unordere
     eyeInventory.emplace_back(0.05, std::make_shared<Chestplate>("Copper Chestplate", "chestplate_00", 3.0f, 3, ItemRarity::Unique));
     eyeInventory.emplace_back(0.05, std::make_shared<Leggings>("Copper Leggings", "leggings_00", 3.0f, 3, ItemRarity::Unique));
     eyeInventory.emplace_back(0.05, std::make_shared<Boots>("Copper Boots", "boots_00", 3.0f, 3, ItemRarity::Unique));
+    eyeInventory.emplace_back(0.1, std::make_shared<Orb>("Eye Orb", "orb", ItemRarity::Rare));
 
     for (const auto& pair : enemyRects) {
         for (const sf::FloatRect& rect : pair.second) {
@@ -101,7 +105,7 @@ void loadEnemy(std::vector<std::unique_ptr<Enemy>>& enemies, const std::unordere
     batBossInventory.emplace_back(1.0f, std::make_shared<Leggings>("Copper Leggings", "leggings_00", 5.0f, 5, ItemRarity::Rare));
     batBossInventory.emplace_back(1.0f, std::make_shared<Boots>("Copper Boots", "boots_00", 5.0f, 5, ItemRarity::Rare));
 
-    enemies.push_back(std::make_unique<BatBoss>(sf::Vector2f(176, 108) * 32.0f, batBossInventory));
+    // enemies.push_back(std::make_unique<BatBoss>(sf::Vector2f(176, 108) * 32.0f, batBossInventory));
 }
 
 void loadNpc(std::vector<std::unique_ptr<Npc>>& npcs, const TileMap& map) {
@@ -233,6 +237,13 @@ void loadQuests(std::vector<Quest>& quests) {
     // quests.back().addObjective  (<stage>, <objective>);
 }
 
+void loadBossAltars(std::vector<BossAltar>& bossAltars, const std::unordered_map<int, sf::FloatRect>& bossAltarRects) {
+    bossAltars.emplace_back(
+        0,
+        bossAltarRects.at(0)
+    );
+}
+
 int main() {
     sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Project_H", sf::Style::Close);
     // window.setFramerateLimit(60);
@@ -294,6 +305,9 @@ int main() {
 
     InventoryUI inventoryUI(static_cast<sf::Vector2f>(window.getSize()), player);
     MerchantUI merchantUI(static_cast<sf::Vector2f>(window.getSize()), player);
+
+    std::vector<BossAltar> bossAltars;
+    loadBossAltars(bossAltars, map.getBossAltarRects());
     // --- [End] ---
 
     while (window.isOpen()) {
@@ -409,7 +423,6 @@ int main() {
                 }
             }
         }
-        //
         // Player collision Items
         for (auto it = items.begin(); it != items.end(); ) {
             if (it->canPickup() && player.isCollision(it->getHitbox())) {
@@ -423,7 +436,15 @@ int main() {
                 ++it; 
             }
         }
-        //
+        // Player collision Boss Altars
+        for (BossAltar& bossAltar : bossAltars) {
+            if (player.isCollision(bossAltar.getHitbox())) {
+                bossAltar.collisionWithPlayer = true;
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::F)) {
+                    bossAltar.interactWithPlayer(player, enemies);
+                }
+            }
+        }
 
         player.update(dt, window, map.getCollisionRects(), map.getRegionRects());
         
@@ -441,6 +462,10 @@ int main() {
 
         for (Item& item : items) {
             item.update(dt);
+        }
+
+        for (BossAltar& bossAltar : bossAltars) {
+            bossAltar.update(dt);
         }
         
         map.update(dt);
@@ -543,12 +568,11 @@ int main() {
         particleManager.drawScreen(sceneTexture);
 
         bool merchantFlag = false;
-        for (auto& npc : npcs) {
-            if (const QuestNpc* questNpc = dynamic_cast<QuestNpc*>(npc.get())) {
-                sceneTexture.setView(view);
-                questNpc->drawInteractQuest(sceneTexture);
-            }
-            else if (MerchantNpc* merchantNpc = dynamic_cast<MerchantNpc*>(npc.get())) {
+        for (std::unique_ptr<Npc>& npc : npcs) {
+            sceneTexture.setView(view);
+            npc->drawInteractText(sceneTexture);
+            
+            if (MerchantNpc* merchantNpc = dynamic_cast<MerchantNpc*>(npc.get())) {
                 if (merchantNpc->isInteractWithPlayer()) {
                     merchantFlag = true;
 
@@ -558,15 +582,15 @@ int main() {
                     }
                 }   
             }
-            
         }
-
         if (merchantUI.isVisible() && merchantFlag == false) {
             merchantUI.isPayment(player);
         }
-
         merchantUI.setVisible(merchantFlag);
 
+        for (const BossAltar& bossAltar : bossAltars) {
+            bossAltar.drawInteractText(sceneTexture);
+        }
         // --- [End] ---
 
         sceneTexture.display(); 

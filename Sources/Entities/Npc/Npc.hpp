@@ -2,7 +2,6 @@
 
 #include <SFML/Graphics.hpp>
 #include <string>
-#include <vector>
 
 #include "AnimationManager.hpp"
 #include "TextureManager.hpp"
@@ -17,6 +16,11 @@ protected:
     sf::Text           label;
     sf::RectangleShape labelBackground;
     
+    float    FADE_SPEED;
+    float    interactTextOpacity;
+    float    previousInteractTextOpacity;
+    sf::Text interactText;
+
     AnimationManager   animationManager;
     sf::Sprite         shadow;
 
@@ -26,12 +30,12 @@ public:
     bool collisionWithPlayer;
 
     Npc(const sf::FloatRect& _hitbox, const std::string& name, const std::string& spriteName);
-
-    int getID() const;
     
     virtual void update(const float& dt);
     
     void draw(sf::RenderTarget& target) const;
+
+    void drawInteractText(sf::RenderTarget& target) const;
     
     sf::FloatRect getHitbox() const;
 

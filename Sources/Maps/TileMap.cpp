@@ -298,6 +298,14 @@ bool TileMap::load(const std::string& tmxPath, const std::vector<std::pair<std::
                         }
                         m_RegionRects[id] = sf::FloatRect(x, y, width, height);
                     }
+                    else if (objectGroupName == "BossAltar") {
+                        auto prop = objectNode.child("properties").find_child_by_attribute("property", "name", "bossAltar_id");
+                        int id = -1;
+                        if (prop) {
+                            id = prop.attribute("value").as_int();
+                        }
+                        m_bossAltarRects[id] = sf::FloatRect(x, y, width, height);
+                    }
                     else {
                         std::cerr << "[Bug] - TileMap.cpp - load() - Collision\n";
                     }
@@ -356,6 +364,10 @@ void TileMap::updateObjects() {
         }
     }
 
+    for (auto& pair : m_bossAltarRects) {
+        pair.second = getTransform().transformRect(pair.second);
+    }
+    
     for (auto& pair : m_questNpcRects) {
         pair.second = getTransform().transformRect(pair.second);
     }
@@ -509,6 +521,14 @@ void TileMap::drawMinimap(sf::RenderTarget& target, sf::RenderStates states) con
     //     }
     // }
 
+    hitbox.setOutlineColor(sf::Color::White);
+    hitbox.setFillColor(sf::Color::White);
+    for (auto& pair : m_bossAltarRects) {
+        hitbox.setSize(pair.second.getSize());
+        hitbox.setPosition(pair.second.getPosition());
+        target.draw(hitbox);
+    }
+
     hitbox.setOutlineColor(sf::Color::Green);
     hitbox.setFillColor(sf::Color::Green);
     for (auto& pair : m_questNpcRects) {
@@ -536,6 +556,10 @@ void TileMap::drawMinimap(sf::RenderTarget& target, sf::RenderStates states) con
 
 const std::vector<sf::FloatRect>& TileMap::getCollisionRects() const {
     return m_collisionRects;
+}
+
+const std::unordered_map<int, sf::FloatRect>& TileMap::getBossAltarRects() const {
+    return m_bossAltarRects;
 }
 
 const std::unordered_map<int, sf::FloatRect>& TileMap::getQuestNpcRects() const {

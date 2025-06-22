@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="256" height="256" tilewidth="16" tileheight="16" infinite="0" nextlayerid="26" nextobjectid="333">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="256" height="256" tilewidth="16" tileheight="16" infinite="0" nextlayerid="28" nextobjectid="334">
  <tileset firstgid="1" source="overworld.tsx"/>
  <tileset firstgid="1481" name="CastleWalls" tilewidth="16" tileheight="16" tilecount="1024" columns="32">
   <image source="CastleWalls.png" width="512" height="512"/>
@@ -1078,6 +1078,13 @@
   </objectgroup>
  </group>
  <group id="11" name="Collision">
+  <objectgroup id="27" name="BossAltar">
+   <object id="333" x="2832" y="1744" width="16" height="16">
+    <properties>
+     <property name="bossAltar_id" value="0"/>
+    </properties>
+   </object>
+  </objectgroup>
   <objectgroup id="5" name="CollisionObjects">
    <object id="63" x="1826.5" y="1797.5" width="27" height="14.1667"/>
    <object id="64" x="1698.5" y="1843" width="26.5" height="15.1667"/>

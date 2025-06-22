@@ -3,21 +3,7 @@
 #include "Font.hpp"
 
 QuestNpc::QuestNpc(int newID, const sf::FloatRect& newHitbox, const std::string& name, const std::string& spriteName) 
-: Npc(newHitbox, name, spriteName), ID(newID) {
-    FADE_SPEED                  = 5.0f;
-    interactTextOpacity         = 0.0f;
-    previousInteractTextOpacity = 0.0f;
-    
-    interactText.setFont(Font::font);
-    interactText.setCharacterSize(12.5f);
-    interactText.setOutlineThickness(2.0f);
-    interactText.setFillColor(sf::Color(255, 255, 255, interactTextOpacity));
-    interactText.setOutlineColor(sf::Color(0, 0, 0, interactTextOpacity));
-    interactText.setString("Press [F] to talk");
-    interactText.setOrigin(interactText.getLocalBounds().left + interactText.getLocalBounds().width / 2, 
-                           interactText.getLocalBounds().top  + interactText.getLocalBounds().height / 2);
-    interactText.setPosition(hitbox.getPosition() + sf::Vector2f(hitbox.getSize().x / 2, -hitbox.getSize().y));
-}
+: Npc(newHitbox, name, spriteName), ID(newID) {}
 
 void QuestNpc::update(const float& dt) {
     Npc::update(dt);
@@ -41,10 +27,6 @@ void QuestNpc::update(const float& dt) {
         interactText.setOutlineColor(sf::Color(0, 0, 0, interactTextOpacity));
         previousInteractTextOpacity = interactTextOpacity;
     }
-}
-
-void QuestNpc::drawInteractQuest(sf::RenderTarget& target) const {
-    target.draw(interactText);
 }
 
 void QuestNpc::interactWithPlayer(Player& player) {

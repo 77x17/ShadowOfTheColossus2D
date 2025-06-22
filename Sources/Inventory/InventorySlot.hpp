@@ -3,7 +3,7 @@
 #include <SFML/Graphics.hpp>
 #include <memory>
 
-#include "ItemData.hpp"
+#include "AllItems.hpp"
 
 class InventorySlot {
 public:
