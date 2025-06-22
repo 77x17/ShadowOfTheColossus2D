@@ -93,6 +93,18 @@ void MerchantUI::updateHover(const sf::Vector2f& mousePos) {
             return; 
         }
     }
+    for (auto& slot : merchantBagSlots) {
+        if (slot.contains(mousePos) && (*slot.item)) {
+            hoveredItemInfo.setString((*slot.item)->getInformation());
+            hoveredItemInfo.setPosition(mousePos);
+            hoveredItemInfo.setOrigin(hoveredItemInfo.getLocalBounds().left + hoveredItemInfo.getLocalBounds().width, hoveredItemInfo.getLocalBounds().top + hoveredItemInfo.getLocalBounds().height);
+            
+            hoveredItemInfoBox.setSize(hoveredItemInfo.getLocalBounds().getSize() + sf::Vector2f(slotPadding, slotPadding) * 2.0f);
+            hoveredItemInfoBox.setPosition(hoveredItemInfo.getPosition() - sf::Vector2f(slotPadding, slotPadding));           
+            hoveredItemInfoBox.setOrigin(hoveredItemInfo.getOrigin());
+            return; 
+        }
+    }
 }
 
 void MerchantUI::updateDrag(const sf::Vector2f& mousePos) {
@@ -306,4 +318,15 @@ bool MerchantUI::isVisible() const {
 
 bool MerchantUI::isDrag() const {
     return draggedItem != nullptr;
+}
+
+void MerchantUI::isPayment(Player& player) {
+    for (std::shared_ptr<ItemData>& item : merchantInventory) {
+        if (item != nullptr) {
+            item          = nullptr;
+            player.golds += 10.0f;
+
+            SoundManager::playSound("payment");
+        }
+    }
 }

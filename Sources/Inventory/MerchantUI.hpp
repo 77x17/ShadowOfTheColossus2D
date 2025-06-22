@@ -50,4 +50,5 @@ public:
     bool isVisible() const;
     bool isDrag() const;
     
+    void isPayment(Player& player);
 };

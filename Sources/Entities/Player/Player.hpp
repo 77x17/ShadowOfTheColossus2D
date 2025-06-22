@@ -94,10 +94,12 @@ private:
 
     std::vector<std::shared_ptr<ItemData>> inventory;   // 10 x 4 = 40
     std::vector<std::shared_ptr<ItemData>> equipment;   // 8
+
     // --- [End] - Inventory --- 
 public:
-    bool collisionWithNpc = false;
-    bool updateQuest      = false;
+    bool  collisionWithNpc = false;
+    bool  updateQuest      = false;
+    float golds = 0.0f;
 
 public:
     Player(const sf::Vector2f& position, const float& baseHp, std::vector<Quest>&& _quests);

@@ -63,15 +63,15 @@ void loadEnemy(std::vector<std::unique_ptr<Enemy>>& enemies, const std::unordere
     // Normal     = 0.05    - 1 / 20
 
     std::vector<std::pair<float, std::shared_ptr<ItemData>>> batInventory;
-    batInventory.emplace_back(0.05, std::make_shared<Bow>("Old Bow", "bow_00", 1.0f, 1));
-    batInventory.emplace_back(0.05, std::make_shared<Helmet>("Old Helmet", "helmet_00", 2.0f, 1));
-    batInventory.emplace_back(0.05, std::make_shared<Chestplate>("Old Chestplate", "chestplate_00", 2.0f, 1));
-    batInventory.emplace_back(0.05, std::make_shared<Leggings>("Old Leggings", "leggings_00", 2.0f, 1));
-    batInventory.emplace_back(0.05, std::make_shared<Boots>("Old Boots", "boots_00", 2.0f, 1));
+    batInventory.emplace_back(0.05, std::make_shared<Bow>("Old Bow", "bow_00", 1.0f, 1, ItemRarity::Normal));
+    batInventory.emplace_back(0.05, std::make_shared<Helmet>("Old Helmet", "helmet_00", 2.0f, 1, ItemRarity::Normal));
+    batInventory.emplace_back(0.05, std::make_shared<Chestplate>("Old Chestplate", "chestplate_00", 2.0f, 1, ItemRarity::Normal));
+    batInventory.emplace_back(0.05, std::make_shared<Leggings>("Old Leggings", "leggings_00", 2.0f, 1, ItemRarity::Normal));
+    batInventory.emplace_back(0.05, std::make_shared<Boots>("Old Boots", "boots_00", 2.0f, 1, ItemRarity::Normal));
     
     std::vector<std::pair<float, std::shared_ptr<ItemData>>> eyeInventory;
-    eyeInventory.emplace_back(0.05, std::make_shared<Bow>("Wooden Bow", "bow_00", 2.5f, 1));
-    eyeInventory.emplace_back(0.05, std::make_shared<Helmet>("Copper Helmet", "helmet_00", 4.0f, 1));
+    eyeInventory.emplace_back(0.05, std::make_shared<Bow>("Wooden Bow", "bow_00", 2.5f, 1, ItemRarity::Unique));
+    eyeInventory.emplace_back(0.05, std::make_shared<Helmet>("Copper Helmet", "helmet_00", 4.0f, 1, ItemRarity::Unique));
 
     for (const auto& pair : enemyRects) {
         for (const sf::FloatRect& rect : pair.second) {
@@ -155,7 +155,7 @@ void loadQuests(std::vector<Quest>& quests) {
     quests.back().addDialogue   (2, "[7/7] From now on, you fight as an archer. Help us drive back the darkness");
     quests.back().addDescription(2, "Speak to Torren");
     quests.back().addObjective  (2, std::make_shared<TalkObjective>(1));
-    quests.back().addItemFromNpc(2, std::make_shared<Bow>("Old Bow", "bow_00", 1.0f, 1));
+    quests.back().addItemFromNpc(2, std::make_shared<Bow>("Old Bow", "bow_00", 1.0f, 1, ItemRarity::Normal));
     // Stage 3: Diệt quái
     quests.back().addNpcID      (3, -1);
     quests.back().addDialogue   (3, std::string());
@@ -276,8 +276,8 @@ int main() {
     // }
     
     std::vector<Item> items;
-    items.emplace_back(player.getPosition() + sf::Vector2f(100.0f, 0), std::make_shared<Bow>("God Bow", "bow_00", 10.0f, 1));
-    items.emplace_back(player.getPosition() + sf::Vector2f(300.0f, 0), std::make_shared<Helmet>("God Helmet", "helmet_00", 20.0f, 1));
+    items.emplace_back(player.getPosition() + sf::Vector2f(100.0f, 0), std::make_shared<Bow>("God Bow", "bow_00", 10.0f, 1, ItemRarity::Mythic));
+    items.emplace_back(player.getPosition() + sf::Vector2f(300.0f, 0), std::make_shared<Helmet>("God Helmet", "helmet_00", 20.0f, 1, ItemRarity::Mythic));
 
     InventoryUI inventoryUI(static_cast<sf::Vector2f>(window.getSize()), player);
     MerchantUI merchantUI(static_cast<sf::Vector2f>(window.getSize()), player);
@@ -529,24 +529,30 @@ int main() {
         sceneTexture.setView(uiView);
         particleManager.drawScreen(sceneTexture);
 
+        bool merchantFlag = false;
         for (auto& npc : npcs) {
-            bool merchantFlag = false;
             if (const QuestNpc* questNpc = dynamic_cast<QuestNpc*>(npc.get())) {
                 sceneTexture.setView(view);
                 questNpc->drawInteractQuest(sceneTexture);
             }
-            else if (const MerchantNpc* merchantNpc = dynamic_cast<MerchantNpc*>(npc.get())) {
+            else if (MerchantNpc* merchantNpc = dynamic_cast<MerchantNpc*>(npc.get())) {
                 if (merchantNpc->isInteractWithPlayer()) {
                     merchantFlag = true;
+
+                    if (inventoryUI.isVisible()) {
+                        merchantNpc->interactWithPlayer(player);
+                        merchantFlag = false;
+                    }
                 }   
             }
             
-            if (inventoryUI.isVisible()) {
-                merchantFlag = false;
-            }
-
-            merchantUI.setVisible(merchantFlag);
         }
+
+        if (merchantUI.isVisible() && merchantFlag == false) {
+            merchantUI.isPayment(player);
+        }
+
+        merchantUI.setVisible(merchantFlag);
 
         // --- [End] ---
 

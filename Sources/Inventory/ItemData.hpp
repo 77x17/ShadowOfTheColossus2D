@@ -19,21 +19,58 @@ enum class ItemType {
     Quest
 };
 
+enum class ItemRarity {
+    Normal,
+    Unique,
+    Rare,
+    Legendary,
+    Mythic
+};
+
 class ItemData {
 public:
     std::string name;
     ItemType    type;
     sf::Sprite  sprite;
+    ItemRarity  rarity;
 
-    ItemData(const std::string& _name, ItemType _type, const std::string& _textureName) 
-    : name(_name), type(_type) {
+    ItemData(const std::string& _name, ItemType _type, const std::string& _textureName, ItemRarity _rarity) 
+    : name(_name), type(_type), rarity(_rarity) {
         sprite.setTexture(TextureManager::get(_textureName));
         sprite.setScale(2.0f, 2.0f);
     }
 
-    virtual std::string getInformation() const {
-        return name;
+    std::string getItemRarityString() const {
+        switch (rarity) {
+            case ItemRarity::Normal:
+                return "Normal";
+                break;
+            case ItemRarity::Unique:
+                return "Unique";
+                break;
+            case ItemRarity::Rare:
+                return "Rare";
+                break;
+            case ItemRarity::Legendary:
+                return "Legendary";
+                break;
+            case ItemRarity::Mythic:
+                return "Mythic";
+                break;
+            default:
+                std::cerr << "[Bug] - ItemData.hpp - getInformation()\n";
+                break;
+        }
+        return std::string();
     }
+
+    std::string getInformation() const {
+        return name + "\n\n"
+             + getDetails() + "\n\n"
+             + getItemRarityString();
+    }
+
+    virtual std::string getDetails() const = 0;
 
     virtual float getDamage() const = 0;
     virtual float getHealth() const = 0;
@@ -44,17 +81,16 @@ public:
     float health;
     int   levelRequired;
 
-    Armor(const std::string& _name, ItemType armorType, const std::string& textureName, float _health, int _levelRequired) 
-    : ItemData(_name, armorType, textureName), health(_health), levelRequired(_levelRequired) {}
+    Armor(const std::string& _name, ItemType armorType, const std::string& textureName, float _health, int _levelRequired, ItemRarity _rarity) 
+    : ItemData(_name, armorType, textureName, _rarity), health(_health), levelRequired(_levelRequired) {}
 
-    std::string getInformation() const override {
+    std::string getDetails() const override {
         std::string healthString = "Health: " + std::to_string(health);
         healthString = healthString.substr(0, healthString.find('.') + 3);
 
         std::string levelRequiredString = "Lv.Minimum: " + std::to_string(levelRequired);
 
-        return ItemData::getInformation() + "\n\n" 
-             + healthString + "\n\n" 
+        return healthString + "\n\n" 
              + levelRequiredString;
     }
 
@@ -69,26 +105,26 @@ public:
 
 class Helmet : public Armor {
 public:
-    Helmet(const std::string& _name, const std::string& textureName, float _health, int _levelRequired) 
-    : Armor(_name, ItemType::Helmet, textureName, _health, _levelRequired) {}
+    Helmet(const std::string& _name, const std::string& textureName, float _health, int _levelRequired, ItemRarity _rarity) 
+    : Armor(_name, ItemType::Helmet, textureName, _health, _levelRequired, _rarity) {}
 };
 
 class Chestplate : public Armor {
 public:
-    Chestplate(const std::string& _name, const std::string& textureName, float _health, int _levelRequired) 
-    : Armor(_name, ItemType::Chestplate, textureName, _health, _levelRequired) {}
+    Chestplate(const std::string& _name, const std::string& textureName, float _health, int _levelRequired, ItemRarity _rarity) 
+    : Armor(_name, ItemType::Chestplate, textureName, _health, _levelRequired, _rarity) {}
 };
 
 class Leggings : public Armor {
 public:
-    Leggings(const std::string& _name, const std::string& textureName, float _health, int _levelRequired) 
-    : Armor(_name, ItemType::Leggings, textureName, _health, _levelRequired) {}
+    Leggings(const std::string& _name, const std::string& textureName, float _health, int _levelRequired, ItemRarity _rarity) 
+    : Armor(_name, ItemType::Leggings, textureName, _health, _levelRequired, _rarity) {}
 };
 
 class Boots : public Armor {
 public:
-    Boots(const std::string& _name, const std::string& textureName, float _health, int _levelRequired) 
-    : Armor(_name, ItemType::Boots, textureName, _health, _levelRequired) {}
+    Boots(const std::string& _name, const std::string& textureName, float _health, int _levelRequired, ItemRarity _rarity) 
+    : Armor(_name, ItemType::Boots, textureName, _health, _levelRequired, _rarity) {}
 };
 
 class Bow : public ItemData {
@@ -96,17 +132,16 @@ public:
     float damage;
     int   levelRequired;
 
-    Bow(const std::string& _name, const std::string& textureName, float _damage, int _levelRequired) 
-    : ItemData(_name, ItemType::Weapon, textureName), damage(_damage), levelRequired(_levelRequired) {}
+    Bow(const std::string& _name, const std::string& textureName, float _damage, int _levelRequired, ItemRarity _rarity) 
+    : ItemData(_name, ItemType::Weapon, textureName, _rarity), damage(_damage), levelRequired(_levelRequired) {}
 
-    std::string getInformation() const override {
+    std::string getDetails() const override {
         std::string damageString = "Damage: " + std::to_string(damage);
         damageString = damageString.substr(0, damageString.find('.') + 3);
 
         std::string levelRequiredString = "Lv.Minimum: " + std::to_string(levelRequired);
 
-        return ItemData::getInformation() + "\n\n" 
-             + damageString + "\n\n" 
+        return damageString + "\n\n" 
              + levelRequiredString;
     }
 

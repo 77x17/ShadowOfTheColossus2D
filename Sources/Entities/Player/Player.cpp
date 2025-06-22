@@ -721,16 +721,19 @@ std::string Player::getStats() const {
     std::string equipmentHealthString = "Equip HP: " + std::to_string(equipmentHealth);
     std::string damageString          = "Damage  : " + std::to_string(equipmentDamage);
     std::string xpString              = "EXP     : " + getXPString();
+    std::string goldsString           = "Golds   : " + std::to_string(golds);
 
     baseHealthString      = baseHealthString.substr(0, baseHealthString.find('.') + 3);
     equipmentHealthString = equipmentHealthString.substr(0, equipmentHealthString.find('.') + 3);
     damageString          = damageString.substr(0, damageString.find('.') + 3);
+    goldsString           = goldsString.substr(0, goldsString.find('.') + 3);
     
     return healthString + "\n"
          + baseHealthString + "\n" 
          + equipmentHealthString + "\n" 
          + damageString + "\n\n"
-         + xpString;
+         + xpString + "\n"
+         + goldsString;
 }
 
 bool Player::dropItem(const std::shared_ptr<ItemData>& item, std::vector<Item>& items) {

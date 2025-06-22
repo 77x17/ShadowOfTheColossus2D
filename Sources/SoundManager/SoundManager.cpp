@@ -129,6 +129,7 @@ void SoundManager::loadSound() {
     loadSound("menuOpen"  , "Assets/Sounds/menu-open.wav");
     loadSound("menuClose" , "Assets/Sounds/menu-close.wav");
     loadSound("pickupItem", "Assets/Sounds/pickupItem.wav");
+    loadSound("payment"   , "Assets/Sounds/payment.wav");
     // loadMusic("region0"   , "Assets/Sounds/Salted - Wynn OST - 05 Detlas Suburb.ogg");
     // loadMusic("region1"   , "Assets/Sounds/Salted - Wynn OST - 04 Gavel Journey.ogg");
     // setMusicVolume("region0", 50.0f);

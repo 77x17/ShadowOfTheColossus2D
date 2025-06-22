@@ -21,13 +21,6 @@ void MerchantNpc::interactWithPlayer(Player& player) {
 
     shopVisible = !shopVisible;
 
-    if (shopVisible) {
-        // bagSlots = player.getBagSlots();
-    }
-    else {
-        bagSlots = nullptr;
-    }
-
     interactCooldownTimer = INTERACT_COOLDOWN;
 }
 
