@@ -13,6 +13,7 @@
 // --- [Begin] - Entities ---
 #include "Enemy.hpp"
 #include "Bat.hpp"
+#include "BatBoss.hpp"
 #include "Eye.hpp"
 #include "Player.hpp"
 #include "Item.hpp"
@@ -70,8 +71,11 @@ void loadEnemy(std::vector<std::unique_ptr<Enemy>>& enemies, const std::unordere
     batInventory.emplace_back(0.05, std::make_shared<Boots>("Old Boots", "boots_00", 2.0f, 1, ItemRarity::Normal));
     
     std::vector<std::pair<float, std::shared_ptr<ItemData>>> eyeInventory;
-    eyeInventory.emplace_back(0.05, std::make_shared<Bow>("Wooden Bow", "bow_00", 2.5f, 1, ItemRarity::Unique));
-    eyeInventory.emplace_back(0.05, std::make_shared<Helmet>("Copper Helmet", "helmet_00", 4.0f, 1, ItemRarity::Unique));
+    eyeInventory.emplace_back(0.05, std::make_shared<Bow>("Wooden Bow", "bow_00", 2.5f, 3, ItemRarity::Unique));
+    eyeInventory.emplace_back(0.05, std::make_shared<Helmet>("Copper Helmet", "helmet_00", 3.0f, 3, ItemRarity::Unique));
+    eyeInventory.emplace_back(0.05, std::make_shared<Chestplate>("Copper Chestplate", "chestplate_00", 3.0f, 3, ItemRarity::Unique));
+    eyeInventory.emplace_back(0.05, std::make_shared<Leggings>("Copper Leggings", "leggings_00", 3.0f, 3, ItemRarity::Unique));
+    eyeInventory.emplace_back(0.05, std::make_shared<Boots>("Copper Boots", "boots_00", 3.0f, 3, ItemRarity::Unique));
 
     for (const auto& pair : enemyRects) {
         for (const sf::FloatRect& rect : pair.second) {
@@ -89,6 +93,15 @@ void loadEnemy(std::vector<std::unique_ptr<Enemy>>& enemies, const std::unordere
             }
         }
     }
+
+    std::vector<std::pair<float, std::shared_ptr<ItemData>>> batBossInventory;
+    batBossInventory.emplace_back(1.0f, std::make_shared<Bow>("Copper Bow", "bow_00", 5.0f, 5, ItemRarity::Legendary));
+    batBossInventory.emplace_back(1.0f, std::make_shared<Helmet>("Copper Helmet", "helmet_00", 5.0f, 5, ItemRarity::Rare));
+    batBossInventory.emplace_back(1.0f, std::make_shared<Chestplate>("Copper Chestplate", "chestplate_00", 5.0f, 5, ItemRarity::Rare));
+    batBossInventory.emplace_back(1.0f, std::make_shared<Leggings>("Copper Leggings", "leggings_00", 5.0f, 5, ItemRarity::Rare));
+    batBossInventory.emplace_back(1.0f, std::make_shared<Boots>("Copper Boots", "boots_00", 5.0f, 5, ItemRarity::Rare));
+
+    enemies.push_back(std::make_unique<BatBoss>(sf::Vector2f(176, 108) * 32.0f, batBossInventory));
 }
 
 void loadNpc(std::vector<std::unique_ptr<Npc>>& npcs, const TileMap& map) {
@@ -277,7 +290,7 @@ int main() {
     
     std::vector<Item> items;
     items.emplace_back(player.getPosition() + sf::Vector2f(100.0f, 0), std::make_shared<Bow>("God Bow", "bow_00", 10.0f, 1, ItemRarity::Mythic));
-    items.emplace_back(player.getPosition() + sf::Vector2f(300.0f, 0), std::make_shared<Helmet>("God Helmet", "helmet_00", 20.0f, 1, ItemRarity::Mythic));
+    items.emplace_back(player.getPosition() + sf::Vector2f(300.0f, 0), std::make_shared<Helmet>("God Helmet", "helmet_00", 10000.0f, 1, ItemRarity::Mythic));
 
     InventoryUI inventoryUI(static_cast<sf::Vector2f>(window.getSize()), player);
     MerchantUI merchantUI(static_cast<sf::Vector2f>(window.getSize()), player);

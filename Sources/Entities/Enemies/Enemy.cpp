@@ -12,10 +12,43 @@ Enemy::Enemy(const sf::Vector2f& position,
              const std::vector<std::pair<float, std::shared_ptr<ItemData>>>& _inventory) 
 : hitbox(position, size), inventory(_inventory)
 {
+    // --- [Begin] - Configuration ---
     state           = 0;
-    MOVE_SPEED      = 100.0f; 
     basePosition    = position;
     movingDirection = sf::Vector2f(0.f, 0.f);
+
+    DYING_TIME         = 1.0f;
+    dyingCooldownTimer = 0.0f;
+
+    RESPAWN_TIME         = 5.0f;
+    respawnCooldownTimer = 0.0f;
+
+    INVINCIBLE_TIME         = 1.0f;
+    invincibleCooldownTimer = INVINCIBLE_TIME;
+
+    ALERT_LIFETIME     = 0.5f;
+    alertCooldownTimer = 0.0f;
+
+    RANDOM_TIME          = 5.0f;
+    randomCooldownTimer  = 5.0f;
+    stayingCooldownTimer = 0.0f;
+
+    ATTACK_COOLDOWN_TIME = 0.5f;
+    attackCooldownTimer  = 0.0f;
+    // --- [End] ---
+
+    // --- [Begin] - Enemy different ---
+    MOVE_SPEED = 100.0f; 
+
+    DETECION_RANGE = 150.0f;
+
+    KNOCKBACK_STRENGTH     = 100.0f;
+    KNOCKBACK_COOLDOWN     = 0.2f;
+    knockbackCooldownTimer = 0.0f;
+
+    damagePerAttack = 1.0f;
+    expAmount       = 1.0f;
+    // --- [End] ---
 
     // --- [Begin] - Nametag ---
     TEXT_SIZE          = 10;
@@ -35,7 +68,7 @@ Enemy::Enemy(const sf::Vector2f& position,
     labelBackground.setSize(labelBounds.getSize() + sf::Vector2f(BACKGROUND_PADDING, BACKGROUND_PADDING));
     label.setOrigin(labelBounds.left + labelBounds.width / 2, labelBounds.top + labelBounds.height / 2 + 10.0f);
     labelBackground.setOrigin(label.getOrigin() + sf::Vector2f(BACKGROUND_PADDING / 2, -2.0f + BACKGROUND_PADDING / 2));
-    // --- [End] - Nametag ---
+    // --- [End] --- 
 
     // --- [Begin] - Health bar ---
     HEALTH_POINTS_BAR_WIDTH  = 30.0f;
@@ -55,27 +88,7 @@ Enemy::Enemy(const sf::Vector2f& position,
     healthPointsBarBackground.setSize(healthPointsBarBounds.getSize() + sf::Vector2f(2.0f, 2.0f));
     healthPointsBar.setOrigin(healthPointsBarBounds.left + healthPointsBarBounds.width / 2, healthPointsBarBounds.top + healthPointsBarBounds.height / 2);
     healthPointsBarBackground.setOrigin(healthPointsBar.getOrigin() + sf::Vector2f(1.0f, 1.0f));
-    // --- [End] - Health bar ---
-
-    DYING_TIME         = 1.0f;
-    dyingCooldownTimer = 0.0f;
-
-    RESPAWN_TIME         = 5.0f;
-    respawnCooldownTimer = 0.0f;
-
-    INVINCIBLE_TIME         = 1.0f;
-    invincibleCooldownTimer = INVINCIBLE_TIME;
-
-    DETECION_RANGE     = 150.0f;
-    ALERT_LIFETIME     = 0.5f;
-    alertCooldownTimer = 0.0f;
-
-    RANDOM_TIME          = 5.0f;
-    randomCooldownTimer  = 5.0f;
-    stayingCooldownTimer = 0.0f;
-    
-    ATTACK_COOLDOWN_TIME = 0.5f;
-    attackCooldownTimer  = 0.0f;
+    // --- [End] ---
 
     detectionBox.setRadius(DETECION_RANGE);
     detectionBox.setOutlineColor(sf::Color::Blue);
@@ -85,10 +98,6 @@ Enemy::Enemy(const sf::Vector2f& position,
         hitbox.getPosition().x + hitbox.getSize().x / 2.f - DETECION_RANGE,
         hitbox.getPosition().y + hitbox.getSize().y / 2.f - DETECION_RANGE
     );
-
-    KNOCKBACK_STRENGTH     = 100.0f;
-    KNOCKBACK_COOLDOWN     = 0.2f;
-    knockbackCooldownTimer = 0.0f;
 }
 
 bool Enemy::isAlive() const {
@@ -97,7 +106,7 @@ bool Enemy::isAlive() const {
 
 void Enemy::attack(Player& player) {
     if (attackCooldownTimer <= 0) {
-        player.hurt(1.0f);
+        player.hurt(damagePerAttack);
         player.knockback(hitbox.getPosition());
 
         attackCooldownTimer = ATTACK_COOLDOWN_TIME;
@@ -378,7 +387,7 @@ void Enemy::update(const float& dt, Player& player, const std::vector<sf::FloatR
         knockback(player.getPosition());
 
         if (!isAlive()) {
-            player.addVictim(label.getString());
+            player.addVictim(label.getString(), expAmount);
 
             dropItems(items);
         }
@@ -394,20 +403,14 @@ void Enemy::update(const float& dt, Player& player, const std::vector<sf::FloatR
 }
 
 void Enemy::draw(sf::RenderTarget& target) {
-    target.draw(labelBackground);
-    target.draw(label);
-
-    target.draw(healthPointsBarBackground);
-    target.draw(healthPointsBar);
-
-    // sf::RectangleShape hitboxShape;
-    // hitboxShape.setPosition(hitbox.getPosition());
-    // hitboxShape.setSize(hitbox.getSize());
-    // hitboxShape.setOutlineColor(sf::Color::Red);
-    // hitboxShape.setOutlineThickness(1.f);
-    // hitboxShape.setFillColor(sf::Color::Transparent);
-    // target.draw(hitboxShape);
-    // target.draw(detectionBox);
+    sf::RectangleShape hitboxShape;
+    hitboxShape.setPosition(hitbox.getPosition());
+    hitboxShape.setSize(hitbox.getSize());
+    hitboxShape.setOutlineColor(sf::Color::Red);
+    hitboxShape.setOutlineThickness(1.f);
+    hitboxShape.setFillColor(sf::Color::Transparent);
+    target.draw(hitboxShape);
+    target.draw(detectionBox);
     
     shadow.draw(target);
 
@@ -420,6 +423,12 @@ void Enemy::draw(sf::RenderTarget& target) {
     else {
         animationManager.draw(target);
     }
+
+    target.draw(labelBackground);
+    target.draw(label);
+
+    target.draw(healthPointsBarBackground);
+    target.draw(healthPointsBar);
 
     if (alertCooldownTimer > 0) {
         alert.draw(target);

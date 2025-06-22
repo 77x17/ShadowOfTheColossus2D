@@ -10,6 +10,7 @@ Build/Main.o: Sources/Main.cpp Sources/Configuration/Constants.hpp \
  Sources/TextureManager/TextureManager.hpp Sources/Entities/Item/Item.hpp \
  Sources/Effects/EntityEffects.hpp Sources/Inventory/InventorySlot.hpp \
  Sources/Entities/Enemies/Bat/Bat.hpp \
+ Sources/Entities/Enemies/Bat/BatBoss.hpp \
  Sources/Entities/Enemies/Eye/Eye.hpp Sources/UI/UI.hpp \
  Sources/Inventory/InventoryUI.hpp Sources/Inventory/MerchantUI.hpp \
  Sources/Quests/KillMonsterObjective.hpp \

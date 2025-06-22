@@ -140,7 +140,7 @@ public:
     void  updateLevel();
     float XPRequired() const;
     void  updateXP(const float& amount);
-    void  addVictim(const std::string& label);
+    void  addVictim(const std::string& label, const float& expAmount);
 
     // --- [Begin] - UI ---
     float               getHealthRatio() const;

@@ -28,6 +28,9 @@ void TextureManager::loadSprite() {
     load("batShadow", "Assets/Sprites/batShadow.png");
     load("batDead"  , "Assets/Sprites/batDead.png");
     
+    load("batBoss", "Assets/Sprites/batBoss.png");
+    load("batBossDead", "Assets/Sprites/batBossDead.png");
+    
     load("eyeSprite", "Assets/Sprites/eye.png");
     load("eyeShadow", "Assets/Sprites/eyeShadow.png");
     load("eyeDead"  , "Assets/Sprites/eyeDead.png");

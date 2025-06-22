@@ -5,10 +5,17 @@
 #include <cmath>
 
 Eye::Eye(const sf::Vector2f& position, const std::vector<std::pair<float, std::shared_ptr<ItemData>>>& _inventory) 
-: Enemy(position, sf::Vector2f(TILE_SIZE, TILE_SIZE), 5.0f, "Eye Lv.5", _inventory) {
-    MOVE_SPEED     = 80.0f; 
-    DETECION_RANGE = 250.0f;
+: Enemy(position, sf::Vector2f(TILE_SIZE, TILE_SIZE), 10.0f, "Eye Lv.5", _inventory) {
+    // --- [Begin] - Configuration ---
+    MOVE_SPEED      = 80.0f; 
+    
+    DETECION_RANGE  = 250.0f;
 
+    damagePerAttack = 2.5f;
+    expAmount       = 2.5f;
+    // --- [End] ---
+
+    // --- [Begin] - Animation ---
     detectionBox.setRadius(DETECION_RANGE);
     detectionBox.setPosition(
         hitbox.getPosition().x + hitbox.getSize().x / 2.f - DETECION_RANGE,
@@ -21,11 +28,14 @@ Eye::Eye(const sf::Vector2f& position, const std::vector<std::pair<float, std::s
 
     shadow = Animation(TextureManager::get("eyeShadow"), 12,  5, 1, 0, 0.f, false);
     alert  = Animation(TextureManager::get("alert")    ,  8, 10, 1, 0, 0.f, false);
+    // --- [End] ---
 
+    // --- [Begin] - Projectile ---
     SHOOT_COOLDOWN      = 2.0f;
     PROJECTILE_SPEED    = MOVE_SPEED * 1.5;
     PROJECTILE_LIFETIME = 1.0f;
     shootCooldownTimer  = 0.0f;
+    // --- [End] ---
 }
 
 void Eye::respawn() {
@@ -113,7 +123,7 @@ void Eye::updateProjectiles(const float& dt, Player& player) {
 
     if (projectile->isAlive()) {
         if (projectile->isCollision(player.getHitbox())) {
-            player.hurt(1.0f);
+            player.hurt(damagePerAttack);
             player.knockback(projectile->getPosition());
 
             projectile.reset();

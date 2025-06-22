@@ -62,6 +62,9 @@ protected:
 
     std::vector<std::pair<float, std::shared_ptr<ItemData>>> inventory; // rate - item
 
+    float damagePerAttack;
+    float expAmount;
+
 public:
     Enemy(const sf::Vector2f& position, 
           const sf::Vector2f& size, 

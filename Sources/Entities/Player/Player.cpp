@@ -609,7 +609,7 @@ void Player::updateXP(const float& amount) {
     updateLevel();
 }
 
-void Player::addVictim(const std::string& label) {
+void Player::addVictim(const std::string& label, const float& expAmount) {
     for (Quest& quest : quests) {
         QuestEventData dataPack;
         dataPack.eventType  = "kill";
@@ -617,7 +617,7 @@ void Player::addVictim(const std::string& label) {
         quest.update(dataPack);
     }
 
-    updateXP(1.0f);
+    updateXP(expAmount);
 }
 
 float Player::getHealthRatio() const {
