@@ -41,10 +41,10 @@ BatBoss::BatBoss(const sf::Vector2f& position, const std::vector<std::pair<float
     // --- [End] ---
 
     // --- [Begin] - Dash --- 
-    dashCooldownTimer = 0.f;
-    dashDuration      = 0.f;
+    DASH_COOLDOWN     = 4.0f;
     DASH_DURATION     = 0.3f;
-    DASH_COOLDOWN     = 4.f;
+    dashCooldownTimer = 0.0f;
+    dashDuration      = 0.0f;
     // --- [End] ---
 }
 
@@ -57,19 +57,19 @@ void BatBoss::respawn() {
 void BatBoss::followPlayer(const Player& player) {
     Enemy::followPlayer(player);
     
-    if (alertCooldownTimer <= 0 && shootCooldownTimer <= 0) {
-        shootCooldownTimer = SHOOT_COOLDOWN / 2.f;
-    }
-    if (alertCooldownTimer <= 0 && dashCooldownTimer <= 0) {
-        dashCooldownTimer  = DASH_COOLDOWN / 2.f;
+    if (alertCooldownTimer == -13.0f) {
+        shootCooldownTimer = SHOOT_COOLDOWN / 2.0f;
+        dashCooldownTimer  = DASH_COOLDOWN  / 2.0f;
     }
 
     if (dashDuration <= 0 && dashCooldownTimer <= 0) {
         dashDuration      = DASH_DURATION;
         dashCooldownTimer = DASH_COOLDOWN;
-        dashDirection     = Normalize::normalize(player.getPosition() - hitbox.getPosition()); 
+        dashDirection     = Normalize::normalize(player.getPosition() - hitbox.getPosition());
+        
+        SoundManager::playSound("dash");
     }
-    else if (dashCooldownTimer < 0.2f) {
+    else if (dashCooldownTimer < 0.2f && dashDuration < 0.2f) {
         alertCooldownTimer = ALERT_LIFETIME;
     }
 
@@ -91,6 +91,8 @@ void BatBoss::followPlayer(const Player& player) {
                 PROJECTILE_SPEED,
                 PROJECTILE_LIFETIME
             ));
+
+            SoundManager::playSound("fireball");
         }
 
         shootCooldownTimer = SHOOT_COOLDOWN;

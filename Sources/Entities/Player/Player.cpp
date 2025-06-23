@@ -699,8 +699,10 @@ void Player::updateEquipmentStats() {
     equipmentHealth = 0.0f;
     equipmentDamage = 0.0f;
     for (const auto& item : equipment) if (item) {
-        equipmentHealth += item->getHealth();
-        equipmentDamage += item->getDamage();
+        if (auto equipItem = dynamic_cast<EquipItem*>(item.get())) {
+            equipmentHealth += equipItem->getHealth();
+            equipmentDamage += equipItem->getDamage();
+        }
     }
 
     if (healthPoints > baseHealthPoints + equipmentHealth) {

@@ -297,11 +297,6 @@ void InventoryUI::handleRelease(const sf::Vector2f& mousePos, Player& player, st
     for (auto& slot : bagSlots) {
         if (slot.contains(mousePos)) {
             if (draggedItem && !(*slot.item)) {
-                if (previousDraggedItemID >= static_cast<int>((bagSlots).size())) {
-                    // selectedBagItemInfomation.setString(draggedItem->getInformation());
-                    // selectedEquipItemInfomation.setString(std::string());
-                }
-                
                 (*slot.item) = draggedItem;
                 draggedItem  = nullptr;
 
@@ -317,9 +312,11 @@ void InventoryUI::handleRelease(const sf::Vector2f& mousePos, Player& player, st
     for (auto& slot : equipSlots) {
         if (slot.contains(mousePos)) {
             if (draggedItem && !(*slot.item) && slot.type == draggedItem->type) {
-                if (previousDraggedItemID < static_cast<int>((bagSlots).size())) {
-                    // selectedBagItemInfomation.setString(std::string());
-                    // selectedEquipItemInfomation.setString(draggedItem->getInformation());
+                if (const auto& equipItem = dynamic_cast<EquipItem*>(draggedItem.get())) {
+                    if (equipItem->levelRequired > player.getLevel()) {
+                        SoundManager::playSound("blockEquipItem");
+                        continue;
+                    }
                 }
 
                 (*slot.item) = draggedItem;
@@ -328,6 +325,8 @@ void InventoryUI::handleRelease(const sf::Vector2f& mousePos, Player& player, st
                 if (previousDraggedItemID < static_cast<int>((bagSlots).size())) { 
                     player.updateEquipmentStats();
                 }
+
+                SoundManager::playSound("equipItem");
 
                 return;
             }
@@ -341,6 +340,10 @@ void InventoryUI::handleRelease(const sf::Vector2f& mousePos, Player& player, st
             for (auto& slot : equipSlots) {
                 if (previousDraggedItemID == 0) {
                     if (draggedItem && !(*slot.item) && slot.type == draggedItem->type) {
+                        if (const auto& equipItem = dynamic_cast<EquipItem*>(draggedItem.get())) {
+                            if (equipItem->levelRequired > player.getLevel()) continue;
+                        }
+
                         (*slot.item) = draggedItem;
                         draggedItem  = nullptr;
                         return;
@@ -372,7 +375,6 @@ void InventoryUI::handleRelease(const sf::Vector2f& mousePos, Player& player, st
                         
                         if (player.dropItem(draggedItem, items)) {
                             draggedItem = nullptr;
-                            // selectedBagItemInfomation.setString(std::string());
                         }
                         else {
                             std::cerr << "[Bug] - InventoryUI.cpp - handleRelease()\n";
@@ -387,12 +389,6 @@ void InventoryUI::handleRelease(const sf::Vector2f& mousePos, Player& player, st
     else if (draggedItem) {
         if (player.dropItem(draggedItem, items)) {
             draggedItem = nullptr;
-            if (previousDraggedItemID < static_cast<int>((bagSlots).size())) {
-                // selectedBagItemInfomation.setString(std::string());
-            }
-            else {
-                // selectedEquipItemInfomation.setString(std::string());
-            }
         }
         else {
             if (previousDraggedItemID >= static_cast<int>((bagSlots).size())) {
@@ -401,6 +397,10 @@ void InventoryUI::handleRelease(const sf::Vector2f& mousePos, Player& player, st
                 for (auto& slot : equipSlots) {
                     if (previousDraggedItemID == 0) {
                         if (draggedItem && !(*slot.item) && slot.type == draggedItem->type) {
+                            if (const auto& equipItem = dynamic_cast<EquipItem*>(draggedItem.get())) {
+                                if (equipItem->levelRequired > player.getLevel()) continue;
+                            }
+                            
                             (*slot.item) = draggedItem;
                             draggedItem  = nullptr;
                             return;

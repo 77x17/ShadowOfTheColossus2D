@@ -34,12 +34,11 @@ public:
     ItemRarity  rarity;
 
     ItemData(const std::string& _name, ItemType _type, const std::string& _textureName, ItemRarity _rarity);
+    virtual ~ItemData() = default;
 
     std::string getItemRarityString() const;
     sf::Color getItemRarityColor() const;
     std::string getInformation() const;
     virtual std::string getDetails() const = 0;
 
-    virtual float getDamage() const;
-    virtual float getHealth() const;
 };

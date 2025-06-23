@@ -286,6 +286,8 @@ void Enemy::updateThinking(Player& player) {
         detectionBox.setOutlineColor(sf::Color::Yellow);
     }
     else {
+        alertCooldownTimer = -13.0f;
+
         moveRandomly();
 
         detectionBox.setOutlineColor(sf::Color::Blue);

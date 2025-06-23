@@ -1,13 +1,12 @@
 #pragma once
 
-#include "ItemData.hpp"
+#include "EquipItem.hpp"
 
-class Bow : public ItemData {
+class Bow : public EquipItem {
 public:
     float damage;
-    int   levelRequired;
 
-    Bow(const std::string& _name, const std::string& textureName, float _damage, int _levelRequired, ItemRarity _rarity);
+    Bow(const std::string& _name, const std::string& textureName, int _levelRequired, ItemRarity _rarity, float _damage);
 
     std::string getDetails() const override;
 

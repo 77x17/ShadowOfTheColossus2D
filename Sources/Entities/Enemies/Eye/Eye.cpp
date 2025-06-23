@@ -54,7 +54,7 @@ void Eye::updateTimer(const float &dt) {
 void Eye::followPlayer(const Player& player) {
     sf::Vector2f normalizeDirection = Normalize::normalize(player.getPosition() - hitbox.getPosition());
 
-    if (alertCooldownTimer <= 0 && shootCooldownTimer <= 0) {
+    if (alertCooldownTimer == -13.0f) {
         shootCooldownTimer = SHOOT_COOLDOWN / 2.f;
     }
 
@@ -66,6 +66,8 @@ void Eye::followPlayer(const Player& player) {
             PROJECTILE_SPEED,
             PROJECTILE_LIFETIME
         );
+
+        SoundManager::playSound("fireball");
 
         shootCooldownTimer = SHOOT_COOLDOWN;
     }

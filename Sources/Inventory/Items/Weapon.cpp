@@ -1,7 +1,7 @@
 #include "Weapon.hpp"
 
-Bow::Bow(const std::string& _name, const std::string& textureName, float _damage, int _levelRequired, ItemRarity _rarity) 
-: ItemData(_name, ItemType::Weapon, textureName, _rarity), damage(_damage), levelRequired(_levelRequired) {}
+Bow::Bow(const std::string& m_name, const std::string& textureName, int m_levelRequired, ItemRarity m_rarity, float m_damage) 
+: EquipItem(m_name, ItemType::Weapon, textureName, m_levelRequired, m_rarity), damage(m_damage) {}
 
 std::string Bow::getDetails() const {
     std::string damageString = "Damage: " + std::to_string(damage);

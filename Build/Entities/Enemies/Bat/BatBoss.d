@@ -10,6 +10,7 @@ Build/Entities/Enemies/Bat/BatBoss.o: \
  Sources/Inventory/Items/ItemData.hpp Sources/Entities/Item/Item.hpp \
  Sources/Effects/EntityEffects.hpp Sources/Inventory/InventorySlot.hpp \
  Sources/Inventory/Items/AllItems.hpp Sources/Inventory/Items/Armor.hpp \
- Sources/Inventory/Items/Weapon.hpp Sources/Inventory/Items/Material.hpp \
+ Sources/Inventory/Items/EquipItem.hpp Sources/Inventory/Items/Weapon.hpp \
+ Sources/Inventory/Items/Material.hpp \
  Sources/TextureManager/TextureManager.hpp \
  Sources/Configuration/Normalize.hpp

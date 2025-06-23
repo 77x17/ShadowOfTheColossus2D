@@ -1,13 +1,13 @@
 #pragma once
 
-#include "ItemData.hpp"
+#include "EquipItem.hpp"
 
-class Armor : public ItemData {
+class Armor : public EquipItem {
 public:
     float health;
-    int   levelRequired;
 
-    Armor(const std::string& _name, ItemType armorType, const std::string& textureName, float _health, int _levelRequired, ItemRarity _rarity);
+    Armor(const std::string& _name, ItemType armorType, const std::string& textureName, int _levelRequired, ItemRarity _rarity, float _health);
+    virtual ~Armor() = default;
 
     std::string getDetails() const override;
 
@@ -18,20 +18,20 @@ public:
 
 class Helmet : public Armor {
 public:
-    Helmet(const std::string& _name, const std::string& textureName, float _health, int _levelRequired, ItemRarity _rarity);
+    Helmet(const std::string& m_name, const std::string& textureName, int m_levelRequired, ItemRarity m_rarity, float m_health);
 };
 
 class Chestplate : public Armor {
 public:
-    Chestplate(const std::string& _name, const std::string& textureName, float _health, int _levelRequired, ItemRarity _rarity);
+    Chestplate(const std::string& m_name, const std::string& textureName, int m_levelRequired, ItemRarity m_rarity, float m_health);
 };
 
 class Leggings : public Armor {
 public:
-    Leggings(const std::string& _name, const std::string& textureName, float _health, int _levelRequired, ItemRarity _rarity);
+    Leggings(const std::string& m_name, const std::string& textureName, int m_levelRequired, ItemRarity m_rarity, float m_health);
 };
 
 class Boots : public Armor {
 public:
-    Boots(const std::string& _name, const std::string& textureName, float _health, int _levelRequired, ItemRarity _rarity);
+    Boots(const std::string& m_name, const std::string& textureName, int m_levelRequired, ItemRarity m_rarity, float m_health);
 };

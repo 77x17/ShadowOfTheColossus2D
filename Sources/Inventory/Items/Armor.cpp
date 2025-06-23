@@ -1,7 +1,7 @@
 #include "Armor.hpp"
 
-Armor::Armor(const std::string& _name, ItemType armorType, const std::string& textureName, float _health, int _levelRequired, ItemRarity _rarity) 
-: ItemData(_name, armorType, textureName, _rarity), health(_health), levelRequired(_levelRequired) {}
+Armor::Armor(const std::string& m_name, ItemType armorType, const std::string& textureName, int m_levelRequired, ItemRarity m_rarity, float m_health) 
+: EquipItem(m_name, armorType, textureName, m_levelRequired, m_rarity), health(m_health) {}
 
 std::string Armor::getDetails() const {
     std::string healthString = "Health: " + std::to_string(health);
@@ -10,7 +10,7 @@ std::string Armor::getDetails() const {
     std::string levelRequiredString = "Lv.Minimum: " + std::to_string(levelRequired);
 
     return healthString + "\n\n" 
-            + levelRequiredString;
+         + levelRequiredString;
 }
 
 float Armor::getDamage() const {
@@ -21,14 +21,14 @@ float Armor::getHealth() const {
     return health;
 }
 
-Helmet::Helmet(const std::string& _name, const std::string& textureName, float _health, int _levelRequired, ItemRarity _rarity) 
-: Armor(_name, ItemType::Helmet, textureName, _health, _levelRequired, _rarity) {}
+Helmet::Helmet(const std::string& m_name, const std::string& textureName, int m_levelRequired, ItemRarity m_rarity, float m_health) 
+: Armor(m_name, ItemType::Helmet, textureName, m_levelRequired, m_rarity, m_health) {}
 
-Chestplate::Chestplate(const std::string& _name, const std::string& textureName, float _health, int _levelRequired, ItemRarity _rarity) 
-: Armor(_name, ItemType::Chestplate, textureName, _health, _levelRequired, _rarity) {}
+Chestplate::Chestplate(const std::string& m_name, const std::string& textureName, int m_levelRequired, ItemRarity m_rarity, float m_health) 
+: Armor(m_name, ItemType::Chestplate, textureName, m_levelRequired, m_rarity, m_health) {}
 
-Leggings::Leggings(const std::string& _name, const std::string& textureName, float _health, int _levelRequired, ItemRarity _rarity) 
-: Armor(_name, ItemType::Leggings, textureName, _health, _levelRequired, _rarity) {}
+Leggings::Leggings(const std::string& m_name, const std::string& textureName, int m_levelRequired, ItemRarity m_rarity, float m_health) 
+: Armor(m_name, ItemType::Leggings, textureName, m_levelRequired, m_rarity, m_health) {}
 
-Boots::Boots(const std::string& _name, const std::string& textureName, float _health, int _levelRequired, ItemRarity _rarity) 
-: Armor(_name, ItemType::Boots, textureName, _health, _levelRequired, _rarity) {}
+Boots::Boots(const std::string& m_name, const std::string& textureName, int m_levelRequired, ItemRarity m_rarity, float m_health) 
+: Armor(m_name, ItemType::Boots, textureName, m_levelRequired, m_rarity, m_health) {}

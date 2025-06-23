@@ -13,3 +13,5 @@
 - Vị trí trong OpenGL tăng từ dưới lên
 - float length != 0 suy ra chia ? => BUG BUG BUG
 - Bug 2 ngày vì float / 10.0f quá nhỏ tiệm cận 0 => 0
+- Lưu std::vector< std::pair<> > sẽ nhanh hơn dùng std::unordered_map<> thường nếu không cần .at()
+- Nên dynamic_cast<> thay vì thêm một attribute vào Base class một cách không cần thiết

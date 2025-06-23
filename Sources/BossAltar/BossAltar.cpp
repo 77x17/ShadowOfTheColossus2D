@@ -136,12 +136,12 @@ void BossAltar::summonBoss(std::vector<std::unique_ptr<Enemy>>& enemies) {
 
     if (ID == 0) {
         std::vector<std::pair<float, std::shared_ptr<ItemData>>> batBossInventory;
-        batBossInventory.emplace_back(1.0f, std::make_shared<Bow>("Copper Bow", "bow_00", 5.0f, 5, ItemRarity::Legendary));
-        batBossInventory.emplace_back(1.0f, std::make_shared<Helmet>("Copper Helmet", "helmet_00", 5.0f, 5, ItemRarity::Rare));
-        batBossInventory.emplace_back(1.0f, std::make_shared<Chestplate>("Copper Chestplate", "chestplate_00", 5.0f, 5, ItemRarity::Rare));
-        batBossInventory.emplace_back(1.0f, std::make_shared<Leggings>("Copper Leggings", "leggings_00", 5.0f, 5, ItemRarity::Rare));
-        batBossInventory.emplace_back(1.0f, std::make_shared<Boots>("Copper Boots", "boots_00", 5.0f, 5, ItemRarity::Rare));
+        batBossInventory.emplace_back(0.1f, std::make_shared<Bow>("Copper Bow", "bow_00", 5, ItemRarity::Legendary, 5.0f));
+        batBossInventory.emplace_back(0.1f, std::make_shared<Helmet>("Copper Helmet", "helmet_00", 5, ItemRarity::Rare, 5.0f));
+        batBossInventory.emplace_back(0.1f, std::make_shared<Chestplate>("Copper Chestplate", "chestplate_00", 5, ItemRarity::Rare, 5.0f));
+        batBossInventory.emplace_back(0.1f, std::make_shared<Leggings>("Copper Leggings", "leggings_00", 5, ItemRarity::Rare, 5.0f));
+        batBossInventory.emplace_back(0.1f, std::make_shared<Boots>("Copper Boots", "boots_00", 5, ItemRarity::Rare, 5.0f));
 
-        enemies.push_back(std::make_unique<BatBoss>(sf::Vector2f(176, 108) * 32.0f, batBossInventory));
+        enemies.push_back(std::make_unique<BatBoss>(sf::Vector2f(hitbox.getPosition()), batBossInventory));
     }
 }

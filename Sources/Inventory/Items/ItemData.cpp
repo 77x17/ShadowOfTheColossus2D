@@ -71,12 +71,3 @@ std::string ItemData::getInformation() const {
             + getDetails() + "\n\n"
             + "\n";
 }
-
-float ItemData::getDamage() const {
-    return 0.0f;
-}
-
-float ItemData::getHealth() const {
-    return 0.0f;
-}
-
