@@ -5,6 +5,7 @@
 #include "Enemy.hpp"
 
 enum class BatBossState {
+    DESPAWN = -3,
     DYING = -2,
     DEAD  = -1,
     IDLE_LEFT,
@@ -22,5 +23,7 @@ public:
 
     void updateTimer(const float& dt) override;
     void updateAnimation() override;
+
+    void respawn() override;
 
 };

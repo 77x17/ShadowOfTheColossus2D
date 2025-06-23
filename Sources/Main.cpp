@@ -71,15 +71,15 @@ void loadEnemy(std::vector<std::unique_ptr<Enemy>>& enemies, const std::unordere
     batInventory.emplace_back(0.05, std::make_shared<Chestplate>("Old Chestplate", "chestplate_00", 2.0f, 1, ItemRarity::Normal));
     batInventory.emplace_back(0.05, std::make_shared<Leggings>("Old Leggings", "leggings_00", 2.0f, 1, ItemRarity::Normal));
     batInventory.emplace_back(0.05, std::make_shared<Boots>("Old Boots", "boots_00", 2.0f, 1, ItemRarity::Normal));
-    batInventory.emplace_back(0.1, std::make_shared<Orb>("Bat Orb", "orb", ItemRarity::Rare));
+    batInventory.emplace_back(0.01, std::make_shared<Orb>("Bat Orb", "orb", ItemRarity::Rare));
     
     std::vector<std::pair<float, std::shared_ptr<ItemData>>> eyeInventory;
-    eyeInventory.emplace_back(0.05, std::make_shared<Bow>("Wooden Bow", "bow_00", 2.5f, 3, ItemRarity::Unique));
-    eyeInventory.emplace_back(0.05, std::make_shared<Helmet>("Copper Helmet", "helmet_00", 3.0f, 3, ItemRarity::Unique));
-    eyeInventory.emplace_back(0.05, std::make_shared<Chestplate>("Copper Chestplate", "chestplate_00", 3.0f, 3, ItemRarity::Unique));
-    eyeInventory.emplace_back(0.05, std::make_shared<Leggings>("Copper Leggings", "leggings_00", 3.0f, 3, ItemRarity::Unique));
-    eyeInventory.emplace_back(0.05, std::make_shared<Boots>("Copper Boots", "boots_00", 3.0f, 3, ItemRarity::Unique));
-    eyeInventory.emplace_back(0.1, std::make_shared<Orb>("Eye Orb", "orb", ItemRarity::Rare));
+    eyeInventory.emplace_back(0.03, std::make_shared<Bow>("Wooden Bow", "bow_00", 2.5f, 3, ItemRarity::Unique));
+    eyeInventory.emplace_back(0.03, std::make_shared<Helmet>("Copper Helmet", "helmet_00", 3.0f, 3, ItemRarity::Unique));
+    eyeInventory.emplace_back(0.03, std::make_shared<Chestplate>("Copper Chestplate", "chestplate_00", 3.0f, 3, ItemRarity::Unique));
+    eyeInventory.emplace_back(0.03, std::make_shared<Leggings>("Copper Leggings", "leggings_00", 3.0f, 3, ItemRarity::Unique));
+    eyeInventory.emplace_back(0.03, std::make_shared<Boots>("Copper Boots", "boots_00", 3.0f, 3, ItemRarity::Unique));
+    eyeInventory.emplace_back(0.01, std::make_shared<Orb>("Eye Orb", "orb", ItemRarity::Rare));
 
     for (const auto& pair : enemyRects) {
         for (const sf::FloatRect& rect : pair.second) {
@@ -97,15 +97,6 @@ void loadEnemy(std::vector<std::unique_ptr<Enemy>>& enemies, const std::unordere
             }
         }
     }
-
-    std::vector<std::pair<float, std::shared_ptr<ItemData>>> batBossInventory;
-    batBossInventory.emplace_back(1.0f, std::make_shared<Bow>("Copper Bow", "bow_00", 5.0f, 5, ItemRarity::Legendary));
-    batBossInventory.emplace_back(1.0f, std::make_shared<Helmet>("Copper Helmet", "helmet_00", 5.0f, 5, ItemRarity::Rare));
-    batBossInventory.emplace_back(1.0f, std::make_shared<Chestplate>("Copper Chestplate", "chestplate_00", 5.0f, 5, ItemRarity::Rare));
-    batBossInventory.emplace_back(1.0f, std::make_shared<Leggings>("Copper Leggings", "leggings_00", 5.0f, 5, ItemRarity::Rare));
-    batBossInventory.emplace_back(1.0f, std::make_shared<Boots>("Copper Boots", "boots_00", 5.0f, 5, ItemRarity::Rare));
-
-    // enemies.push_back(std::make_unique<BatBoss>(sf::Vector2f(176, 108) * 32.0f, batBossInventory));
 }
 
 void loadNpc(std::vector<std::unique_ptr<Npc>>& npcs, const TileMap& map) {
@@ -189,7 +180,7 @@ void loadQuests(std::vector<Quest>& quests) {
     // --- [End] ---
     
     // --- [Begin] - Into the Darkwood ---
-    quests.push_back(Quest("Into the Darkwood", 100));
+    quests.push_back(Quest("Into the Darkwood", 200));
     quests.back().addRequiredLevel(3);
     quests.back().addRequiredDescription("Find Mira. Min Lv.3");
     // Stage 0: Mira khởi đầu
@@ -202,29 +193,42 @@ void loadQuests(std::vector<Quest>& quests) {
     quests.back().addObjective  (0, std::make_shared<TalkObjective>(2));
     // Stage 1: Gặp Bren
     quests.back().addNpcID      (1, 3);
-    quests.back().addDialogue   (1, "[1/5] Mira sent you? Hmph... Then things must be worse than I thought");
-    quests.back().addDialogue   (1, "[2/5] This forest holds secrets-old, dangerous ones");
-    quests.back().addDialogue   (1, "[3/5] Before I trust you with more, bring me some samples from the creatures nearby");
-    quests.back().addDialogue   (1, "[4/5] I need 3 Shadow Spores and 2 Black Leaves. You'll know them when you see them");
-    quests.back().addDialogue   (1, "[5/5] Bring them here, and I'll tell you what really happened to Darkwood");
+    quests.back().addDialogue   (1, "[1/5] So Mira sent you... Then the forest truly is crying out");
+    quests.back().addDialogue   (1, "[2/5] Long ago, a cursed gate was opened, unleashing horrors from beyond");
+    quests.back().addDialogue   (1, "[3/5] We sealed the gate, but remnants remain—twisted creatures, each guarding a fragment of power");
+    quests.back().addDialogue   (1, "[4/5] These fragments, we call them orbs. Two in particular: the Bat Orb and the Eye Orb");
+    quests.back().addDialogue   (1, "[5/5] Bring them to me. Only then can we confront what still lingers");
     quests.back().addDescription(1, "Head deeper into the forest and find Bren");
     quests.back().addObjective  (1, std::make_shared<TalkObjective>(3));
     // Stage 2: Kiếm đồ
     quests.back().addNpcID      (2, 3);
     quests.back().addDialogue   (2, std::string());
-    quests.back().addDescription(2, "Collect materials for Bren");
-    quests.back().addObjective  (2, std::make_shared<GiveItemObjective>("Wooden Bow", 2));
-    quests.back().addObjective  (2, std::make_shared<GiveItemObjective>("Copper Helmet", 2));
+    quests.back().addDescription(2, "Collect the Bat Orb and Eye Orb from corrupted creatures");
+    quests.back().addObjective  (2, std::make_shared<GiveItemObjective>("Bat Orb", 1));
+    quests.back().addObjective  (2, std::make_shared<GiveItemObjective>("Eye Orb", 1));
     // Stage 3: Trả đồ, nghe kể chuyện
     quests.back().addNpcID      (3, 3);
-    quests.back().addDialogue   (3, "[1/6] Ah, you've returned. Good. Let me see...");
-    quests.back().addDialogue   (3, "[2/6] These spores... they reek of corruption");
-    quests.back().addDialogue   (3, "[3/6] Decades ago, this forest was pure. But something came-something ancient");
-    quests.back().addDialogue   (3, "[4/6] It twisted the trees, poisoned the roots, and consumed the heart of the woods");
-    quests.back().addDialogue   (3, "[5/6] We tried to fight back, but the deeper we went, the darker it became");
-    quests.back().addDialogue   (3, "[6/6] If you truly want to help, we must go further. Into the shadows");
-    quests.back().addDescription(3, "Return to Bren with the items and listen to his tale");
+    quests.back().addDialogue   (3, "[1/6] You've returned with both orbs... I feared they were lost");
+    quests.back().addDialogue   (3, "[2/6] Each orb once belonged to ancient guardians-fallen to corruption");
+    quests.back().addDialogue   (3, "[3/6] These guardians were sealed, but now their power stirs once more");
+    quests.back().addDialogue   (3, "[4/6] We must awaken one-summon it at the altar, and destroy it completely");
+    quests.back().addDialogue   (3, "[5/6] Only by cleansing the past can we close the cursed gate forever");
+    quests.back().addDialogue   (3, "[6/6] Go. Use the orbs at the boss altar. Return to me once the deed is done");
+    quests.back().addDescription(3, "Return to Bren with the orbs and listen to his tale");
     quests.back().addObjective  (3, std::make_shared<TalkObjective>(3));
+    // Stage 4: Triệu hồi và tiêu diệt boss
+    quests.back().addNpcID      (4, -1); // -1 nếu không cần NPC trong bước này
+    quests.back().addDialogue   (4, std::string());
+    quests.back().addDescription(4, "Find the altar to summon the boss and defeat it");
+    quests.back().addObjective  (4, std::make_shared<KillMonsterObjective>("Bat Boss Lv.10", 1));
+    // Stage 5: Gặp lại Bren
+    quests.back().addNpcID      (5, 3); 
+    quests.back().addDialogue   (5, "[1/4] So it's done... I felt the forest exhale for the first time in years");
+    quests.back().addDialogue   (5, "[2/4] That beast was only one of many, sealed across the lands");
+    quests.back().addDialogue   (5, "[3/4] The cursed gate is weakening still. To truly close it, more must fall");
+    quests.back().addDialogue   (5, "[4/4] Rest for now. But when you're ready... there is more to be done");
+    quests.back().addDescription(5, "Return to Bren after defeating the boss");
+    quests.back().addObjective  (5, std::make_shared<TalkObjective>(3));
     // --- [End] ---
 
     // quests.push_back(Quest(<name>, <exp>));
@@ -300,8 +304,14 @@ int main() {
     // }
     
     std::vector<Item> items;
-    items.emplace_back(player.getPosition() + sf::Vector2f(100.0f, 0), std::make_shared<Bow>("God Bow", "bow_00", 10.0f, 1, ItemRarity::Mythic));
+    items.emplace_back(player.getPosition() + sf::Vector2f(100.0f, 0), std::make_shared<Bow>("God Bow", "bow_00", 10.0f, 1, ItemRarity::Legendary));
     items.emplace_back(player.getPosition() + sf::Vector2f(300.0f, 0), std::make_shared<Helmet>("God Helmet", "helmet_00", 10000.0f, 1, ItemRarity::Mythic));
+    player.addItem(std::make_shared<Orb>("Bat Orb", "orb", ItemRarity::Rare));
+    player.addItem(std::make_shared<Orb>("Bat Orb", "orb", ItemRarity::Rare));
+    // player.addItem(std::make_shared<Orb>("Bat Orb", "orb", ItemRarity::Rare));
+    player.addItem(std::make_shared<Orb>("Eye Orb", "orb", ItemRarity::Rare));
+    player.addItem(std::make_shared<Orb>("Eye Orb", "orb", ItemRarity::Rare));
+    // player.addItem(std::make_shared<Orb>("Eye Orb", "orb", ItemRarity::Rare));
 
     InventoryUI inventoryUI(static_cast<sf::Vector2f>(window.getSize()), player);
     MerchantUI merchantUI(static_cast<sf::Vector2f>(window.getSize()), player);
@@ -441,7 +451,7 @@ int main() {
             if (player.isCollision(bossAltar.getHitbox())) {
                 bossAltar.collisionWithPlayer = true;
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::F)) {
-                    bossAltar.interactWithPlayer(player, enemies);
+                    bossAltar.interactWithPlayer(player);
                 }
             }
         }
@@ -455,6 +465,15 @@ int main() {
         for (auto& enemy : enemies) {
             enemy->update(dt, player, map.getCollisionRects(), items);
         }
+        // Enemies despawn
+        for (auto it = enemies.begin(); it != enemies.end(); ) {
+            if ((*it)->isDespawn()) {
+                it = enemies.erase(it);
+            }
+            else {
+                ++it;
+            }
+        }
 
         for (auto& npc : npcs) {
             npc->update(dt);
@@ -466,6 +485,9 @@ int main() {
 
         for (BossAltar& bossAltar : bossAltars) {
             bossAltar.update(dt);
+            if (bossAltar.isSuitableForSummonBoss()) {
+                bossAltar.summonBoss(enemies);
+            }
         }
         
         map.update(dt);

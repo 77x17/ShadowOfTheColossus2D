@@ -80,6 +80,7 @@ public:
     void knockback(const sf::Vector2f& playerPosition);
     virtual void kill();
     virtual void respawn();
+    bool isDespawn() const;
 
     float calculateDistance(const Player& player) const;
 

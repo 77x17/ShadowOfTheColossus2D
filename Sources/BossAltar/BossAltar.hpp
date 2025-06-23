@@ -2,6 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <vector>
+#include <string>
 
 #include "Player.hpp"
 #include "Enemy.hpp"
@@ -11,6 +12,8 @@ private:
     int ID;
     sf::FloatRect hitbox;
 
+    std::vector<std::pair<std::string, int>> requiredItems;
+
     float INTERACT_COOLDOWN     = 1.0f;
     float interactCooldownTimer = 0.0f;
 
@@ -19,6 +22,7 @@ private:
     float    previousInteractTextOpacity;
     sf::Text interactText;
 
+    bool suitableForSummonBoss = false;
 public:
     bool collisionWithPlayer = false;
     
@@ -32,6 +36,10 @@ public:
     
     sf::FloatRect getHitbox() const;
 
-    void interactWithPlayer(Player& player, std::vector<std::unique_ptr<Enemy>>& enemies);
+    void interactWithPlayer(Player& player);
+
+    bool isSuitableForSummonBoss() const;
+
+    void summonBoss(std::vector<std::unique_ptr<Enemy>>& enemies);
 
 };

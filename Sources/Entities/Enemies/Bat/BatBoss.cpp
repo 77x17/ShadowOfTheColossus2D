@@ -7,7 +7,7 @@ BatBoss::BatBoss(const sf::Vector2f& position, const std::vector<std::pair<float
     // --- [Begin] - Configuration ---
     MOVE_SPEED = 100.0f; 
 
-    DETECION_RANGE = 350.0f;
+    DETECION_RANGE = 400.0f;
     KNOCKBACK_COOLDOWN = 0.05f;
     KNOCKBACK_STRENGTH = 50.0f;
 
@@ -62,4 +62,10 @@ void BatBoss::updateAnimation() {
 
     alert .setPosition(hitbox.getPosition() + sf::Vector2f(hitbox.getSize().x / 2.0f - alert.getSprite().getLocalBounds().width / 2.0f, -hitbox.getSize().y / 2.0f));
     shadow.setPosition(hitbox.getPosition() + sf::Vector2f(hitbox.getSize().x / 2.0f - 10.0f, hitbox.getSize().y));
+}
+
+void BatBoss::respawn() {
+    if (state == -1 && respawnCooldownTimer <= 0) {
+        state = -3;
+    }
 }

@@ -101,7 +101,7 @@ Enemy::Enemy(const sf::Vector2f& position,
 }
 
 bool Enemy::isAlive() const {
-    return state != -1 && state != -2;     // DEAD
+    return state >= 0;
 }
 
 void Enemy::attack(Player& player) {
@@ -166,6 +166,10 @@ void Enemy::respawn() {
     }
 }
 
+bool Enemy::isDespawn() const {
+    return state == -3;
+}
+ 
 float Enemy::calculateDistance(const Player& player) const {
     sf::Vector2f distanceFomular = player.getPosition() - hitbox.getPosition();
     return std::sqrt(distanceFomular.x * distanceFomular.x + distanceFomular.y * distanceFomular.y);
@@ -403,14 +407,14 @@ void Enemy::update(const float& dt, Player& player, const std::vector<sf::FloatR
 }
 
 void Enemy::draw(sf::RenderTarget& target) {
-    sf::RectangleShape hitboxShape;
-    hitboxShape.setPosition(hitbox.getPosition());
-    hitboxShape.setSize(hitbox.getSize());
-    hitboxShape.setOutlineColor(sf::Color::Red);
-    hitboxShape.setOutlineThickness(1.f);
-    hitboxShape.setFillColor(sf::Color::Transparent);
-    target.draw(hitboxShape);
-    target.draw(detectionBox);
+    // sf::RectangleShape hitboxShape;
+    // hitboxShape.setPosition(hitbox.getPosition());
+    // hitboxShape.setSize(hitbox.getSize());
+    // hitboxShape.setOutlineColor(sf::Color::Red);
+    // hitboxShape.setOutlineThickness(1.f);
+    // hitboxShape.setFillColor(sf::Color::Transparent);
+    // target.draw(hitboxShape);
+    // target.draw(detectionBox);
     
     shadow.draw(target);
 

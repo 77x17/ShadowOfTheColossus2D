@@ -1,5 +1,7 @@
 #include "BossAltar.hpp"
 
+#include "BatBoss.hpp"
+#include "Material.hpp"
 
 BossAltar::BossAltar(const int& m_ID, const sf::FloatRect& m_hitbox) 
 : ID(m_ID), hitbox(m_hitbox) {
@@ -18,6 +20,19 @@ BossAltar::BossAltar(const int& m_ID, const sf::FloatRect& m_hitbox)
                            interactText.getLocalBounds().top  + interactText.getLocalBounds().height / 2);
     interactText.setPosition(hitbox.getPosition() + sf::Vector2f(hitbox.getSize().x / 2, -hitbox.getSize().y));
     // --- [End] ---
+
+    // --- [Begin] - Required Items ---
+    switch (ID) {
+        case 0: {
+            requiredItems.emplace_back("Bat Orb", 1);
+            requiredItems.emplace_back("Eye Orb", 1);
+            break;
+        }
+        default: {
+            break;
+        }
+    }
+    // --- [End] ---
 }
 
 void BossAltar::update(const float& dt) {
@@ -31,6 +46,12 @@ void BossAltar::update(const float& dt) {
     }
     else {
         interactTextOpacity += (0   - interactTextOpacity) * FADE_SPEED * dt;
+
+        if (40 < interactTextOpacity && interactTextOpacity < 50) {
+            interactText.setString("Press [F] to interact");
+            interactText.setOrigin(interactText.getLocalBounds().left + interactText.getLocalBounds().width / 2, 
+                                   interactText.getLocalBounds().top  + interactText.getLocalBounds().height / 2);
+        }
     }
 
     if (std::abs(previousInteractTextOpacity - interactTextOpacity) > ZERO_EPSILON) {
@@ -58,12 +79,69 @@ sf::FloatRect BossAltar::getHitbox() const {
     return hitbox;
 }
 
-void BossAltar::interactWithPlayer(Player& player, std::vector<std::unique_ptr<Enemy>>& enemies) {
+void BossAltar::interactWithPlayer(Player& player) {
     if (interactCooldownTimer > 0) {
         return;
     }
 
-    std::cerr << "Vcl\n";
+    std::unordered_map<std::string, int> itemCounts;
+    for (const std::shared_ptr<ItemData>& item : *player.getInventory()) if (item) {
+        itemCounts[item->name]++;
+    }
+
+    suitableForSummonBoss = true;
+    for (const auto& pair : requiredItems) {
+        if (itemCounts[pair.first] < pair.second) {
+            suitableForSummonBoss = false;
+        }
+    }
+    if (suitableForSummonBoss) {
+        for (const auto& pair : requiredItems) {
+            int removeAmount = pair.second;
+            for (std::shared_ptr<ItemData>& item : *player.getInventory()) {
+                if (removeAmount <= 0) {
+                    break;
+                }
+
+                if (item && item->name == pair.first) {
+                    item = nullptr;
+                    --removeAmount;
+                }
+            }
+        }
+    }
+    else {
+        switch (ID) {
+            case 0: {
+                interactText.setString("     Bat Boss Lv.10    \n01 Bat Orb - 01 Eye Orb");
+                interactText.setOrigin(interactText.getLocalBounds().left + interactText.getLocalBounds().width / 2, 
+                                    interactText.getLocalBounds().top  + interactText.getLocalBounds().height / 2);
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+    }
 
     interactCooldownTimer = INTERACT_COOLDOWN;
+}
+
+bool BossAltar::isSuitableForSummonBoss() const {
+    return suitableForSummonBoss == true;
+}
+
+void BossAltar::summonBoss(std::vector<std::unique_ptr<Enemy>>& enemies) {
+    suitableForSummonBoss = false;
+
+    if (ID == 0) {
+        std::vector<std::pair<float, std::shared_ptr<ItemData>>> batBossInventory;
+        batBossInventory.emplace_back(1.0f, std::make_shared<Bow>("Copper Bow", "bow_00", 5.0f, 5, ItemRarity::Legendary));
+        batBossInventory.emplace_back(1.0f, std::make_shared<Helmet>("Copper Helmet", "helmet_00", 5.0f, 5, ItemRarity::Rare));
+        batBossInventory.emplace_back(1.0f, std::make_shared<Chestplate>("Copper Chestplate", "chestplate_00", 5.0f, 5, ItemRarity::Rare));
+        batBossInventory.emplace_back(1.0f, std::make_shared<Leggings>("Copper Leggings", "leggings_00", 5.0f, 5, ItemRarity::Rare));
+        batBossInventory.emplace_back(1.0f, std::make_shared<Boots>("Copper Boots", "boots_00", 5.0f, 5, ItemRarity::Rare));
+
+        enemies.push_back(std::make_unique<BatBoss>(sf::Vector2f(176, 108) * 32.0f, batBossInventory));
+    }
 }
