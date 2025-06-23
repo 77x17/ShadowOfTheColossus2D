@@ -20,3 +20,7 @@ float Bow::getDamage() const {
 float Bow::getHealth() const {
     return 0.0f;
 }
+
+std::shared_ptr<ItemData> Bow::clone() const {
+    return std::make_shared<Bow>(*this);
+}

@@ -46,6 +46,8 @@ private:
     sf::Text hoveredItemName;
     sf::Text hoveredItemRarity;
 
+    sf::Text amountText;
+
 public:
     InventoryUI(const sf::Vector2f& windowSize, Player& player);
 
@@ -58,6 +60,7 @@ public:
     void updateHover(const sf::Vector2f& mousePos);
     void updateDrag(const sf::Vector2f& mousePos);
     void handleClick(const sf::Vector2f& mousePos);
+    void handleRightClick(const sf::Vector2f& mousePos);
     void handleRelease(const sf::Vector2f& mousePos, Player& player, std::vector<Item>& items);
     void draw(sf::RenderTarget& target);
     
@@ -66,4 +69,5 @@ public:
     
     void updateStats(Player &player);
 
+    void updateAmount();
 };

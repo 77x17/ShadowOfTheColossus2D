@@ -104,8 +104,15 @@ void BossAltar::interactWithPlayer(Player& player) {
                 }
 
                 if (item && item->name == pair.first) {
-                    item = nullptr;
-                    --removeAmount;
+                    if (item->amount <= removeAmount) {
+                        removeAmount -= item->amount;
+
+                        item = nullptr;
+                    }
+                    else {
+                        item->amount -= removeAmount;
+                        removeAmount = 0;
+                    }
                 }
             }
         }

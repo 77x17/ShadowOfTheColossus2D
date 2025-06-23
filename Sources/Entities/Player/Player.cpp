@@ -683,13 +683,30 @@ int Player::getCollisionRegionID() const {
 
 // --- [Begin] - Inventory --- 
 bool Player::addItem(const std::shared_ptr<ItemData>& newItem) {
-    for (auto& item : inventory) {
-        if (!item) {
-            item = newItem;
-
+    bool added = false;
+    for (auto& item : inventory) if (item) {
+        if (item->name == newItem->name) {
+            item->amount += newItem->amount;
+            
             SoundManager::playSound("pickupItem");
 
-            return true;
+            added = true;
+            break;
+        }
+    }
+
+    if (added) {
+        return true;
+    }
+    else {
+        for (auto& item : inventory) {
+            if (!item) {
+                item = newItem;
+
+                SoundManager::playSound("pickupItem");
+
+                return true;
+            }
         }
     }
     return false; // Hết chỗ
@@ -741,16 +758,12 @@ std::string Player::getStats() const {
 }
 
 bool Player::dropItem(const std::shared_ptr<ItemData>& item, std::vector<Item>& items) {
-    if (isAlive()) {
-        items.emplace_back(getCenterPosition(), item);
-        updateEquipmentStats();
+    items.emplace_back(getCenterPosition(), item);
+    updateEquipmentStats();
 
-        SoundManager::playSound("pickupItem");
+    SoundManager::playSound("pickupItem");
 
-        return true;
-    }
-
-    return false;
+    return true;
 }
 // --- [End] - Inventory --- 
 

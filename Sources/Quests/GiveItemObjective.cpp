@@ -8,7 +8,7 @@ GiveItemObjective::GiveItemObjective(const std::string& name, int amount) {
 
 void GiveItemObjective::updateProgress(const QuestEventData& data) {
     if (data.eventType == "giveItem" && data.targetName == itemName && !isFinished()) {
-        currentAmount++;
+        currentAmount += data.amount;
     }
 }
 
@@ -24,5 +24,6 @@ QuestEventData GiveItemObjective::getQuestEventData() const {
     QuestEventData data;
     data.eventType  = "giveItem";
     data.targetName = itemName;
+    data.amount     = requiredAmount - currentAmount;
     return data;
 }

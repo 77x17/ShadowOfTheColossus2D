@@ -8,32 +8,28 @@
 class InventorySlot {
 public:
     sf::RectangleShape slotBox;
+    sf::Text           amountText;
+    
     std::shared_ptr<ItemData>* item = nullptr;
+
+    InventorySlot(const float& slotSize);
 
     bool contains(const sf::Vector2f& point) const;
 
     void draw(sf::RenderTarget& target) const;
 
+    void setPosition(const sf::Vector2f position);
+
+    void updateAmount();
 };
 
 class BagSlot : public InventorySlot {
 public:
-    void init(const float& slotSize) {
-        slotBox.setSize(sf::Vector2f(slotSize, slotSize));
-        slotBox.setFillColor(sf::Color(100, 100, 100));
-        slotBox.setOutlineThickness(1.f);
-        slotBox.setOutlineColor(sf::Color::White);
-    }
+    BagSlot(const float& slotSize);
 };
 
 class EquipSlot : public InventorySlot {
 public:
-    void init(const float& slotSize) {
-        slotBox.setSize(sf::Vector2f(slotSize, slotSize));
-        slotBox.setFillColor(sf::Color(80, 80, 80));
-        slotBox.setOutlineThickness(1.f);
-        slotBox.setOutlineColor(sf::Color::Yellow);
-    }
-
     ItemType type;
+    EquipSlot(const float& slotSize);
 };

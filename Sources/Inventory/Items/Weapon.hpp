@@ -13,4 +13,6 @@ public:
     float getDamage() const override;
 
     float getHealth() const override;
+
+    std::shared_ptr<ItemData> clone() const override;
 };

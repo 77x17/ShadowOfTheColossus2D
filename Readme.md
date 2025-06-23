@@ -15,3 +15,4 @@
 - Bug 2 ngày vì float / 10.0f quá nhỏ tiệm cận 0 => 0
 - Lưu std::vector< std::pair<> > sẽ nhanh hơn dùng std::unordered_map<> thường nếu không cần .at()
 - Nên dynamic_cast<> thay vì thêm một attribute vào Base class một cách không cần thiết
+- Khi đa hình thì phải dùng hàm virtual clone() = 0 cho Base class để copy không bị Slicing data

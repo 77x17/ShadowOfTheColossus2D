@@ -368,7 +368,7 @@ void Enemy::dropItems(std::vector<Item>& items) {
         if (chance(gen) <= pair.first) {
             sf::Vector2f center = hitbox.getPosition() + hitbox.getSize() / 2.0f;
             sf::Vector2f offset = sf::Vector2f(rand() % static_cast<int>(hitbox.getSize().x), rand() % static_cast<int>(hitbox.getSize().y)) - hitbox.getSize() / 2.0f;
-            items.emplace_back(center + offset, pair.second);
+            items.emplace_back(center + offset, pair.second->clone());
         }
     }
 }

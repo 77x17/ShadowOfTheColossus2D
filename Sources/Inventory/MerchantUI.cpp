@@ -27,12 +27,11 @@ MerchantUI::MerchantUI(const sf::Vector2f& windowSize, Player& player) {
     if (inventory == nullptr || static_cast<int>((*inventory).size()) != rows * cols) {
         std::cerr << "[Bug] - InventoryUI.cpp - Constructor\n";
     }
-    BagSlot bagSlot;
-    bagSlot.init(slotSize);
+    BagSlot bagSlot(slotSize);
     for (int y = 0, index = 0; y < rows; ++y) {
         for (int x = 0; x < cols; ++x, ++index) {
             bagSlot.item = &(*inventory)[index];
-            bagSlot.slotBox.setPosition(startPos + sf::Vector2f(x * (slotSize + slotPadding), y * (slotSize + slotPadding)));
+            bagSlot.setPosition(startPos + sf::Vector2f(x * (slotSize + slotPadding), y * (slotSize + slotPadding)));
             
             playerBagSlots.push_back(bagSlot);
         }
@@ -50,7 +49,7 @@ MerchantUI::MerchantUI(const sf::Vector2f& windowSize, Player& player) {
     for (int y = 0, index = 0; y < rows; ++y) {
         for (int x = 0; x < cols; ++x, ++index) {
             bagSlot.item = &merchantInventory[index];
-            bagSlot.slotBox.setPosition(startPos + sf::Vector2f(x * (slotSize + slotPadding), (y + 4) * (slotSize + slotPadding)) + sf::Vector2f(0.0f, -slotPadding + groupPadding));
+            bagSlot.setPosition(startPos + sf::Vector2f(x * (slotSize + slotPadding), (y + 4) * (slotSize + slotPadding)) + sf::Vector2f(0.0f, -slotPadding + groupPadding));
             
             merchantBagSlots.push_back(bagSlot);
         }
@@ -75,6 +74,11 @@ MerchantUI::MerchantUI(const sf::Vector2f& windowSize, Player& player) {
     hoveredItemRarity.setCharacterSize(textSize);
     hoveredItemRarity.setOutlineThickness(1.0f);
     hoveredItemRarity.setOutlineColor(sf::Color::Black);
+
+    amountText.setFont(Font::font);
+    amountText.setStyle(sf::Text::Bold);
+    amountText.setCharacterSize(10.0f);
+    amountText.setFillColor(sf::Color::White);
 }
 
 void MerchantUI::updatePosition(const sf::Vector2f& windowSize) {
@@ -84,7 +88,7 @@ void MerchantUI::updatePosition(const sf::Vector2f& windowSize) {
     inventoryText.setPosition(startPos - sf::Vector2f(0.0f, slotPadding));
     for (int y = 0, index = 0; y < rows; ++y) {
         for (int x = 0; x < cols; ++x, ++index) {
-            playerBagSlots[index].slotBox.setPosition(startPos + sf::Vector2f(x * (slotSize + slotPadding), y * (slotSize + slotPadding)));
+            playerBagSlots[index].setPosition(startPos + sf::Vector2f(x * (slotSize + slotPadding), y * (slotSize + slotPadding)));
         }
     }
 
@@ -92,7 +96,7 @@ void MerchantUI::updatePosition(const sf::Vector2f& windowSize) {
 
     for (int y = 0, index = 0; y < rows; ++y) {
         for (int x = 0; x < cols; ++x, ++index) {
-            merchantBagSlots[index].slotBox.setPosition(startPos + sf::Vector2f(x * (slotSize + slotPadding), (y + 4) * (slotSize + slotPadding)) + sf::Vector2f(0.0f, -slotPadding + groupPadding));
+            merchantBagSlots[index].setPosition(startPos + sf::Vector2f(x * (slotSize + slotPadding), (y + 4) * (slotSize + slotPadding)) + sf::Vector2f(0.0f, -slotPadding + groupPadding));
         }
     }
 }
@@ -155,17 +159,29 @@ void MerchantUI::updateDrag(const sf::Vector2f& mousePos) {
     hoveredItemRarity.setString(std::string());
     if (draggedItem) {
         dreggedPos = mousePos;
+
+        amountText.setPosition(mousePos + sf::Vector2f(slotSize - 2.0f, slotSize - 2.0f));
+        amountText.setString(std::to_string(draggedItem->amount));
+        amountText.setOrigin(amountText.getLocalBounds().left + amountText.getLocalBounds().width, amountText.getLocalBounds().top + amountText.getLocalBounds().height);
+    }
+    else {
+        amountText.setString(std::string());
     }
 }
 
 void MerchantUI::handleClick(const sf::Vector2f& mousePos) {
+    if (draggedItem) {
+        // std::cerr << "[Bug] - MerchantUI.cpp - handleClick()\n";
+        return;
+    }
+
     previousDraggedItemID = -1;
 
     for (auto& slot : playerBagSlots) {
         ++previousDraggedItemID;
 
         if (slot.contains(mousePos)) {
-            if (!draggedItem && (*slot.item)) {
+            if ((*slot.item)) {
                 draggedItem  = (*slot.item);
                 (*slot.item) = nullptr;
 
@@ -178,10 +194,55 @@ void MerchantUI::handleClick(const sf::Vector2f& mousePos) {
         ++previousDraggedItemID;
 
         if (slot.contains(mousePos)) {
-            if (!draggedItem && (*slot.item)) {
+            if ((*slot.item)) {
                 draggedItem  = (*slot.item);
                 (*slot.item) = nullptr;
 
+                return;
+            }
+        }
+    }
+}
+
+void MerchantUI::handleRightClick(const sf::Vector2f& mousePos) {
+    if (draggedItem) {
+        // std::cerr << "[Bug] - MerchantUI.cpp - handleClick()\n";
+        return;
+    }
+
+    previousDraggedItemID = -1;
+
+    for (auto& slot : playerBagSlots) {
+        ++previousDraggedItemID;
+
+        if (slot.contains(mousePos)) {
+            if ((*slot.item)) {
+                draggedItem         = (*slot.item)->clone();
+                draggedItem->amount = (draggedItem->amount + 1) / 2;
+                
+                (*slot.item)->amount -= draggedItem->amount;
+                if ((*slot.item)->amount == 0) {
+                    (*slot.item) = nullptr;
+                }
+
+                return;
+            }
+        }
+    }
+
+    for (auto& slot : merchantBagSlots) {
+        ++previousDraggedItemID;
+
+        if (slot.contains(mousePos)) {
+            if ((*slot.item)) {
+                draggedItem         = (*slot.item)->clone();
+                draggedItem->amount = (draggedItem->amount + 1) / 2;
+                
+                (*slot.item)->amount -= draggedItem->amount;
+                if ((*slot.item)->amount == 0) {
+                    (*slot.item) = nullptr;
+                }
+                
                 return;
             }
         }
@@ -189,11 +250,22 @@ void MerchantUI::handleClick(const sf::Vector2f& mousePos) {
 }
 
 void MerchantUI::handleRelease(const sf::Vector2f& mousePos, Player& player, std::vector<Item>& items) {
+    if (draggedItem == nullptr) {
+        // std::cerr << "[Bug] - MerchantUI.cpp - handleRelease()\n";
+        return;
+    }
+
     for (auto& slot : playerBagSlots) {
         if (slot.contains(mousePos)) {
-            if (draggedItem && !(*slot.item)) {
+            if (!(*slot.item)) {    // Empty thì đặt
                 (*slot.item) = draggedItem;
                 draggedItem  = nullptr;
+
+                return;
+            }
+            else if ((*slot.item)->name == draggedItem->name) { // Cùng loại item thì gộp vào
+                (*slot.item)->amount += draggedItem->amount;
+                draggedItem = nullptr;
 
                 return;
             }
@@ -202,9 +274,15 @@ void MerchantUI::handleRelease(const sf::Vector2f& mousePos, Player& player, std
 
     for (auto& slot : merchantBagSlots) {
         if (slot.contains(mousePos)) {
-            if (draggedItem && !(*slot.item)) {
+            if (!(*slot.item)) {    // Empty thì đặt
                 (*slot.item) = draggedItem;
                 draggedItem  = nullptr;
+
+                return;
+            }
+            else if ((*slot.item)->name == draggedItem->name) { // Cùng loại item thì gộp vào
+                (*slot.item)->amount += draggedItem->amount;
+                draggedItem = nullptr;
 
                 return;
             }
@@ -217,14 +295,39 @@ void MerchantUI::handleRelease(const sf::Vector2f& mousePos, Player& player, std
 
             for (auto& slot : merchantBagSlots) {
                 if (previousDraggedItemID == 0) {
-                    if (draggedItem && !(*slot.item)) {
+                    if (!(*slot.item)) {
                         (*slot.item) = draggedItem;
                         draggedItem  = nullptr;
 
                         return;
                     }
-                    else if (draggedItem) {
-                        std::cerr << "[Bug] - MerchantUI.cpp - handleRelease()\n";
+                    else if ((*slot.item)->name == draggedItem->name) { // Cùng loại item thì gộp vào
+                        (*slot.item)->amount += draggedItem->amount;
+                        draggedItem = nullptr;
+
+                        return;
+                    }
+                    else {
+                        for (auto& o_slot : playerBagSlots) {
+                            if (!(*o_slot.item)) {
+                                (*o_slot.item) = draggedItem;
+                                draggedItem    = nullptr;
+                                return;
+                            }
+                            else if ((*o_slot.item)->name == draggedItem->name) {   // Chung loại
+                                (*o_slot.item)->amount += draggedItem->amount;
+                                draggedItem = nullptr;
+
+                                return;
+                            }
+                        }
+                        
+                        if (player.dropItem(draggedItem, items)) {
+                            draggedItem = nullptr;
+                        }
+                        else {
+                            std::cerr << "[Bug] - MerchantUI.cpp - handleRelease()\n";
+                        }
                     }
                 }
                 --previousDraggedItemID;
@@ -234,16 +337,28 @@ void MerchantUI::handleRelease(const sf::Vector2f& mousePos, Player& player, std
         else {
             for (auto& slot : playerBagSlots) {
                 if (previousDraggedItemID == 0) {
-                    if (draggedItem && !(*slot.item)) {
+                    if (!(*slot.item)) {
                         (*slot.item) = draggedItem;
                         draggedItem  = nullptr;
                         return;
                     }
-                    else if (draggedItem) {
+                    else if ((*slot.item)->name == draggedItem->name) { // Cùng loại item thì gộp vào
+                        (*slot.item)->amount += draggedItem->amount;
+                        draggedItem = nullptr;
+
+                        return;
+                    }
+                    else {
                         for (auto& o_slot : playerBagSlots) {
-                            if (draggedItem && !(*o_slot.item)) {
+                            if (!(*o_slot.item)) {
                                 (*o_slot.item) = draggedItem;
                                 draggedItem    = nullptr;
+                                return;
+                            }
+                            else if ((*o_slot.item)->name == draggedItem->name) {   // Chung loại
+                                (*o_slot.item)->amount += draggedItem->amount;
+                                draggedItem = nullptr;
+
                                 return;
                             }
                         }
@@ -261,73 +376,11 @@ void MerchantUI::handleRelease(const sf::Vector2f& mousePos, Player& player, std
             // std::cerr << "[Bug] - MerchantUI.cpp - handleRelease()\n";
         }
     }
-    else if (draggedItem) {
-        if (player.dropItem(draggedItem, items)) {
-            draggedItem = nullptr;
-        }
-        else {
-            if (previousDraggedItemID >= static_cast<int>((playerBagSlots).size())) {
-                previousDraggedItemID -= static_cast<int>((playerBagSlots).size());
-
-                for (auto& slot : merchantBagSlots) {
-                    if (previousDraggedItemID == 0) {
-                        if (draggedItem && !(*slot.item)) {
-                            (*slot.item) = draggedItem;
-                            draggedItem  = nullptr;
-                            return;
-                        } else if (draggedItem) {
-                            for (auto& o_slot : merchantBagSlots) {
-                                if (draggedItem && !(*o_slot.item)) {
-                                    (*o_slot.item) = draggedItem;
-                                    draggedItem    = nullptr;
-                                    return;
-                                }
-                            }
-                            
-                            if (player.dropItem(draggedItem, items)) {
-                                draggedItem = nullptr;
-                            }
-                            else {
-                                std::cerr << "[Bug] - MerchantUI.cpp - handleRelease()\n";
-                            }
-                        }
-                    }
-                    --previousDraggedItemID;
-                }
-                previousDraggedItemID += static_cast<int>((playerBagSlots).size());
-
-                // std::cerr << "[Bug] - MerchantUI.cpp - handleRelease()\n";
-            } 
-            else {
-                for (auto& slot : playerBagSlots) {
-                    if (previousDraggedItemID == 0) {
-                        if (draggedItem && !(*slot.item)) {
-                            (*slot.item) = draggedItem;
-                            draggedItem  = nullptr;
-                            return;
-                        }
-                        else if (draggedItem) {
-                            for (auto& o_slot : playerBagSlots) {
-                                if (draggedItem && !(*o_slot.item)) {
-                                    (*o_slot.item) = draggedItem;
-                                    draggedItem    = nullptr;
-                                    return;
-                                }
-                            }
-                            
-                            if (player.dropItem(draggedItem, items)) {
-                                draggedItem = nullptr;
-                            }
-                            else {
-                                std::cerr << "[Bug] - MerchantUI.cpp - handleRelease()\n";
-                            }
-                        }
-                    }
-                    --previousDraggedItemID;
-                }
-                // std::cerr << "[Bug] - MerchantUI.cpp - handleRelease()\n";
-            }
-        }
+    else if (player.dropItem(draggedItem, items)) {
+        draggedItem = nullptr;
+    }
+    else {
+        std::cerr << "[Bug] - MerchantUI.cpp - handleRelease()\n";
     }
 }
 
@@ -353,6 +406,7 @@ void MerchantUI::draw(sf::RenderTarget& target) {
         sf::Sprite sprite = draggedItem->sprite;
         sprite.setPosition(dreggedPos);
         target.draw(sprite);
+        target.draw(amountText);
     }
 }
 
@@ -367,10 +421,21 @@ bool MerchantUI::isDrag() const {
 void MerchantUI::isPayment(Player& player) {
     for (std::shared_ptr<ItemData>& item : merchantInventory) {
         if (item != nullptr) {
+            player.golds += item->amount * 10.0f;
+            
             item          = nullptr;
-            player.golds += 10.0f;
 
             SoundManager::playSound("payment");
         }
+    }
+}
+
+void MerchantUI::updateAmount() {
+    for (auto& slot : playerBagSlots) {
+        slot.updateAmount();
+    }
+    
+    for (auto& slot : merchantBagSlots) {
+        slot.updateAmount();
     }
 }

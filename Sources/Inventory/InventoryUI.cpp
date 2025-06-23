@@ -13,6 +13,7 @@ InventoryUI::InventoryUI(const sf::Vector2f& windowSize, Player& player) {
     containBox.setOrigin(containBox.getLocalBounds().width / 2.0f, containBox.getLocalBounds().height / 2.0f);
     containBox.setPosition(windowSize / 2.0f); // Vị trí ban đầu
     
+    // --- [Begin] - Inventory ---
     sf::Vector2f startPos = containBox.getGlobalBounds().getPosition() + sf::Vector2f(groupPadding, groupPadding);
     inventoryText.setFont(Font::font);
     inventoryText.setCharacterSize(textSize);
@@ -25,18 +26,18 @@ InventoryUI::InventoryUI(const sf::Vector2f& windowSize, Player& player) {
     if (inventory == nullptr || static_cast<int>((*inventory).size()) != rows * cols) {
         std::cerr << "[Bug] - InventoryUI.cpp - Constructor\n";
     }
-    BagSlot bagSlot;
-    bagSlot.init(slotSize);
+    BagSlot bagSlot(slotSize);
     for (int y = 0, index = 0; y < rows; ++y) {
         for (int x = 0; x < cols; ++x, ++index) {
             bagSlot.item = &(*inventory)[index];
-            bagSlot.slotBox.setPosition(startPos + sf::Vector2f(x * (slotSize + slotPadding), y * (slotSize + slotPadding)));
+            bagSlot.setPosition(startPos + sf::Vector2f(x * (slotSize + slotPadding), y * (slotSize + slotPadding)));
             
             bagSlots.push_back(bagSlot);
         }
     }
+    // --- [End] ---
 
-    // ===== TẠO EQUIP SLOTS (8 ô dọc) =====
+    // --- [Begin] - Equipment ---
     std::string equipSlotLabels[] = { "Helmet", "Chestplate", "Leggings", "Boots", "Ring", "Amulet", "Shield", "Weapon" };
     equipLabels.assign(8, sf::Text());
     for (int i = 0; i < 8; ++i) {
@@ -59,11 +60,10 @@ InventoryUI::InventoryUI(const sf::Vector2f& windowSize, Player& player) {
     if (equipment == nullptr || (*equipment).size() != 8) {
         std::cerr << "[Bug] - InventoryUI.cpp - Constructor\n";
     }
-    EquipSlot equipSlot;
-    equipSlot.init(slotSize);
+    EquipSlot equipSlot(slotSize);
     for (int i = 0; i < 4; ++i) {
         equipSlot.item = &(*equipment)[i];
-        equipSlot.slotBox.setPosition(equipStart + sf::Vector2f(0.0f, i * (slotSize + slotPadding)));
+        equipSlot.setPosition(equipStart + sf::Vector2f(0.0f, i * (slotSize + slotPadding)));
         equipSlot.type = equipSlotTypes[i];
         
         equipSlots.push_back(equipSlot);
@@ -75,7 +75,7 @@ InventoryUI::InventoryUI(const sf::Vector2f& windowSize, Player& player) {
 
     for (int i = 4; i < 8; ++i) {
         equipSlot.item = &(*equipment)[i];
-        equipSlot.slotBox.setPosition(equipStart + sf::Vector2f(4 * (slotSize + slotPadding), (i - 4) * (slotSize + slotPadding)));
+        equipSlot.setPosition(equipStart + sf::Vector2f(4 * (slotSize + slotPadding), (i - 4) * (slotSize + slotPadding)));
         equipSlot.type = equipSlotTypes[i];
 
         equipSlots.push_back(equipSlot);
@@ -152,6 +152,11 @@ InventoryUI::InventoryUI(const sf::Vector2f& windowSize, Player& player) {
     hoveredItemRarity.setCharacterSize(textSize);
     hoveredItemRarity.setOutlineThickness(1.0f);
     hoveredItemRarity.setOutlineColor(sf::Color::Black);
+
+    amountText.setFont(Font::font);
+    amountText.setStyle(sf::Text::Bold);
+    amountText.setCharacterSize(10.0f);
+    amountText.setFillColor(sf::Color::White);
 }
 
 void InventoryUI::updatePosition(const sf::Vector2f& windowSize) {
@@ -161,7 +166,7 @@ void InventoryUI::updatePosition(const sf::Vector2f& windowSize) {
     inventoryText.setPosition(startPos - sf::Vector2f(0.0f, slotPadding));
     for (int y = 0, index = 0; y < rows; ++y) {
         for (int x = 0; x < cols; ++x, ++index) {
-            bagSlots[index].slotBox.setPosition(startPos + sf::Vector2f(x * (slotSize + slotPadding), y * (slotSize + slotPadding)));
+            bagSlots[index].setPosition(startPos + sf::Vector2f(x * (slotSize + slotPadding), y * (slotSize + slotPadding)));
         }
     }
 
@@ -169,13 +174,13 @@ void InventoryUI::updatePosition(const sf::Vector2f& windowSize) {
     sf::Vector2f equipStart = startPos + sf::Vector2f((cols - 1) * (slotSize + slotPadding) + slotSize + groupPadding, 0.0f);
     equipmentText.setPosition(equipStart - sf::Vector2f(0.0f, slotPadding));
     for (int i = 0; i < 4; ++i) {
-        equipSlots[i].slotBox.setPosition(equipStart + sf::Vector2f(0.0f, i * (slotSize + slotPadding)));
+        equipSlots[i].setPosition(equipStart + sf::Vector2f(0.0f, i * (slotSize + slotPadding)));
         
         equipLabels[i].setPosition(equipStart + sf::Vector2f((slotSize + slotPadding), i * (slotSize + slotPadding)));
     }
 
     for (int i = 4; i < 8; ++i) {
-        equipSlots[i].slotBox.setPosition(equipStart + sf::Vector2f(4 * (slotSize + slotPadding), (i - 4) * (slotSize + slotPadding)));
+        equipSlots[i].setPosition(equipStart + sf::Vector2f(4 * (slotSize + slotPadding), (i - 4) * (slotSize + slotPadding)));
 
         equipLabels[i].setPosition(equipStart + sf::Vector2f(4 * (slotSize + slotPadding) - slotPadding, (i - 4) * (slotSize + slotPadding) + slotSize));
     }
@@ -256,21 +261,31 @@ void InventoryUI::updateDrag(const sf::Vector2f& mousePos) {
     hoveredItemInfo.setString(std::string());
     if (draggedItem) {
         dreggedPos = mousePos;
+
+        amountText.setPosition(mousePos + sf::Vector2f(slotSize - 2.0f, slotSize - 2.0f));
+        amountText.setString(std::to_string(draggedItem->amount));
+        amountText.setOrigin(amountText.getLocalBounds().left + amountText.getLocalBounds().width, amountText.getLocalBounds().top + amountText.getLocalBounds().height);
+    }
+    else {
+        amountText.setString(std::string());
     }
 }
 
 void InventoryUI::handleClick(const sf::Vector2f& mousePos) {
+    if (draggedItem) {
+        // std::cerr << "[Bug] - InventoryUI.cpp - handleClick()\n";
+        return;
+    }
+
     previousDraggedItemID = -1;
 
     for (auto& slot : bagSlots) {
         ++previousDraggedItemID;
 
         if (slot.contains(mousePos)) {
-            if (!draggedItem && (*slot.item)) {
+            if ((*slot.item)) {
                 draggedItem  = (*slot.item);
                 (*slot.item) = nullptr;
-
-                // selectedBagItemInfomation.setString(draggedItem->getInformation());
 
                 return;
             }
@@ -281,12 +296,55 @@ void InventoryUI::handleClick(const sf::Vector2f& mousePos) {
         ++previousDraggedItemID;
 
         if (slot.contains(mousePos)) {
-            if (!draggedItem && (*slot.item)) {
+            if ((*slot.item)) {
                 draggedItem  = (*slot.item);
                 (*slot.item) = nullptr;
                 
-                // selectedEquipItemInfomation.setString(draggedItem->getInformation());
+                return;
+            }
+        }
+    }
+}
 
+void InventoryUI::handleRightClick(const sf::Vector2f& mousePos) {
+    if (draggedItem) {
+        // std::cerr << "[Bug] - InventoryUI.cpp - handleClick()\n";
+        return;
+    }
+
+    previousDraggedItemID = -1;
+
+    for (auto& slot : bagSlots) {
+        ++previousDraggedItemID;
+
+        if (slot.contains(mousePos)) {
+            if ((*slot.item)) {
+                draggedItem         = (*slot.item)->clone();
+                draggedItem->amount = (draggedItem->amount + 1) / 2;
+                
+                (*slot.item)->amount -= draggedItem->amount;
+                if ((*slot.item)->amount == 0) {
+                    (*slot.item) = nullptr;
+                }
+
+                return;
+            }
+        }
+    }
+
+    for (auto& slot : equipSlots) {
+        ++previousDraggedItemID;
+
+        if (slot.contains(mousePos)) {
+            if ((*slot.item)) {
+                draggedItem         = (*slot.item)->clone();
+                draggedItem->amount = (draggedItem->amount + 1) / 2;
+                
+                (*slot.item)->amount -= draggedItem->amount;
+                if ((*slot.item)->amount == 0) {
+                    (*slot.item) = nullptr;
+                }
+                
                 return;
             }
         }
@@ -294,11 +352,26 @@ void InventoryUI::handleClick(const sf::Vector2f& mousePos) {
 }
 
 void InventoryUI::handleRelease(const sf::Vector2f& mousePos, Player& player, std::vector<Item>& items) {
+    if (draggedItem == nullptr) {
+        // std::cerr << "[Bug] - InventoryUI.cpp - handleRelease()\n";
+        return;
+    }
+
     for (auto& slot : bagSlots) {
         if (slot.contains(mousePos)) {
-            if (draggedItem && !(*slot.item)) {
+            if (!(*slot.item)) {    // Empty thì đặt vào
                 (*slot.item) = draggedItem;
                 draggedItem  = nullptr;
+
+                if (previousDraggedItemID >= static_cast<int>((bagSlots).size())) { 
+                    player.updateEquipmentStats();
+                }
+
+                return;
+            }
+            else if ((*slot.item)->name == draggedItem->name) { // Cùng loại item thì gộp vào
+                (*slot.item)->amount += draggedItem->amount;
+                draggedItem = nullptr;
 
                 if (previousDraggedItemID >= static_cast<int>((bagSlots).size())) { 
                     player.updateEquipmentStats();
@@ -311,7 +384,11 @@ void InventoryUI::handleRelease(const sf::Vector2f& mousePos, Player& player, st
 
     for (auto& slot : equipSlots) {
         if (slot.contains(mousePos)) {
-            if (draggedItem && !(*slot.item) && slot.type == draggedItem->type) {
+            if (!(*slot.item)) {    // Empty thì đặt vào
+                if (slot.type != draggedItem->type) {
+                    SoundManager::playSound("blockEquipItem");
+                    continue;
+                }
                 if (const auto& equipItem = dynamic_cast<EquipItem*>(draggedItem.get())) {
                     if (equipItem->levelRequired > player.getLevel()) {
                         SoundManager::playSound("blockEquipItem");
@@ -330,6 +407,18 @@ void InventoryUI::handleRelease(const sf::Vector2f& mousePos, Player& player, st
 
                 return;
             }
+            else if ((*slot.item)->name == draggedItem->name) { // Cùng loại item thì gộp vào
+                (*slot.item)->amount += draggedItem->amount;
+                draggedItem = nullptr;
+
+                if (previousDraggedItemID < static_cast<int>((bagSlots).size())) { 
+                    player.updateEquipmentStats();
+                }
+
+                SoundManager::playSound("equipItem");
+
+                return;
+            }
         }
     }
 
@@ -339,7 +428,7 @@ void InventoryUI::handleRelease(const sf::Vector2f& mousePos, Player& player, st
 
             for (auto& slot : equipSlots) {
                 if (previousDraggedItemID == 0) {
-                    if (draggedItem && !(*slot.item) && slot.type == draggedItem->type) {
+                    if (!(*slot.item) && slot.type == draggedItem->type) {
                         if (const auto& equipItem = dynamic_cast<EquipItem*>(draggedItem.get())) {
                             if (equipItem->levelRequired > player.getLevel()) continue;
                         }
@@ -348,7 +437,7 @@ void InventoryUI::handleRelease(const sf::Vector2f& mousePos, Player& player, st
                         draggedItem  = nullptr;
                         return;
                     }
-                    else if (draggedItem) {
+                    else {
                         std::cerr << "[Bug] - InventoryUI.cpp - handleRelease()\n";
                     }
                 }
@@ -359,21 +448,35 @@ void InventoryUI::handleRelease(const sf::Vector2f& mousePos, Player& player, st
         else {
             for (auto& slot : bagSlots) {
                 if (previousDraggedItemID == 0) {
-                    if (draggedItem && !(*slot.item)) {
+                    if (!(*slot.item)) {    // Empty thì đặt vào
                         (*slot.item) = draggedItem;
                         draggedItem  = nullptr;
+
                         return;
                     }
-                    else if (draggedItem) {
+                    else if ((*slot.item)->name == draggedItem->name) { // Cùng loại item thì gộp vào
+                        (*slot.item)->amount += draggedItem->amount;
+                        draggedItem = nullptr;
+
+                        return;
+                    }
+                    else {  // Duyệt xem có ô nào chung loại item hoặc trống thì đặt vào
                         for (auto& o_slot : bagSlots) {
-                            if (draggedItem && !(*o_slot.item)) {
+                            if (!(*o_slot.item)) {  // Trống
                                 (*o_slot.item) = draggedItem;
                                 draggedItem    = nullptr;
+
+                                return;
+                            }
+                            else if ((*o_slot.item)->name == draggedItem->name) {   // Chung loại
+                                (*o_slot.item)->amount += draggedItem->amount;
+                                draggedItem = nullptr;
+
                                 return;
                             }
                         }
                         
-                        if (player.dropItem(draggedItem, items)) {
+                        if (player.dropItem(draggedItem, items)) {  // Nếu full thì drop
                             draggedItem = nullptr;
                         }
                         else {
@@ -386,50 +489,11 @@ void InventoryUI::handleRelease(const sf::Vector2f& mousePos, Player& player, st
             // std::cerr << "[Bug] - Inventory.cpp - handleRelease()\n";
         }
     }
-    else if (draggedItem) {
-        if (player.dropItem(draggedItem, items)) {
-            draggedItem = nullptr;
-        }
-        else {
-            if (previousDraggedItemID >= static_cast<int>((bagSlots).size())) {
-                previousDraggedItemID -= static_cast<int>((bagSlots).size());
-
-                for (auto& slot : equipSlots) {
-                    if (previousDraggedItemID == 0) {
-                        if (draggedItem && !(*slot.item) && slot.type == draggedItem->type) {
-                            if (const auto& equipItem = dynamic_cast<EquipItem*>(draggedItem.get())) {
-                                if (equipItem->levelRequired > player.getLevel()) continue;
-                            }
-                            
-                            (*slot.item) = draggedItem;
-                            draggedItem  = nullptr;
-                            return;
-                        }
-                        else if (draggedItem) {
-                            std::cerr << "[Bug] - InventoryUI.cpp - handleRelease()\n";
-                        }
-                    }
-                    --previousDraggedItemID;
-                }
-                // std::cerr << "[Bug] - Inventory.cpp - handleRelease()\n";
-            } 
-            else {
-                for (auto& slot : bagSlots) {
-                    if (previousDraggedItemID == 0) {
-                        if (draggedItem && !(*slot.item)) {
-                            (*slot.item) = draggedItem;
-                            draggedItem  = nullptr;
-                            return;
-                        }
-                        else if (draggedItem) {
-                            std::cerr << "[Bug] - InventoryUI.cpp - handleRelease()\n";
-                        }
-                    }
-                    --previousDraggedItemID;
-                }
-                // std::cerr << "[Bug] - Inventory.cpp - handleRelease()\n";
-            }
-        }
+    else if (player.dropItem(draggedItem, items)) {
+        draggedItem = nullptr;
+    }
+    else {
+        std::cerr << "[Bug] - InventoryUI.cpp - handleRelease()\n";
     }
 }
 
@@ -466,6 +530,7 @@ void InventoryUI::draw(sf::RenderTarget& target) {
         sf::Sprite sprite = draggedItem->sprite;
         sprite.setPosition(dreggedPos);
         target.draw(sprite);
+        target.draw(amountText);
     }
 }
 
@@ -479,4 +544,14 @@ bool InventoryUI::isDrag() const {
 
 void InventoryUI::updateStats(Player &player) {
     equipmentStats.setString(player.getStats());
+}
+
+void InventoryUI::updateAmount() {
+    for (auto& slot : bagSlots) {
+        slot.updateAmount();
+    }
+    
+    for (auto& slot : equipSlots) {
+        slot.updateAmount();
+    }
 }

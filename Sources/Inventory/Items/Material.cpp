@@ -6,3 +6,7 @@ Orb::Orb(const std::string& _name, const std::string& textureName, ItemRarity _r
 std::string Orb::getDetails() const {
     return std::string();
 }
+
+std::shared_ptr<ItemData> Orb::clone() const {
+    return std::make_shared<Orb>(*this);
+}

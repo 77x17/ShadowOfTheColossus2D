@@ -53,9 +53,9 @@ void QuestNpc::interactWithPlayer(Player& player) {
                         quest.update(dataPack);
                     }
                     else {
-                        // --- [Begin] - giveItemObjective ---
                         std::vector<std::shared_ptr<QuestObjective>> questObjectives = quest.getQuestObjectives();
                         for (auto& objective : questObjectives) if (!objective->isFinished()) {
+                            // --- [Begin] - giveItemObjective ---
                             QuestEventData objectiveData = objective->getQuestEventData();
                             if (objectiveData.eventType == "giveItem") {
                                 for (auto& item : *player.getInventory()) if (item) {
@@ -63,23 +63,35 @@ void QuestNpc::interactWithPlayer(Player& player) {
                                         QuestEventData giveItemData;
                                         giveItemData.eventType  = "giveItem";
                                         giveItemData.targetName = item->name;
+                                        if (item->amount <= objectiveData.amount) {
+                                            giveItemData.amount = item->amount;
+
+                                            item = nullptr;
+                                        }
+                                        else {
+                                            giveItemData.amount = objectiveData.amount;
+
+                                            item->amount -= objectiveData.amount;
+                                        }
+
                                         quest.update(giveItemData);
                                         
-                                        item = nullptr; // take item from player
-
                                         if (objective->isFinished()) {
                                             break;
                                         }
                                     }
                                 }
                             }
+                            // --- [End] ---
+                            // --- [Begin] - giveItemObjective ---
                             else if (objectiveData.eventType == "collectItem") {
                                 for (auto& item : *player.getInventory()) if (item) {
                                     if (item->name == objectiveData.targetName) {
-                                        QuestEventData giveItemData;
-                                        giveItemData.eventType  = "collectItem";
-                                        giveItemData.targetName = item->name;
-                                        quest.update(giveItemData);
+                                        QuestEventData collectItemData;
+                                        collectItemData.eventType  = "collectItem";
+                                        collectItemData.targetName = item->name;
+                                        collectItemData.amount     = item->amount;
+                                        quest.update(collectItemData);
                                         
                                         if (objective->isFinished()) {
                                             break;
@@ -87,6 +99,7 @@ void QuestNpc::interactWithPlayer(Player& player) {
                                     }
                                 }
                             }
+                            // --- [End] ---
                         }
 
                         if (quest.isFinishObjectives()) {
@@ -95,7 +108,6 @@ void QuestNpc::interactWithPlayer(Player& player) {
                         else {
                             interactText.setString("I need your support");
                         }
-                        // --- [End] - giveItemObjective ---
 
                         continue;
                     }

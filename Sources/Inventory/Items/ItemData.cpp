@@ -2,9 +2,9 @@
 
 #include "TextureManager.hpp"
 
-ItemData::ItemData(const std::string& _name, ItemType _type, const std::string& _textureName, ItemRarity _rarity) 
-: name(_name), type(_type), rarity(_rarity) {
-    sprite.setTexture(TextureManager::get(_textureName));
+ItemData::ItemData(const std::string& m_name, ItemType m_type, const std::string& m_textureName, ItemRarity m_rarity, const int& m_amount) 
+: name(m_name), type(m_type), rarity(m_rarity), amount(m_amount) {
+    sprite.setTexture(TextureManager::get(m_textureName));
     sprite.setScale(2.0f, 2.0f);
 }
 
