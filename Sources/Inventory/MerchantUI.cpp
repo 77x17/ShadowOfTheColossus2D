@@ -87,6 +87,14 @@ void MerchantUI::updatePosition(const sf::Vector2f& windowSize) {
             playerBagSlots[index].slotBox.setPosition(startPos + sf::Vector2f(x * (slotSize + slotPadding), y * (slotSize + slotPadding)));
         }
     }
+
+    merchantInventoryText.setPosition(startPos + sf::Vector2f(0.0f, 4 * (slotSize + slotPadding) - 2 * slotPadding + groupPadding));
+
+    for (int y = 0, index = 0; y < rows; ++y) {
+        for (int x = 0; x < cols; ++x, ++index) {
+            merchantBagSlots[index].slotBox.setPosition(startPos + sf::Vector2f(x * (slotSize + slotPadding), (y + 4) * (slotSize + slotPadding)) + sf::Vector2f(0.0f, -slotPadding + groupPadding));
+        }
+    }
 }
 
 void MerchantUI::updateHover(const sf::Vector2f& mousePos) {

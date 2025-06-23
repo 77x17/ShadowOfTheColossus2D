@@ -17,7 +17,7 @@ bool GiveItemObjective::isFinished() const {
 }
 
 std::string GiveItemObjective::getDescription() const {
-    return "Collect " + std::to_string(currentAmount) + "/" + std::to_string(requiredAmount) + " " + itemName;
+    return "Give " + std::to_string(currentAmount) + "/" + std::to_string(requiredAmount) + " " + itemName;
 }
 
 QuestEventData GiveItemObjective::getQuestEventData() const {

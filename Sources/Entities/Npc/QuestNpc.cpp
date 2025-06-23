@@ -73,6 +73,20 @@ void QuestNpc::interactWithPlayer(Player& player) {
                                     }
                                 }
                             }
+                            else if (objectiveData.eventType == "collectItem") {
+                                for (auto& item : *player.getInventory()) if (item) {
+                                    if (item->name == objectiveData.targetName) {
+                                        QuestEventData giveItemData;
+                                        giveItemData.eventType  = "collectItem";
+                                        giveItemData.targetName = item->name;
+                                        quest.update(giveItemData);
+                                        
+                                        if (objective->isFinished()) {
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
                         }
 
                         if (quest.isFinishObjectives()) {

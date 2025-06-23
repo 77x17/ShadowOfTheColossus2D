@@ -1,7 +1,7 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
-#include <vector>
+
 #include "Enemy.hpp"
 #include "Projectile.hpp"
 
@@ -25,8 +25,7 @@ private:
 public:
     Eye(const sf::Vector2f& position, const std::vector<std::pair<float, std::shared_ptr<ItemData>>>& _inventory);
 
-    void respawn() override;
-    void kill() override;
+    // void respawn() override;
 
     void updateTimer(const float &dt) override;
     void followPlayer(const Player& player) override;

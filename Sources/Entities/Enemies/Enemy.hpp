@@ -78,7 +78,7 @@ public:
     void attack(Player& player);
     void hurt(const float& damage);
     void knockback(const sf::Vector2f& playerPosition);
-    virtual void kill();
+    void kill();
     virtual void respawn();
     bool isDespawn() const;
 

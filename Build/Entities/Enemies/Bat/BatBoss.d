@@ -11,4 +11,5 @@ Build/Entities/Enemies/Bat/BatBoss.o: \
  Sources/Effects/EntityEffects.hpp Sources/Inventory/InventorySlot.hpp \
  Sources/Inventory/Items/AllItems.hpp Sources/Inventory/Items/Armor.hpp \
  Sources/Inventory/Items/Weapon.hpp Sources/Inventory/Items/Material.hpp \
- Sources/TextureManager/TextureManager.hpp
+ Sources/TextureManager/TextureManager.hpp \
+ Sources/Configuration/Normalize.hpp

@@ -1,8 +1,7 @@
 #include "Eye.hpp"
 
 #include "TextureManager.hpp"
-
-#include <cmath>
+#include "Normalize.hpp"
 
 Eye::Eye(const sf::Vector2f& position, const std::vector<std::pair<float, std::shared_ptr<ItemData>>>& _inventory) 
 : Enemy(position, sf::Vector2f(TILE_SIZE, TILE_SIZE), 10.0f, "Eye Lv.5", _inventory) {
@@ -38,19 +37,11 @@ Eye::Eye(const sf::Vector2f& position, const std::vector<std::pair<float, std::s
     // --- [End] ---
 }
 
-void Eye::respawn() {
-    if (state == static_cast<int>(EyeState::DEAD) && respawnCooldownTimer <= 0) {
-        Enemy::respawn();
-
-        projectile.reset();
-    }
-}
-
-void Eye::kill() {
-    Enemy::kill();
-
-    projectile.reset();
-}
+// void Eye::respawn() {
+//     if (state == static_cast<int>(EyeState::DEAD) && respawnCooldownTimer <= 0) {
+//         Enemy::respawn();
+//     }
+// }
 
 void Eye::updateTimer(const float &dt) {
     Enemy::updateTimer(dt);
@@ -61,15 +52,7 @@ void Eye::updateTimer(const float &dt) {
 }
 
 void Eye::followPlayer(const Player& player) {
-    sf::Vector2f normalizeDirection = player.getPosition() - hitbox.getPosition();
-    float length = std::sqrt(normalizeDirection.x * normalizeDirection.x + normalizeDirection.y * normalizeDirection.y);
-
-    if (length > ZERO_EPSILON) {
-        normalizeDirection /= length;
-    }
-    else {
-        std::cerr << "[Bug] Eye.cpp - followPlayer()\n";
-    }
+    sf::Vector2f normalizeDirection = Normalize::normalize(player.getPosition() - hitbox.getPosition());
 
     if (alertCooldownTimer <= 0 && shootCooldownTimer <= 0) {
         shootCooldownTimer = SHOOT_COOLDOWN / 2.f;
@@ -143,9 +126,9 @@ void Eye::update(const float& dt, Player& player, const std::vector<sf::FloatRec
 }
 
 void Eye::draw(sf::RenderTarget& target) {
-    Enemy::draw(target);
-    
     if (projectile) {
         projectile->draw(target);
     }
+    
+    Enemy::draw(target);
 }

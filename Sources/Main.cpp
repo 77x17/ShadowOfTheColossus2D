@@ -25,12 +25,15 @@
 #include "MerchantUI.hpp"
 // --- [End] ---
 
+// --- [Begin] - Quests ---
 #include "Quest.hpp"
 #include "KillMonsterObjective.hpp"
 #include "FinishObjective.hpp"
 #include "TalkObjective.hpp"
 #include "ExploreObjective.hpp"
 #include "GiveItemObjective.hpp"
+#include "CollectItemObjective.hpp"
+// --- [End] ---
 
 // --- [Begin] - Npcs ---
 #include "Npc.hpp"
@@ -204,8 +207,8 @@ void loadQuests(std::vector<Quest>& quests) {
     quests.back().addNpcID      (2, 3);
     quests.back().addDialogue   (2, std::string());
     quests.back().addDescription(2, "Collect the Bat Orb and Eye Orb from corrupted creatures");
-    quests.back().addObjective  (2, std::make_shared<GiveItemObjective>("Bat Orb", 1));
-    quests.back().addObjective  (2, std::make_shared<GiveItemObjective>("Eye Orb", 1));
+    quests.back().addObjective  (2, std::make_shared<CollectItemObjective>("Bat Orb", 1));
+    quests.back().addObjective  (2, std::make_shared<CollectItemObjective>("Eye Orb", 1));
     // Stage 3: Trả đồ, nghe kể chuyện
     quests.back().addNpcID      (3, 3);
     quests.back().addDialogue   (3, "[1/6] You've returned with both orbs... I feared they were lost");
@@ -308,10 +311,12 @@ int main() {
     items.emplace_back(player.getPosition() + sf::Vector2f(300.0f, 0), std::make_shared<Helmet>("God Helmet", "helmet_00", 10000.0f, 1, ItemRarity::Mythic));
     player.addItem(std::make_shared<Orb>("Bat Orb", "orb", ItemRarity::Rare));
     player.addItem(std::make_shared<Orb>("Bat Orb", "orb", ItemRarity::Rare));
-    // player.addItem(std::make_shared<Orb>("Bat Orb", "orb", ItemRarity::Rare));
+    player.addItem(std::make_shared<Orb>("Bat Orb", "orb", ItemRarity::Rare));
+    player.addItem(std::make_shared<Orb>("Bat Orb", "orb", ItemRarity::Rare));
     player.addItem(std::make_shared<Orb>("Eye Orb", "orb", ItemRarity::Rare));
     player.addItem(std::make_shared<Orb>("Eye Orb", "orb", ItemRarity::Rare));
-    // player.addItem(std::make_shared<Orb>("Eye Orb", "orb", ItemRarity::Rare));
+    player.addItem(std::make_shared<Orb>("Eye Orb", "orb", ItemRarity::Rare));
+    player.addItem(std::make_shared<Orb>("Eye Orb", "orb", ItemRarity::Rare));
 
     InventoryUI inventoryUI(static_cast<sf::Vector2f>(window.getSize()), player);
     MerchantUI merchantUI(static_cast<sf::Vector2f>(window.getSize()), player);

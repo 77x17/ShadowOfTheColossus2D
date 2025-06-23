@@ -18,7 +18,8 @@ Build/Main.o: Sources/Main.cpp Sources/Configuration/Constants.hpp \
  Sources/Quests/KillMonsterObjective.hpp \
  Sources/Quests/FinishObjective.hpp Sources/Quests/TalkObjective.hpp \
  Sources/Quests/ExploreObjective.hpp Sources/Quests/GiveItemObjective.hpp \
- Sources/Entities/Npc/Npc.hpp Sources/TextureManager/TextureManager.hpp \
+ Sources/Quests/CollectItemObjective.hpp Sources/Entities/Npc/Npc.hpp \
+ Sources/TextureManager/TextureManager.hpp \
  Sources/Entities/Npc/QuestNpc.hpp Sources/Entities/Npc/MerchantNpc.hpp \
  Sources/ParticleManager/ParticleManager.hpp \
  Sources/BossAltar/BossAltar.hpp

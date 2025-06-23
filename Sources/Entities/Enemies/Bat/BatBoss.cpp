@@ -1,6 +1,7 @@
 #include "BatBoss.hpp"
 
 #include "TextureManager.hpp"
+#include "Normalize.hpp"
 
 BatBoss::BatBoss(const sf::Vector2f& position, const std::vector<std::pair<float, std::shared_ptr<ItemData>>>& _inventory) 
 : Enemy(position, sf::Vector2f(TILE_SIZE, TILE_SIZE) * 2.0f, 100.0f, "Bat Boss Lv.10", _inventory) {
@@ -31,18 +32,83 @@ BatBoss::BatBoss(const sf::Vector2f& position, const std::vector<std::pair<float
     shadow = Animation(TextureManager::get("batShadow"), 12,  5, 1, 0, 0.0f, false);
     alert  = Animation(TextureManager::get("alert")    ,  8, 10, 1, 0, 0.0f, false);
     // --- [End] ---
+
+    // --- [Begin] - Projectile ---
+    SHOOT_COOLDOWN      = 2.0f;
+    PROJECTILE_SPEED    = MOVE_SPEED * 1.5;
+    PROJECTILE_LIFETIME = 1.0f;
+    shootCooldownTimer  = 0.0f;
+    // --- [End] ---
+
+    // --- [Begin] - Dash --- 
+    dashCooldownTimer = 0.f;
+    dashDuration      = 0.f;
+    DASH_DURATION     = 0.3f;
+    DASH_COOLDOWN     = 4.f;
+    // --- [End] ---
+}
+
+void BatBoss::respawn() {
+    if (state == -1 && respawnCooldownTimer <= 0) {
+        state = -3;
+    }
 }
 
 void BatBoss::followPlayer(const Player& player) {
     Enemy::followPlayer(player);
     
-    if (calculateDistance(player) <= ATTACK_RANGE) {    
-        movingDirection   *= 1.5f;
+    if (alertCooldownTimer <= 0 && shootCooldownTimer <= 0) {
+        shootCooldownTimer = SHOOT_COOLDOWN / 2.f;
     }
+    if (alertCooldownTimer <= 0 && dashCooldownTimer <= 0) {
+        dashCooldownTimer  = DASH_COOLDOWN / 2.f;
+    }
+
+    if (dashDuration <= 0 && dashCooldownTimer <= 0) {
+        dashDuration      = DASH_DURATION;
+        dashCooldownTimer = DASH_COOLDOWN;
+        dashDirection     = Normalize::normalize(player.getPosition() - hitbox.getPosition()); 
+    }
+    else if (dashCooldownTimer < 0.2f) {
+        alertCooldownTimer = ALERT_LIFETIME;
+    }
+
+    if (dashDuration > 0) {
+        movingDirection = dashDirection * 5.0f;
+    }
+    else {
+        dashDirection = sf::Vector2f(0.0f, 0.0f);
+    }
+
+    if (shootCooldownTimer <= 0) {
+        const int dx[8] = {-1, -1, -1, 0, 0, 1, 1, 1};
+        const int dy[8] = {-1, 0, 1, -1, 1, -1, 0, 1};
+        for (int i = 0; i < 8; i++) {
+            projectiles.push_back(std::make_unique<Projectile>(
+                TextureManager::get("fireball"),
+                hitbox.getPosition() + hitbox.getSize() / 2.f,
+                Normalize::normalize(sf::Vector2f(dx[i], dy[i])),
+                PROJECTILE_SPEED,
+                PROJECTILE_LIFETIME
+            ));
+        }
+
+        shootCooldownTimer = SHOOT_COOLDOWN;
+    } 
 }
 
 void BatBoss::updateTimer(const float& dt) {
     Enemy::updateTimer(dt);
+
+    if (shootCooldownTimer > 0) {
+        shootCooldownTimer -= dt;
+    }
+    if (dashCooldownTimer > 0) {
+        dashCooldownTimer -= dt;
+    }
+    if (dashDuration > 0) {
+        dashDuration -= dt;
+    }
 }
 
 void BatBoss::updateAnimation() {
@@ -64,8 +130,45 @@ void BatBoss::updateAnimation() {
     shadow.setPosition(hitbox.getPosition() + sf::Vector2f(hitbox.getSize().x / 2.0f - 10.0f, hitbox.getSize().y));
 }
 
-void BatBoss::respawn() {
-    if (state == -1 && respawnCooldownTimer <= 0) {
-        state = -3;
+void BatBoss::updateProjectiles(const float& dt, Player& player) {
+    for (auto it = projectiles.begin(); it != projectiles.end(); ) {
+        (*it)->update(dt);
+
+        bool shouldRemove = false;
+        if ((*it)->isAlive()) {
+            if ((*it)->isCollision(player.getHitbox())) {
+                player.hurt(damagePerAttack);
+                player.knockback((*it)->getPosition());
+
+                shouldRemove = true;
+            }
+        }
+        else {
+            shouldRemove = true;
+        }
+
+        if (shouldRemove) {
+            it = projectiles.erase(it);
+        }
+        else {
+            ++it;
+        }
     }
+}   
+
+void BatBoss::update(const float& dt, Player& player, const std::vector<sf::FloatRect>& collisionRects, std::vector<Item>& items) {
+    Enemy::update(dt, player,collisionRects, items);
+    
+    if (invincibleCooldownTimer <= 0) {
+        updateProjectiles(dt, player);
+    }
+}
+
+
+void BatBoss::draw(sf::RenderTarget& target) {
+    for (const std::unique_ptr<Projectile>& projectile : projectiles) {
+        projectile->draw(target);
+    }
+   
+    Enemy::draw(target); 
 }
