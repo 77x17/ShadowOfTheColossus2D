@@ -21,6 +21,7 @@ INCLUDES = -I"./Sources" \
 		   -I"./Sources/Entities/Projectile" \
 		   -I"./Sources/Inventory" \
 		   -I"./Sources/Inventory/Items" \
+		   -I"./Sources/ItemManager" \
 		   -I"./Sources/LightSource" \
 		   -I"./Sources/Maps" \
 		   -I"./Sources/ParticleManager" \
@@ -51,6 +52,7 @@ SRCS := $(wildcard $(SRC_DIR)/*.cpp) \
         $(wildcard $(SRC_DIR)/Entities/Projectile/*.cpp) \
         $(wildcard $(SRC_DIR)/Inventory/*.cpp) \
         $(wildcard $(SRC_DIR)/Inventory/Items/*.cpp) \
+        $(wildcard $(SRC_DIR)/ItemManager/*.cpp) \
         $(wildcard $(SRC_DIR)/LightSource/*.cpp) \
         $(wildcard $(SRC_DIR)/Maps/*.cpp) \
         $(wildcard $(SRC_DIR)/ParticleManager/*.cpp) \

@@ -10,4 +10,5 @@ Build/BossAltar/BossAltar.o: Sources/BossAltar/BossAltar.cpp \
  Sources/Inventory/Items/AllItems.hpp Sources/Inventory/Items/Armor.hpp \
  Sources/Inventory/Items/EquipItem.hpp Sources/Inventory/Items/Weapon.hpp \
  Sources/Inventory/Items/Material.hpp Sources/Entities/Enemies/Enemy.hpp \
- Sources/Entities/Enemies/Bat/BatBoss.hpp
+ Sources/Entities/Enemies/Bat/BatBoss.hpp \
+ Sources/ItemManager/ItemManager.hpp

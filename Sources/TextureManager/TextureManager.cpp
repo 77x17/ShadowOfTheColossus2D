@@ -1,24 +1,8 @@
 #include "TextureManager.hpp"
 
-// Tải một texture từ file và lưu bằng một ID
-void TextureManager::load(const std::string& id, const std::string& path) {
-    auto texture = std::make_unique<sf::Texture>();
+std::unordered_map<std::string, std::unique_ptr<sf::Texture>> TextureManager::textures;
 
-    if (texture->loadFromFile(path)) {
-        texture->setSmooth(false);
-        textures[id] = std::move(texture);
-    } 
-    else {
-        std::cerr << "Failed to load texture: " << path << '\n';
-    }
-}
-
-// Lấy một tham chiếu hằng (const reference) đến texture đã được tải
-const sf::Texture& TextureManager::get(const std::string& id) {
-    return *textures.at(id); 
-}
-
-void TextureManager::loadSprite() {
+void TextureManager::loadSprites() {
     load("playerSprite", "Assets/Sprites/player.png");
     load("playerShadow", "Assets/Sprites/playerShadow.png");
     load("arrow"       , "Assets/Sprites/arrow.png");
@@ -47,4 +31,22 @@ void TextureManager::loadSprite() {
     load("leggings_00"  , "Assets/Items/leggings_00.png");
     load("boots_00"     , "Assets/Items/boots_00.png");
     load("orb"          , "Assets/Items/orb.png");
+}
+
+// Tải một texture từ file và lưu bằng một ID
+void TextureManager::load(const std::string& id, const std::string& path) {
+    auto texture = std::make_unique<sf::Texture>();
+
+    if (texture->loadFromFile(path)) {
+        texture->setSmooth(false);
+        textures[id] = std::move(texture);
+    } 
+    else {
+        std::cerr << "Failed to load texture: " << path << '\n';
+    }
+}
+
+// Lấy một tham chiếu hằng (const reference) đến texture đã được tải
+const sf::Texture& TextureManager::get(const std::string& id) {
+    return *textures.at(id); 
 }

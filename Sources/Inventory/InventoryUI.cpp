@@ -530,7 +530,10 @@ void InventoryUI::draw(sf::RenderTarget& target) {
         sf::Sprite sprite = draggedItem->sprite;
         sprite.setPosition(dreggedPos);
         target.draw(sprite);
-        target.draw(amountText);
+
+        if (draggedItem->amount >= 2) {
+            target.draw(amountText);
+        }
     }
 }
 

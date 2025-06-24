@@ -2,6 +2,38 @@
 
 #include <iostream>
 
+std::unordered_map<std::string, sf::SoundBuffer> SoundManager::buffers;
+std::unordered_map<std::string, sf::Sound> SoundManager::sounds;
+std::unordered_map<std::string, std::unique_ptr<sf::Music>> SoundManager::regionMusic;
+std::string SoundManager::oldRegionMusic = std::string();
+float SoundManager::normalVolume = 100.0f;
+float SoundManager::fadeVolume   = 100.0f;
+
+void SoundManager::loadSounds() {
+    loadSound("arrow"     , "Assets/Sounds/arrow.wav");
+    loadSound("roll"      , "Assets/Sounds/roll.wav");
+    loadSound("playerHurt", "Assets/Sounds/playerHurt.wav");
+    loadSound("playerDie" , "Assets/Sounds/playerDie.wav");
+    loadSound("enemyHurt" , "Assets/Sounds/enemyHurt.wav");
+    loadSound("enemyDie"  , "Assets/Sounds/enemyDie.wav");
+    loadSound("levelUp"   , "Assets/Sounds/levelUp.wav");
+    loadSound("talk"      , "Assets/Sounds/talk.wav");
+    loadSound("updateQuest", "Assets/Sounds/updateQuest.wav");
+    loadSound("finishedQuest", "Assets/Sounds/finishedQuest.wav");
+    loadSound("menuOpen"  , "Assets/Sounds/menu-open.wav");
+    loadSound("menuClose" , "Assets/Sounds/menu-close.wav");
+    loadSound("pickupItem", "Assets/Sounds/pickupItem.wav");
+    loadSound("payment"   , "Assets/Sounds/payment.wav");
+    loadSound("equipItem"   , "Assets/Sounds/equipItem.wav");
+    loadSound("blockEquipItem"   , "Assets/Sounds/blockEquipItem.wav");
+    loadSound("dash"      , "Assets/Sounds/roll.wav");
+    loadSound("fireball"      , "Assets/Sounds/fireball.wav");
+    // loadMusic("region0"   , "Assets/Sounds/Salted - Wynn OST - 05 Detlas Suburb.ogg");
+    // loadMusic("region1"   , "Assets/Sounds/Salted - Wynn OST - 04 Gavel Journey.ogg");
+    // setMusicVolume("region0", 50.0f);
+    // setMusicVolume("region1", 50.0f);
+}
+
 void SoundManager::loadSound(const std::string& name, const std::string& filepath) {
     sf::SoundBuffer buffer;
     if (!buffer.loadFromFile(filepath)) {
@@ -113,29 +145,4 @@ void SoundManager::setMusicVolume(const std::string& name, const float& volume) 
     if (it != regionMusic.end()) {
         it->second->setVolume(volume);
     }
-}
-
-void SoundManager::loadSound() {
-    loadSound("arrow"     , "Assets/Sounds/arrow.wav");
-    loadSound("roll"      , "Assets/Sounds/roll.wav");
-    loadSound("playerHurt", "Assets/Sounds/playerHurt.wav");
-    loadSound("playerDie" , "Assets/Sounds/playerDie.wav");
-    loadSound("enemyHurt" , "Assets/Sounds/enemyHurt.wav");
-    loadSound("enemyDie"  , "Assets/Sounds/enemyDie.wav");
-    loadSound("levelUp"   , "Assets/Sounds/levelUp.wav");
-    loadSound("talk"      , "Assets/Sounds/talk.wav");
-    loadSound("updateQuest", "Assets/Sounds/updateQuest.wav");
-    loadSound("finishedQuest", "Assets/Sounds/finishedQuest.wav");
-    loadSound("menuOpen"  , "Assets/Sounds/menu-open.wav");
-    loadSound("menuClose" , "Assets/Sounds/menu-close.wav");
-    loadSound("pickupItem", "Assets/Sounds/pickupItem.wav");
-    loadSound("payment"   , "Assets/Sounds/payment.wav");
-    loadSound("equipItem"   , "Assets/Sounds/equipItem.wav");
-    loadSound("blockEquipItem"   , "Assets/Sounds/blockEquipItem.wav");
-    loadSound("dash"      , "Assets/Sounds/roll.wav");
-    loadSound("fireball"      , "Assets/Sounds/fireball.wav");
-    // loadMusic("region0"   , "Assets/Sounds/Salted - Wynn OST - 05 Detlas Suburb.ogg");
-    // loadMusic("region1"   , "Assets/Sounds/Salted - Wynn OST - 04 Gavel Journey.ogg");
-    // setMusicVolume("region0", 50.0f);
-    // setMusicVolume("region1", 50.0f);
 }

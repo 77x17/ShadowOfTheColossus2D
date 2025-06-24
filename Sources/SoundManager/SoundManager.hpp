@@ -36,5 +36,5 @@ public:
     static float getMusicVolume(const std::string& name);
     static void setMusicVolume(const std::string& name, const float& volume);
 
-    static void loadSound();
+    static void loadSounds();
 };

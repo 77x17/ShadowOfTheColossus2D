@@ -2,6 +2,7 @@
 
 #include "BatBoss.hpp"
 #include "Material.hpp"
+#include "ItemManager.hpp"
 
 BossAltar::BossAltar(const int& m_ID, const sf::FloatRect& m_hitbox) 
 : ID(m_ID), hitbox(m_hitbox) {
@@ -121,8 +122,8 @@ void BossAltar::interactWithPlayer(Player& player) {
         switch (ID) {
             case 0: {
                 interactText.setString("     Bat Boss Lv.10    \n01 Bat Orb - 01 Eye Orb");
-                interactText.setOrigin(interactText.getLocalBounds().left + interactText.getLocalBounds().width / 2, 
-                                    interactText.getLocalBounds().top  + interactText.getLocalBounds().height / 2);
+                interactText.setOrigin(interactText.getLocalBounds().left + interactText.getLocalBounds().width  / 2, 
+                                       interactText.getLocalBounds().top  + interactText.getLocalBounds().height / 2);
                 break;
             }
             default: {
@@ -143,11 +144,11 @@ void BossAltar::summonBoss(std::vector<std::unique_ptr<Enemy>>& enemies) {
 
     if (ID == 0) {
         std::vector<std::pair<float, std::shared_ptr<ItemData>>> batBossInventory;
-        batBossInventory.emplace_back(0.1f, std::make_shared<Bow>("Copper Bow", "bow_00", 5, ItemRarity::Legendary, 5.0f));
-        batBossInventory.emplace_back(0.1f, std::make_shared<Helmet>("Copper Helmet", "helmet_00", 5, ItemRarity::Rare, 5.0f));
-        batBossInventory.emplace_back(0.1f, std::make_shared<Chestplate>("Copper Chestplate", "chestplate_00", 5, ItemRarity::Rare, 5.0f));
-        batBossInventory.emplace_back(0.1f, std::make_shared<Leggings>("Copper Leggings", "leggings_00", 5, ItemRarity::Rare, 5.0f));
-        batBossInventory.emplace_back(0.1f, std::make_shared<Boots>("Copper Boots", "boots_00", 5, ItemRarity::Rare, 5.0f));
+        batBossInventory.emplace_back(0.2f, ItemManager::get("Bat Bow"));
+        batBossInventory.emplace_back(0.2f, ItemManager::get("Bat Helmet"));
+        batBossInventory.emplace_back(0.2f, ItemManager::get("Bat Chestplate"));
+        batBossInventory.emplace_back(0.2f, ItemManager::get("Bat Leggings"));
+        batBossInventory.emplace_back(0.2f, ItemManager::get("Bat Boots"));
 
         enemies.push_back(std::make_unique<BatBoss>(sf::Vector2f(hitbox.getPosition()), batBossInventory));
     }

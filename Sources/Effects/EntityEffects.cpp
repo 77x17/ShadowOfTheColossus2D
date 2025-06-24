@@ -1,5 +1,31 @@
 #include "EntityEffects.hpp"
 
+std::unordered_map<std::string, std::unique_ptr<sf::Shader>> EntityEffects::shaders;
+
+void EntityEffects::loadShaders() {
+    load("invincible", "Assets/Shaders/entityEffects.frag", {
+        {"invincibleAmount", 0.2f},
+        {"flashAmount", 0.5f},
+        {"useBlackFlash", false},
+    });
+
+    load("flash", "Assets/Shaders/entityEffects.frag", {
+        {"invincibleAmount", 0.2f},
+        {"flashAmount", 1.0f},
+        {"useBlackFlash", false}
+    });
+
+    load("blackFlash", "Assets/Shaders/entityEffects.frag", {
+        {"invincibleAmount", 0.2f},
+        {"flashAmount", 1.0f},
+        {"useBlackFlash", true}
+    });
+
+    load("glow", "Assets/Shaders/glowEffects.frag", {
+        {"glowColor", sf::Glsl::Vec4(1.0f, 1.0f, 1.0f, 1.0f)}
+    });
+}
+
 void EntityEffects::load(const std::string& id, const std::string& path, const std::unordered_map<std::string, UniformVariant>& uniforms) {
     std::unique_ptr<sf::Shader> shader = std::make_unique<sf::Shader>();
     if (shader->loadFromFile(path, sf::Shader::Fragment)) {
@@ -26,26 +52,3 @@ sf::Shader* EntityEffects::get(const std::string& id) {
     return nullptr;
 }
 
-void EntityEffects::loadShader() {
-    load("invincible", "Assets/Shaders/entityEffects.frag", {
-        {"invincibleAmount", 0.2f},
-        {"flashAmount", 0.5f},
-        {"useBlackFlash", false},
-    });
-
-    load("flash", "Assets/Shaders/entityEffects.frag", {
-        {"invincibleAmount", 0.2f},
-        {"flashAmount", 1.0f},
-        {"useBlackFlash", false}
-    });
-
-    load("blackFlash", "Assets/Shaders/entityEffects.frag", {
-        {"invincibleAmount", 0.2f},
-        {"flashAmount", 1.0f},
-        {"useBlackFlash", true}
-    });
-
-    load("glow", "Assets/Shaders/glowEffects.frag", {
-        {"glowColor", sf::Glsl::Vec4(1.0f, 1.0f, 1.0f, 1.0f)}
-    });
-}

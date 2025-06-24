@@ -39,7 +39,7 @@ void InventorySlot::draw(sf::RenderTarget& target) const {
 }
 
 void InventorySlot::updateAmount() {
-    if (item && *item) {
+    if (item && *item && (*item)->amount >= 2) {
         amountText.setString(std::to_string((*item)->amount));
         amountText.setOrigin(amountText.getLocalBounds().left + amountText.getLocalBounds().width, amountText.getLocalBounds().top + amountText.getLocalBounds().height);
     }

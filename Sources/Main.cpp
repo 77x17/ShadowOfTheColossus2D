@@ -1,5 +1,4 @@
 #include <SFML/Graphics.hpp>
-#include <memory>
 #include <windows.h>
 
 #include "Constants.hpp"
@@ -7,8 +6,14 @@
 #include "Clock.hpp"
 
 #include "Font.hpp"
-#include "SoundManager.hpp"
 #include "TileMap.hpp"
+
+// --- [Begin] - Manager ---
+#include "SoundManager.hpp"
+#include "ParticleManager.hpp"
+#include "TextureManager.hpp"
+#include "ItemManager.hpp"
+// --- [End] ---
 
 // --- [Begin] - Entities ---
 #include "Enemy.hpp"
@@ -43,25 +48,10 @@
 
 #include "EntityEffects.hpp"
 // #include "NaturalEffects.hpp"
-#include "ParticleManager.hpp"
-#include "TextureManager.hpp"
 
 #include "BossAltar.hpp"
 
-sf::Font Font::font;
-
-std::unordered_map<std::string, std::unique_ptr<sf::Texture>> TextureManager::textures;
-
-std::unordered_map<std::string, sf::SoundBuffer> SoundManager::buffers;
-std::unordered_map<std::string, sf::Sound> SoundManager::sounds;
-std::unordered_map<std::string, std::unique_ptr<sf::Music>> SoundManager::regionMusic;
-std::string SoundManager::oldRegionMusic = std::string();
-float SoundManager::normalVolume = 100.0f;
-float SoundManager::fadeVolume   = 100.0f;
-
-std::unordered_map<std::string, std::unique_ptr<sf::Shader>> EntityEffects::shaders;
-
-void loadEnemy(std::vector<std::unique_ptr<Enemy>>& enemies, const std::unordered_map<std::string, std::vector<sf::FloatRect>>& enemyRects) {
+void loadEnemies(std::vector<std::unique_ptr<Enemy>>& enemies, const std::unordered_map<std::string, std::vector<sf::FloatRect>>& enemyRects) {
     // Mythic	  = 0.0001  - 1 / 10000
     // Legendary  = 0.001   - 1 / 1000
     // Rare	      = 0.01    - 1 / 100
@@ -69,20 +59,20 @@ void loadEnemy(std::vector<std::unique_ptr<Enemy>>& enemies, const std::unordere
     // Normal     = 0.05    - 1 / 20
 
     std::vector<std::pair<float, std::shared_ptr<ItemData>>> batInventory;
-    batInventory.emplace_back(0.05, std::make_shared<Bow>("Old Bow", "bow_00", 1, ItemRarity::Normal, 1.0f));
-    batInventory.emplace_back(0.05, std::make_shared<Helmet>("Old Helmet", "helmet_00", 1, ItemRarity::Normal, 2.0f));
-    batInventory.emplace_back(0.05, std::make_shared<Chestplate>("Old Chestplate", "chestplate_00", 1, ItemRarity::Normal, 2.0f));
-    batInventory.emplace_back(0.05, std::make_shared<Leggings>("Old Leggings", "leggings_00", 1, ItemRarity::Normal, 2.0f));
-    batInventory.emplace_back(0.05, std::make_shared<Boots>("Old Boots", "boots_00", 1, ItemRarity::Normal, 2.0f));
-    batInventory.emplace_back(0.01, std::make_shared<Orb>("Bat Orb", "orb", ItemRarity::Rare));
+    batInventory.emplace_back(0.05, ItemManager::get("Old Bow"));
+    batInventory.emplace_back(0.05, ItemManager::get("Old Helmet"));
+    batInventory.emplace_back(0.05, ItemManager::get("Old Chestplate"));
+    batInventory.emplace_back(0.05, ItemManager::get("Old Leggings"));
+    batInventory.emplace_back(0.05, ItemManager::get("Old Boots"));
+    batInventory.emplace_back(0.01, ItemManager::get("Bat Orb"));
     
     std::vector<std::pair<float, std::shared_ptr<ItemData>>> eyeInventory;
-    eyeInventory.emplace_back(0.03, std::make_shared<Bow>("Wooden Bow", "bow_00", 3, ItemRarity::Unique, 2.5f));
-    eyeInventory.emplace_back(0.03, std::make_shared<Helmet>("Copper Helmet", "helmet_00", 3, ItemRarity::Unique, 3.0f));
-    eyeInventory.emplace_back(0.03, std::make_shared<Chestplate>("Copper Chestplate", "chestplate_00", 3, ItemRarity::Unique, 3.0f));
-    eyeInventory.emplace_back(0.03, std::make_shared<Leggings>("Copper Leggings", "leggings_00", 3, ItemRarity::Unique, 3.0f));
-    eyeInventory.emplace_back(0.03, std::make_shared<Boots>("Copper Boots", "boots_00", 3, ItemRarity::Unique, 3.0f));
-    eyeInventory.emplace_back(0.01, std::make_shared<Orb>("Eye Orb", "orb", ItemRarity::Rare));
+    eyeInventory.emplace_back(0.03, ItemManager::get("Wooden Bow"));
+    eyeInventory.emplace_back(0.03, ItemManager::get("Wooden Helmet"));
+    eyeInventory.emplace_back(0.03, ItemManager::get("Wooden Chestplate"));
+    eyeInventory.emplace_back(0.03, ItemManager::get("Wooden Leggings"));
+    eyeInventory.emplace_back(0.03, ItemManager::get("Wooden Boots"));
+    eyeInventory.emplace_back(0.01, ItemManager::get("Eye Orb"));
 
     for (const auto& pair : enemyRects) {
         for (const sf::FloatRect& rect : pair.second) {
@@ -96,13 +86,13 @@ void loadEnemy(std::vector<std::unique_ptr<Enemy>>& enemies, const std::unordere
                 enemies.push_back(std::make_unique<Eye>(rect.getPosition(), eyeInventory));
             }
             else {
-                std::cerr << "[Bug] - Main.cpp - loadEnemy()\n";
+                std::cerr << "[Bug] - Main.cpp - loadEnemies()\n";
             }
         }
     }
 }
 
-void loadNpc(std::vector<std::unique_ptr<Npc>>& npcs, const TileMap& map) {
+void loadNpcs(std::vector<std::unique_ptr<Npc>>& npcs, const TileMap& map) {
     npcs.push_back(std::make_unique<QuestNpc>(
         0,
         map.getQuestNpcRects().at(0),
@@ -166,7 +156,7 @@ void loadQuests(std::vector<Quest>& quests) {
     quests.back().addDialogue   (2, "[7/7] From now on, you fight as an archer. Help us drive back the darkness");
     quests.back().addDescription(2, "Speak to Torren");
     quests.back().addObjective  (2, std::make_shared<TalkObjective>(1));
-    quests.back().addItemFromNpc(2, std::make_shared<Bow>("Old Bow", "bow_00", 1, ItemRarity::Normal, 1.0f));
+    quests.back().addItemFromNpc(2, ItemManager::get("Old Bow"));
     // Stage 3: Diệt quái
     quests.back().addNpcID      (3, -1);
     quests.back().addDialogue   (3, std::string());
@@ -258,23 +248,24 @@ int main() {
 
     //  --- [Begin] - Loading ---
     Font::font.loadFromFile("Assets/Fonts/Roboto_Mono.ttf");
-    TextureManager::loadSprite();
-    EntityEffects::loadShader();
+    TextureManager::loadSprites();
+    SoundManager::loadSounds();
+    EntityEffects::loadShaders();
+    ItemManager::loadItems();
 
     // NaturalEffects naturalEffects;
     // naturalEffects.load("Assets/Shaders/naturalEffects.frag");
     // naturalEffects.loadSmartLightingShader("Assets/Shaders/smartLighting.frag");
 
-    SoundManager::loadSound();
 
     TileMap map;
     map.loadMap();
 
     std::vector<std::unique_ptr<Enemy>> enemies;
-    loadEnemy(enemies, map.getEnemyRects());
+    loadEnemies(enemies, map.getEnemyRects());
 
     std::vector<std::unique_ptr<Npc>> npcs;
-    loadNpc(npcs, map);
+    loadNpcs(npcs, map);
     
     std::vector<Quest> quests;
     loadQuests(quests);
@@ -309,20 +300,8 @@ int main() {
     std::vector<Item> items;
     items.emplace_back(player.getPosition() + sf::Vector2f(100.0f, 0), std::make_shared<Bow>("God Bow", "bow_00", 1, ItemRarity::Legendary, 10.0f));
     items.emplace_back(player.getPosition() + sf::Vector2f(300.0f, 0), std::make_shared<Helmet>("God Helmet", "helmet_00", 1, ItemRarity::Mythic, 10000.0f));
-    items.emplace_back(player.getPosition() + sf::Vector2f(400.0f, 0), std::make_shared<Helmet>("God Helmet", "helmet_00", 1, ItemRarity::Mythic, 10000.0f));
-    items.emplace_back(player.getPosition() + sf::Vector2f(500.0f, 0), std::make_shared<Helmet>("God Helmet", "helmet_00", 1, ItemRarity::Mythic, 10000.0f));
-    items.emplace_back(player.getPosition() + sf::Vector2f(600.0f, 0), std::make_shared<Helmet>("God Helmet", "helmet_00", 1, ItemRarity::Mythic, 10000.0f));
-    items.emplace_back(player.getPosition() + sf::Vector2f(700.0f, 0), std::make_shared<Helmet>("God Helmet", "helmet_00", 1, ItemRarity::Mythic, 10000.0f));
-    items.emplace_back(player.getPosition() + sf::Vector2f(800.0f, 0), std::make_shared<Helmet>("God Helmet", "helmet_00", 1, ItemRarity::Mythic, 10000.0f));
-    items.emplace_back(player.getPosition() + sf::Vector2f(900.0f, 0), std::make_shared<Helmet>("God Helmet", "helmet_00", 1, ItemRarity::Mythic, 10000.0f));
-    player.addItem(std::make_shared<Orb>("Bat Orb", "orb", ItemRarity::Rare));
-    player.addItem(std::make_shared<Orb>("Bat Orb", "orb", ItemRarity::Rare));
-    player.addItem(std::make_shared<Orb>("Bat Orb", "orb", ItemRarity::Rare));
-    player.addItem(std::make_shared<Orb>("Bat Orb", "orb", ItemRarity::Rare));
-    player.addItem(std::make_shared<Orb>("Eye Orb", "orb", ItemRarity::Rare));
-    player.addItem(std::make_shared<Orb>("Eye Orb", "orb", ItemRarity::Rare));
-    player.addItem(std::make_shared<Orb>("Eye Orb", "orb", ItemRarity::Rare));
-    player.addItem(std::make_shared<Orb>("Eye Orb", "orb", ItemRarity::Rare));
+    player.addItem(ItemManager::get("Bat Orb", 10));
+    player.addItem(ItemManager::get("Eye Orb", 10));
 
     InventoryUI inventoryUI(static_cast<sf::Vector2f>(window.getSize()), player);
     MerchantUI merchantUI(static_cast<sf::Vector2f>(window.getSize()), player);

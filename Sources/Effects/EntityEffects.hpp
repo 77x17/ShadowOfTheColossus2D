@@ -18,5 +18,5 @@ public:
 
     static sf::Shader* get(const std::string& id);
 
-    static void loadShader();
+    static void loadShaders();
 };
