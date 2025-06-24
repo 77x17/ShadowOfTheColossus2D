@@ -1,5 +1,8 @@
 #include "EnemyManager.hpp"
 
+#include "Player.hpp"
+
+#include "Constants.hpp"
 #include "ItemDatabase.hpp"
 
 void EnemyManager::loadEnemies(const std::unordered_map<std::string, std::vector<sf::FloatRect>>& enemyRects) {

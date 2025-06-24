@@ -3,7 +3,6 @@
 #include <SFML/Graphics.hpp>
 
 #include "ItemData.hpp"
-#include "EntityEffects.hpp"
 
 class Item {
 private:

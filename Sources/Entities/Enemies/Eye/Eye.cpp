@@ -1,5 +1,11 @@
 #include "Eye.hpp"
 
+#include "Player.hpp"
+#include "ItemData.hpp"
+#include "ItemManager.hpp"
+
+#include "Constants.hpp"
+#include "SoundManager.hpp"
 #include "TextureManager.hpp"
 #include "Normalize.hpp"
 

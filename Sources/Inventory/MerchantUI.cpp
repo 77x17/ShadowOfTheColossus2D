@@ -2,8 +2,11 @@
 
 #include <iostream>
 
-#include "Font.hpp"
 #include "Player.hpp"
+#include "ItemManager.hpp"
+
+#include "Font.hpp"
+#include "SoundManager.hpp"
 
 MerchantUI::MerchantUI(const sf::Vector2f& windowSize, Player& player) {
     containBox.setSize(sf::Vector2f(400.0f, 348.0f));   // (slotSize + slotPadding) * 10 + 2 * 20 | (slotSize + slotPadding) * 8 + 3 * 20

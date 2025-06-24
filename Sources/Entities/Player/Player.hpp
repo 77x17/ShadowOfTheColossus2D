@@ -3,17 +3,11 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 
-#include "Constants.hpp"
+class ItemManager;
+
 #include "AnimationManager.hpp"
 #include "Projectile.hpp"
-#include "SoundManager.hpp"
-#include "Font.hpp"
-
 #include "Quest.hpp"
-
-#include "ItemManager.hpp"
-
-#include "InventorySlot.hpp"
 
 enum class PlayerState {
     DYING = -2,

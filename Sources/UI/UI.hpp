@@ -2,9 +2,10 @@
 
 #include <SFML/Graphics.hpp>
 
-#include "Player.hpp"
-#include "TileMap.hpp"
-#include "Clock.hpp"
+class TileMap;
+class Player;
+class Clock;
+class Quest;
 
 class UI {
 private:

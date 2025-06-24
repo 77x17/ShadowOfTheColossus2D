@@ -1,11 +1,18 @@
 #include "Player.hpp"
 
+#include <cmath>
+
+#include "ItemManager.hpp"
+
+#include "Constants.hpp"
+#include "Font.hpp"
+#include "SoundManager.hpp"
 #include "TextureManager.hpp"
+#include "SoundManager.hpp"
 #include "EntityEffects.hpp"
 #include "Region.hpp"
 #include "Normalize.hpp"
-
-#include <cmath>
+#include "AllItems.hpp"
 
 Player::Player(const sf::Vector2f& position, const float& baseHp, std::vector<Quest>&& _quests) 
 : hitbox(position, sf::Vector2f(TILE_SIZE, TILE_SIZE))

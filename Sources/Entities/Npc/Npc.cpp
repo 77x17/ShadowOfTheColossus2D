@@ -1,6 +1,8 @@
 #include "Npc.hpp"
 
 #include "Font.hpp"
+#include "TextureManager.hpp"
+
 #include <iostream>
 
 Npc::Npc(const sf::FloatRect& newHitbox, 

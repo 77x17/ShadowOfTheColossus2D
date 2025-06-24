@@ -1,11 +1,11 @@
 #pragma once
 
-#include "InventorySlot.hpp"
-
 #include <vector>
 
-#include "Player.hpp"
-#include "ItemManager.hpp"
+#include "InventorySlot.hpp"
+
+class Player;
+class ItemManager;
 
 class MerchantUI {
 private:

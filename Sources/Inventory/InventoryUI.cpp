@@ -2,8 +2,11 @@
 
 #include <iostream>
 
-#include "Font.hpp"
 #include "Player.hpp"
+#include "ItemManager.hpp"
+
+#include "Font.hpp"
+#include "SoundManager.hpp"
 
 InventoryUI::InventoryUI(const sf::Vector2f& windowSize, Player& player) {
     containBox.setSize(sf::Vector2f(600.0f, 348.0f));   // (slotSize + slotPadding) * 15 + 3 * 20 | (slotSize + slotPadding) * 8 + 3 * 20

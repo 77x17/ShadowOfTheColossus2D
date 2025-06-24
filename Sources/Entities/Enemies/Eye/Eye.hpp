@@ -1,11 +1,10 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include <memory>
 
 #include "Enemy.hpp"
 #include "Projectile.hpp"
-
-#include <memory>
 
 enum class EyeState {
     DYING = -2,

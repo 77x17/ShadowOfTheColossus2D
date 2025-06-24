@@ -1,5 +1,10 @@
 #include "BossAltar.hpp"
 
+#include "Player.hpp"
+#include "EnemyManager.hpp"
+
+#include "Constants.hpp"
+#include "Font.hpp"
 #include "ItemDatabase.hpp"
 
 BossAltar::BossAltar(const int& m_ID, const sf::FloatRect& m_hitbox) 

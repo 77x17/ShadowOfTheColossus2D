@@ -1,10 +1,9 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-
-#include "Clock.hpp"
-#include "SmartLightSource.hpp"
-
 #include <memory>
+
+class Clock;
+class SmartLightSource;
 
 class NaturalEffects {
 private:

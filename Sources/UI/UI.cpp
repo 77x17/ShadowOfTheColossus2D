@@ -1,9 +1,15 @@
 #include "UI.hpp"
 
+#include "TileMap.hpp"
+#include "Player.hpp"
+#include "Clock.hpp"
+#include "Quest.hpp"
+
 #include "Font.hpp"
 #include "Quest.hpp"
 #include "Constants.hpp"
 #include "Region.hpp"
+#include "SoundManager.hpp"
 
 #include <cmath>
 

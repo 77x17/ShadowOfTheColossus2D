@@ -1,5 +1,6 @@
 #include "Bat.hpp"
 
+#include "Constants.hpp"
 #include "TextureManager.hpp"
 
 Bat::Bat(const sf::Vector2f& position, const std::vector<std::pair<float, std::shared_ptr<ItemData>>>& _inventory) 

@@ -1,9 +1,16 @@
 #include "Enemy.hpp"
 
-#include "EntityEffects.hpp"
-#include "Normalize.hpp"
-
 #include <random>
+
+#include "Player.hpp"
+#include "ItemData.hpp"
+#include "ItemManager.hpp"
+
+#include "Constants.hpp"
+#include "Font.hpp"
+#include "Normalize.hpp"
+#include "SoundManager.hpp"
+#include "EntityEffects.hpp"
 
 Enemy::Enemy(const sf::Vector2f& position, 
              const sf::Vector2f& size, 

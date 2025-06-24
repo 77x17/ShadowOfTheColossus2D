@@ -5,8 +5,6 @@
 #include "Enemy.hpp"
 #include "Projectile.hpp"
 
-#include <memory>
-
 enum class BatBossState {
     DESPAWN = -3,
     DYING = -2,

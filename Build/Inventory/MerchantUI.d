@@ -4,10 +4,8 @@ Build/Inventory/MerchantUI.o: Sources/Inventory/MerchantUI.cpp \
  Sources/Inventory/Items/EquipItem.hpp \
  Sources/Inventory/Items/ItemData.hpp Sources/Inventory/Items/Weapon.hpp \
  Sources/Inventory/Items/Material.hpp Sources/Entities/Player/Player.hpp \
- Sources/Configuration/Constants.hpp \
  Sources/AnimationManager/AnimationManager.hpp \
- Sources/Entities/Projectile/Projectile.hpp \
- Sources/SoundManager/SoundManager.hpp Sources/Configuration/Font.hpp \
- Sources/Quests/Quest.hpp Sources/Quests/QuestObjective.hpp \
- Sources/ItemManager/ItemManager.hpp Sources/Entities/Item/Item.hpp \
- Sources/Effects/EntityEffects.hpp
+ Sources/Entities/Projectile/Projectile.hpp Sources/Quests/Quest.hpp \
+ Sources/Quests/QuestObjective.hpp Sources/ItemManager/ItemManager.hpp \
+ Sources/Entities/Item/Item.hpp Sources/Configuration/Font.hpp \
+ Sources/SoundManager/SoundManager.hpp

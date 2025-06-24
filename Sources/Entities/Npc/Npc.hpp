@@ -4,8 +4,8 @@
 #include <string>
 
 #include "AnimationManager.hpp"
-#include "TextureManager.hpp"
-#include "Player.hpp"
+
+class Player;
 
 class Npc {
 protected:

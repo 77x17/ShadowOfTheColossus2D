@@ -1,5 +1,10 @@
 #include "MerchantNpc.hpp"
 
+#include "Player.hpp"
+
+#include "Constants.hpp"
+#include "SoundManager.hpp"
+
 MerchantNpc::MerchantNpc(const sf::FloatRect& newHitbox, const std::string& name, const std::string& spriteName)
 : Npc(newHitbox, name, spriteName) {
     interactText.setString("Press [F] to interact");

@@ -1,6 +1,10 @@
 #include "QuestNpc.hpp"
 
+#include "Player.hpp"
+
 #include "Font.hpp"
+#include "Constants.hpp"
+#include "SoundManager.hpp"
 
 QuestNpc::QuestNpc(int newID, const sf::FloatRect& newHitbox, const std::string& name, const std::string& spriteName) 
 : Npc(newHitbox, name, spriteName), ID(newID) {}

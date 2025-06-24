@@ -2,6 +2,9 @@
 
 #include <iostream>
 
+#include "Clock.hpp"
+#include "SmartLightSource.hpp"
+
 NaturalEffects::NaturalEffects() {
     shader = std::make_unique<sf::Shader>();
     smartLights = std::make_unique<SmartLightSource>();

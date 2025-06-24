@@ -1,14 +1,13 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include <memory>
 
-#include "Constants.hpp"
+class Player;
+class ItemData;
+class ItemManager;
+
 #include "AnimationManager.hpp"
-#include "Player.hpp"
-#include "SoundManager.hpp"
-#include "Font.hpp"
-#include "ItemData.hpp"
-#include "ItemManager.hpp"
 
 class Enemy {
 protected:

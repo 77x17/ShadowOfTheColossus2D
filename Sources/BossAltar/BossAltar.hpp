@@ -4,9 +4,8 @@
 #include <vector>
 #include <string>
 
-#include "Player.hpp"
-
-#include "EnemyManager.hpp"
+class Player;
+class EnemyManager;
 
 class BossAltar {
 private:

@@ -2,12 +2,12 @@
 
 #include "Enemy.hpp"
 
+class Player;
+
 #include "Bat.hpp"
 #include "Eye.hpp"
 
 #include "BatBoss.hpp"
-
-#include "Player.hpp"
 
 class EnemyManager {
 private:

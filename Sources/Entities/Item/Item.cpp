@@ -2,6 +2,7 @@
 
 #include "Constants.hpp"
 #include "Font.hpp"
+#include "EntityEffects.hpp"
 
 Item::Item(const sf::Vector2f& position, const std::shared_ptr<ItemData>& _item) 
 : hitbox(position, sf::Vector2f(TILE_SIZE, TILE_SIZE) / 2.0f), item(_item) {

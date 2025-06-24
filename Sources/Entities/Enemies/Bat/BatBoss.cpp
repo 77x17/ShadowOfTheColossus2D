@@ -1,7 +1,13 @@
 #include "BatBoss.hpp"
 
-#include "TextureManager.hpp"
+#include "Player.hpp"
+#include "ItemData.hpp"
+#include "ItemManager.hpp"
+
+#include "Constants.hpp"
 #include "Normalize.hpp"
+#include "TextureManager.hpp"
+#include "SoundManager.hpp"
 
 BatBoss::BatBoss(const sf::Vector2f& position, const std::vector<std::pair<float, std::shared_ptr<ItemData>>>& _inventory) 
 : Enemy(position, sf::Vector2f(TILE_SIZE, TILE_SIZE) * 2.0f, 100.0f, "Bat Boss Lv.10", _inventory) {
