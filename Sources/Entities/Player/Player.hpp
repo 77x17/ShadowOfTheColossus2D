@@ -11,7 +11,7 @@
 
 #include "Quest.hpp"
 
-#include "Item.hpp"
+#include "ItemManager.hpp"
 
 #include "InventorySlot.hpp"
 
@@ -162,7 +162,7 @@ public:
     std::vector<std::shared_ptr<ItemData>>* getInventory();
     std::vector<std::shared_ptr<ItemData>>* getEquipment();
     std::string getStats() const;
-    bool dropItem(const std::shared_ptr<ItemData>& item, std::vector<Item>& items);
+    bool dropItem(const std::shared_ptr<ItemData>& item, ItemManager& items);
     // --- [End]
 
     // --- [Begin] - Enemy --- 

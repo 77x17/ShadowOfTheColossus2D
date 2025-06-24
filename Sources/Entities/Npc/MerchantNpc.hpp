@@ -13,5 +13,7 @@ public:
 
     void interactWithPlayer(Player& player) override;
 
+    void interruptedInteract();
+
     bool isInteractWithPlayer() const;
 };

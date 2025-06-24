@@ -119,7 +119,7 @@ void Eye::updateProjectiles(const float& dt, Player& player) {
     }
 }   
 
-void Eye::update(const float& dt, Player& player, const std::vector<sf::FloatRect>& collisionRects, std::vector<Item>& items) {
+void Eye::update(const float& dt, Player& player, const std::vector<sf::FloatRect>& collisionRects, ItemManager& items) {
     Enemy::update(dt, player,collisionRects, items);
     
     if (invincibleCooldownTimer <= 0 && projectile) {

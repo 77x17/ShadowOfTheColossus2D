@@ -757,8 +757,8 @@ std::string Player::getStats() const {
          + goldsString;
 }
 
-bool Player::dropItem(const std::shared_ptr<ItemData>& item, std::vector<Item>& items) {
-    items.emplace_back(getCenterPosition(), item);
+bool Player::dropItem(const std::shared_ptr<ItemData>& item, ItemManager& items) {
+    items.addItem(getCenterPosition(), item);
     updateEquipmentStats();
 
     SoundManager::playSound("pickupItem");

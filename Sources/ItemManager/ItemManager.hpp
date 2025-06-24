@@ -1,16 +1,21 @@
 #pragma once
 
-#include "ItemData.hpp"
+#include "Item.hpp"
 
-#include <unordered_map>
+class Player;
 
 class ItemManager {
 private:
-    static std::unordered_map<std::string, std::unique_ptr<ItemData>> itemStorage;
+    std::vector<Item> items;
 
 public:
-    static std::shared_ptr<ItemData> get(const std::string& name, const int& amount = 1);
+    void addItem(const sf::Vector2f& position, const std::shared_ptr<ItemData>& item);
 
-    static void loadItems();
+    const std::vector<Item>& getItems();
 
+    void handlePlayerCollision(Player& player);
+
+    void update(const float& dt);
+
+    void draw(sf::RenderTarget& target) const;
 };

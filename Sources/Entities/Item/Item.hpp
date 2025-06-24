@@ -27,7 +27,7 @@ public:
 
     void update(const float& dt);
 
-    void draw(sf::RenderTarget& target);
+    void draw(sf::RenderTarget& target) const;
 
     sf::FloatRect getHitbox() const;
 

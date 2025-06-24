@@ -8,9 +8,11 @@ SFML_LIBS = -lsfml-system -lsfml-graphics -lsfml-window -lsfml-audio
 INCLUDES = -I"./Sources" \
 		   -I"./Sources/AnimationManager" \
 		   -I"./Sources/BossAltar" \
+		   -I"./Sources/BossAltarManager" \
 		   -I"./Sources/Clock" \
 		   -I"./Sources/Configuration" \
 		   -I"./Sources/Effects" \
+		   -I"./Sources/EnemyManager" \
 		   -I"./Sources/Entities" \
 		   -I"./Sources/Entities/Enemies" \
 		   -I"./Sources/Entities/Enemies/Bat" \
@@ -21,10 +23,13 @@ INCLUDES = -I"./Sources" \
 		   -I"./Sources/Entities/Projectile" \
 		   -I"./Sources/Inventory" \
 		   -I"./Sources/Inventory/Items" \
+		   -I"./Sources/ItemDatabase" \
 		   -I"./Sources/ItemManager" \
 		   -I"./Sources/LightSource" \
 		   -I"./Sources/Maps" \
+		   -I"./Sources/NpcManager" \
 		   -I"./Sources/ParticleManager" \
+		   -I"./Sources/QuestManager" \
 		   -I"./Sources/Quests" \
 		   -I"./Sources/SoundManager" \
 		   -I"./Sources/TextureManager" \
@@ -39,10 +44,12 @@ TARGET    = ./Build/Demo.exe
 SRCS := $(wildcard $(SRC_DIR)/*.cpp) \
         $(wildcard $(SRC_DIR)/AnimationManager/*.cpp) \
         $(wildcard $(SRC_DIR)/BossAltar/*.cpp) \
+        $(wildcard $(SRC_DIR)/BossAltarManager/*.cpp) \
         $(wildcard $(SRC_DIR)/Clock/*.cpp) \
         $(wildcard $(SRC_DIR)/Configuration/*.cpp) \
         $(wildcard $(SRC_DIR)/Effects/*.cpp) \
         $(wildcard $(SRC_DIR)/Entities/*.cpp) \
+        $(wildcard $(SRC_DIR)/EnemyManager/*.cpp) \
         $(wildcard $(SRC_DIR)/Entities/Enemies/*.cpp) \
         $(wildcard $(SRC_DIR)/Entities/Enemies/Bat/*.cpp) \
         $(wildcard $(SRC_DIR)/Entities/Enemies/Eye/*.cpp) \
@@ -52,10 +59,13 @@ SRCS := $(wildcard $(SRC_DIR)/*.cpp) \
         $(wildcard $(SRC_DIR)/Entities/Projectile/*.cpp) \
         $(wildcard $(SRC_DIR)/Inventory/*.cpp) \
         $(wildcard $(SRC_DIR)/Inventory/Items/*.cpp) \
+        $(wildcard $(SRC_DIR)/ItemDatabase/*.cpp) \
         $(wildcard $(SRC_DIR)/ItemManager/*.cpp) \
         $(wildcard $(SRC_DIR)/LightSource/*.cpp) \
         $(wildcard $(SRC_DIR)/Maps/*.cpp) \
+        $(wildcard $(SRC_DIR)/NpcManager/*.cpp) \
         $(wildcard $(SRC_DIR)/ParticleManager/*.cpp) \
+        $(wildcard $(SRC_DIR)/QuestManager/*.cpp) \
         $(wildcard $(SRC_DIR)/Quests/*.cpp) \
         $(wildcard $(SRC_DIR)/SoundManager/*.cpp) \
         $(wildcard $(SRC_DIR)/TextureManager/*.cpp) \

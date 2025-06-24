@@ -38,6 +38,10 @@ void MerchantNpc::interactWithPlayer(Player& player) {
     interactCooldownTimer = INTERACT_COOLDOWN;
 }
 
+void MerchantNpc::interruptedInteract() {
+    shopVisible = false;
+}
+
 bool MerchantNpc::isInteractWithPlayer() const {
     return shopVisible;
 }

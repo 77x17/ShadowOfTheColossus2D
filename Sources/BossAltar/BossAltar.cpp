@@ -1,8 +1,6 @@
 #include "BossAltar.hpp"
 
-#include "BatBoss.hpp"
-#include "Material.hpp"
-#include "ItemManager.hpp"
+#include "ItemDatabase.hpp"
 
 BossAltar::BossAltar(const int& m_ID, const sf::FloatRect& m_hitbox) 
 : ID(m_ID), hitbox(m_hitbox) {
@@ -139,17 +137,17 @@ bool BossAltar::isSuitableForSummonBoss() const {
     return suitableForSummonBoss == true;
 }
 
-void BossAltar::summonBoss(std::vector<std::unique_ptr<Enemy>>& enemies) {
+void BossAltar::summonBoss(EnemyManager& enemies) {
     suitableForSummonBoss = false;
 
     if (ID == 0) {
         std::vector<std::pair<float, std::shared_ptr<ItemData>>> batBossInventory;
-        batBossInventory.emplace_back(0.2f, ItemManager::get("Bat Bow"));
-        batBossInventory.emplace_back(0.2f, ItemManager::get("Bat Helmet"));
-        batBossInventory.emplace_back(0.2f, ItemManager::get("Bat Chestplate"));
-        batBossInventory.emplace_back(0.2f, ItemManager::get("Bat Leggings"));
-        batBossInventory.emplace_back(0.2f, ItemManager::get("Bat Boots"));
+        batBossInventory.emplace_back(0.2f, ItemDatabase::get("Bat Bow"));
+        batBossInventory.emplace_back(0.2f, ItemDatabase::get("Bat Helmet"));
+        batBossInventory.emplace_back(0.2f, ItemDatabase::get("Bat Chestplate"));
+        batBossInventory.emplace_back(0.2f, ItemDatabase::get("Bat Leggings"));
+        batBossInventory.emplace_back(0.2f, ItemDatabase::get("Bat Boots"));
 
-        enemies.push_back(std::make_unique<BatBoss>(sf::Vector2f(hitbox.getPosition()), batBossInventory));
+        enemies.summonEnemy(std::make_unique<BatBoss>(sf::Vector2f(hitbox.getPosition()), batBossInventory));
     }
 }

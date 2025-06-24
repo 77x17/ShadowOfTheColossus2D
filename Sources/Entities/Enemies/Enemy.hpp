@@ -8,7 +8,7 @@
 #include "SoundManager.hpp"
 #include "Font.hpp"
 #include "ItemData.hpp"
-#include "Item.hpp"
+#include "ItemManager.hpp"
 
 class Enemy {
 protected:
@@ -90,9 +90,9 @@ public:
     void updateThinking(Player& player);
     void updatePosition(const float& dt, const std::vector<sf::FloatRect>& collisionRects);
     void updateHitbox();
-    void dropItems(std::vector<Item>& items);
+    void dropItems(ItemManager& items);
     virtual void updateAnimation() = 0;
-    virtual void update(const float& dt, Player& player, const std::vector<sf::FloatRect>& collisionRects, std::vector<Item>& items);
+    virtual void update(const float& dt, Player& player, const std::vector<sf::FloatRect>& collisionRects, ItemManager& items);
 
     virtual void draw(sf::RenderTarget& target);
 

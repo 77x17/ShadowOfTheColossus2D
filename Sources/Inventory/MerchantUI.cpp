@@ -249,7 +249,7 @@ void MerchantUI::handleRightClick(const sf::Vector2f& mousePos) {
     }
 }
 
-void MerchantUI::handleRelease(const sf::Vector2f& mousePos, Player& player, std::vector<Item>& items) {
+void MerchantUI::handleRelease(const sf::Vector2f& mousePos, Player& player, ItemManager& items) {
     if (draggedItem == nullptr) {
         // std::cerr << "[Bug] - MerchantUI.cpp - handleRelease()\n";
         return;
@@ -406,7 +406,10 @@ void MerchantUI::draw(sf::RenderTarget& target) {
         sf::Sprite sprite = draggedItem->sprite;
         sprite.setPosition(dreggedPos);
         target.draw(sprite);
-        target.draw(amountText);
+
+        if (draggedItem->amount >= 2) {
+            target.draw(amountText);
+        }
     }
 }
 

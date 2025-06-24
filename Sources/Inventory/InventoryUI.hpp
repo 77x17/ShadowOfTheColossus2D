@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "Player.hpp"
+#include "ItemManager.hpp"
 
 class InventoryUI {
 private:
@@ -61,7 +62,7 @@ public:
     void updateDrag(const sf::Vector2f& mousePos);
     void handleClick(const sf::Vector2f& mousePos);
     void handleRightClick(const sf::Vector2f& mousePos);
-    void handleRelease(const sf::Vector2f& mousePos, Player& player, std::vector<Item>& items);
+    void handleRelease(const sf::Vector2f& mousePos, Player& player, ItemManager& items);
     void draw(sf::RenderTarget& target);
     
     bool isVisible() const;

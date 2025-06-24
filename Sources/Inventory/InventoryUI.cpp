@@ -351,7 +351,7 @@ void InventoryUI::handleRightClick(const sf::Vector2f& mousePos) {
     }
 }
 
-void InventoryUI::handleRelease(const sf::Vector2f& mousePos, Player& player, std::vector<Item>& items) {
+void InventoryUI::handleRelease(const sf::Vector2f& mousePos, Player& player, ItemManager& items) {
     if (draggedItem == nullptr) {
         // std::cerr << "[Bug] - InventoryUI.cpp - handleRelease()\n";
         return;

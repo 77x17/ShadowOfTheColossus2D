@@ -8,11 +8,11 @@ BatBoss::BatBoss(const sf::Vector2f& position, const std::vector<std::pair<float
     // --- [Begin] - Configuration ---
     MOVE_SPEED = 100.0f; 
 
-    DETECION_RANGE = 400.0f;
+    DETECION_RANGE = 500.0f;
     KNOCKBACK_COOLDOWN = 0.05f;
     KNOCKBACK_STRENGTH = 50.0f;
 
-    ATTACK_RANGE = 100.0f;
+    ATTACK_RANGE = 150.0f;
 
     damagePerAttack = 5.0f;
     expAmount       = 50.0f;
@@ -35,8 +35,8 @@ BatBoss::BatBoss(const sf::Vector2f& position, const std::vector<std::pair<float
 
     // --- [Begin] - Projectile ---
     SHOOT_COOLDOWN      = 2.0f;
-    PROJECTILE_SPEED    = MOVE_SPEED * 1.5;
-    PROJECTILE_LIFETIME = 1.0f;
+    PROJECTILE_SPEED    = MOVE_SPEED * 2;
+    PROJECTILE_LIFETIME = 2.0f;
     shootCooldownTimer  = 0.0f;
     // --- [End] ---
 
@@ -158,7 +158,7 @@ void BatBoss::updateProjectiles(const float& dt, Player& player) {
     }
 }   
 
-void BatBoss::update(const float& dt, Player& player, const std::vector<sf::FloatRect>& collisionRects, std::vector<Item>& items) {
+void BatBoss::update(const float& dt, Player& player, const std::vector<sf::FloatRect>& collisionRects, ItemManager& items) {
     Enemy::update(dt, player,collisionRects, items);
     
     if (invincibleCooldownTimer <= 0) {

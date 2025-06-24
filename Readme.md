@@ -16,3 +16,5 @@
 - Lưu std::vector< std::pair<> > sẽ nhanh hơn dùng std::unordered_map<> thường nếu không cần .at()
 - Nên dynamic_cast<> thay vì thêm một attribute vào Base class một cách không cần thiết
 - Khi đa hình thì phải dùng hàm virtual clone() = 0 cho Base class để copy không bị Slicing data
+- Quy tắc đặt tên, quản lý Entity sẽ dùng tên số ít + Manager, quản lý tạo sẽ là Database hoặc Factory
+- Nên dùng Forward declaration khi chỉ cần truyền tham chiếu hoặc con trỏ vào method (function)

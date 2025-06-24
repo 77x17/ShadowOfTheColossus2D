@@ -5,7 +5,8 @@
 #include <string>
 
 #include "Player.hpp"
-#include "Enemy.hpp"
+
+#include "EnemyManager.hpp"
 
 class BossAltar {
 private:
@@ -40,6 +41,6 @@ public:
 
     bool isSuitableForSummonBoss() const;
 
-    void summonBoss(std::vector<std::unique_ptr<Enemy>>& enemies);
+    void summonBoss(EnemyManager& enemies);
 
 };

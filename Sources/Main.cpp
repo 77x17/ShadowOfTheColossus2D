@@ -2,24 +2,25 @@
 #include <windows.h>
 
 #include "Constants.hpp"
-
-#include "Clock.hpp"
-
 #include "Font.hpp"
 #include "TileMap.hpp"
+#include "Clock.hpp"
+
+// --- [Begin] - Database ---
+#include "ItemDatabase.hpp"
+// --- [End] ---
 
 // --- [Begin] - Manager ---
 #include "SoundManager.hpp"
-#include "ParticleManager.hpp"
 #include "TextureManager.hpp"
+#include "ParticleManager.hpp"
+#include "EnemyManager.hpp"
+#include "NpcManager.hpp"
+#include "QuestManager.hpp"
 #include "ItemManager.hpp"
 // --- [End] ---
 
 // --- [Begin] - Entities ---
-#include "Enemy.hpp"
-#include "Bat.hpp"
-#include "BatBoss.hpp"
-#include "Eye.hpp"
 #include "Player.hpp"
 #include "Item.hpp"
 // --- [End] ---
@@ -30,216 +31,10 @@
 #include "MerchantUI.hpp"
 // --- [End] ---
 
-// --- [Begin] - Quests ---
-#include "Quest.hpp"
-#include "KillMonsterObjective.hpp"
-#include "FinishObjective.hpp"
-#include "TalkObjective.hpp"
-#include "ExploreObjective.hpp"
-#include "GiveItemObjective.hpp"
-#include "CollectItemObjective.hpp"
-// --- [End] ---
-
-// --- [Begin] - Npcs ---
-#include "Npc.hpp"
-#include "QuestNpc.hpp"
-#include "MerchantNpc.hpp"
-// --- [End] ---
-
 #include "EntityEffects.hpp"
 // #include "NaturalEffects.hpp"
 
-#include "BossAltar.hpp"
-
-void loadEnemies(std::vector<std::unique_ptr<Enemy>>& enemies, const std::unordered_map<std::string, std::vector<sf::FloatRect>>& enemyRects) {
-    // Mythic	  = 0.0001  - 1 / 10000
-    // Legendary  = 0.001   - 1 / 1000
-    // Rare	      = 0.01    - 1 / 100
-    // Unique     = 0.03    - 1 / 20
-    // Normal     = 0.05    - 1 / 20
-
-    std::vector<std::pair<float, std::shared_ptr<ItemData>>> batInventory;
-    batInventory.emplace_back(0.05, ItemManager::get("Old Bow"));
-    batInventory.emplace_back(0.05, ItemManager::get("Old Helmet"));
-    batInventory.emplace_back(0.05, ItemManager::get("Old Chestplate"));
-    batInventory.emplace_back(0.05, ItemManager::get("Old Leggings"));
-    batInventory.emplace_back(0.05, ItemManager::get("Old Boots"));
-    batInventory.emplace_back(0.01, ItemManager::get("Bat Orb"));
-    
-    std::vector<std::pair<float, std::shared_ptr<ItemData>>> eyeInventory;
-    eyeInventory.emplace_back(0.03, ItemManager::get("Wooden Bow"));
-    eyeInventory.emplace_back(0.03, ItemManager::get("Wooden Helmet"));
-    eyeInventory.emplace_back(0.03, ItemManager::get("Wooden Chestplate"));
-    eyeInventory.emplace_back(0.03, ItemManager::get("Wooden Leggings"));
-    eyeInventory.emplace_back(0.03, ItemManager::get("Wooden Boots"));
-    eyeInventory.emplace_back(0.01, ItemManager::get("Eye Orb"));
-
-    for (const auto& pair : enemyRects) {
-        for (const sf::FloatRect& rect : pair.second) {
-            if (pair.first == "Bat Lv.1") {
-                enemies.push_back(std::make_unique<Bat>(rect.getPosition(), batInventory));
-            }
-            else if (pair.first == "Bat Lv.3") {
-                enemies.push_back(std::make_unique<Bat>(rect.getPosition(), batInventory));
-            }
-            else if (pair.first == "Eye Lv.5") {
-                enemies.push_back(std::make_unique<Eye>(rect.getPosition(), eyeInventory));
-            }
-            else {
-                std::cerr << "[Bug] - Main.cpp - loadEnemies()\n";
-            }
-        }
-    }
-}
-
-void loadNpcs(std::vector<std::unique_ptr<Npc>>& npcs, const TileMap& map) {
-    npcs.push_back(std::make_unique<QuestNpc>(
-        0,
-        map.getQuestNpcRects().at(0),
-        "Elder Thorne",
-        "npc_00"
-    ));
-    npcs.push_back(std::make_unique<QuestNpc>(
-        1,
-        map.getQuestNpcRects().at(1),
-        "Torren",
-        "npc_01"
-    ));
-    npcs.push_back(std::make_unique<QuestNpc>(
-        2,
-        map.getQuestNpcRects().at(2),
-        "Mira",
-        "npc_02"
-    ));
-    npcs.push_back(std::make_unique<QuestNpc>(
-        3,
-        map.getQuestNpcRects().at(3),
-        "Bren",
-        "npc_03"
-    ));
-
-    npcs.push_back(std::make_unique<MerchantNpc>(
-        map.getMerchantNpcRects().at(0),
-        "Merchant",
-        "npc_00"
-    ));
-}
-
-void loadQuests(std::vector<Quest>& quests) {
-    // --- [Begin] - Explore strange path --- 
-    quests.push_back(Quest("Explore strange paths", 40));
-    quests.back().addRequiredLevel(1);
-    quests.back().addRequiredDescription("Find Elder Thorne. Min Lv.1");
-    // Stage 0: Elder Thorne cảnh báo
-    quests.back().addNpcID      (0, 0);
-    quests.back().addDialogue   (0, "[1/4] Something stirs in the forest... It no longer feels safe");
-    quests.back().addDialogue   (0, "[2/4] Long ago, we sealed away a dark presence beyond the hills");
-    quests.back().addDialogue   (0, "[3/4] But now... the whispers return, and creatures creep closer each night");
-    quests.back().addDialogue   (0, "[4/4] You must go, uncover the truth. Our hope rests with you");
-    quests.back().addDescription(0, "Investigate the road beyond the wooden bridge");
-    quests.back().addObjective  (0, std::make_shared<ExploreObjective>(1));
-    // Stage 1: Quay về Elder Thorne
-    quests.back().addNpcID      (1, 0);
-    quests.back().addDialogue   (1, "[1/3] You're back... I feared the worst");
-    quests.back().addDialogue   (1, "[2/3] This place was once peaceful. What have we awakened?");
-    quests.back().addDialogue   (1, "[3/3] Find Torren. He'll help you prepare for what lies ahead");
-    quests.back().addDescription(1, "Return to Elder Thorne");
-    quests.back().addObjective  (1, std::make_shared<TalkObjective>(0));
-    // Stage 2: Gặp Torren, nhận cung
-    quests.back().addNpcID      (2, 1);
-    quests.back().addDialogue   (2, "[1/7] Elder Thorne sent you? Then it must be serious");
-    quests.back().addDialogue   (2, "[2/7] You're really heading out there? It's dangerous");
-    quests.back().addDialogue   (2, "[3/7] I've seen strange tracks by the river. They weren't left by any animal");
-    quests.back().addDialogue   (2, "[4/7] If you're going, take this bow. You'll need it");
-    quests.back().addDialogue   (2, "[5/7] Press [E] to open your inventory, then drag the bow into your weapon slot");
-    quests.back().addDialogue   (2, "[6/7] Press [Space] to use your bow. Stay sharp");
-    quests.back().addDialogue   (2, "[7/7] From now on, you fight as an archer. Help us drive back the darkness");
-    quests.back().addDescription(2, "Speak to Torren");
-    quests.back().addObjective  (2, std::make_shared<TalkObjective>(1));
-    quests.back().addItemFromNpc(2, ItemManager::get("Old Bow"));
-    // Stage 3: Diệt quái
-    quests.back().addNpcID      (3, -1);
-    quests.back().addDialogue   (3, std::string());
-    quests.back().addDescription(3, "Help the villages defeat the monsters");
-    quests.back().addObjective  (3, std::make_shared<KillMonsterObjective>("Bat Lv.1", 5));
-    quests.back().addObjective  (3, std::make_shared<KillMonsterObjective>("Eye Lv.5", 2));
-    // Stage 4: Trở lại Torren
-    quests.back().addNpcID      (4, 1);
-    quests.back().addDialogue   (4, "[1/3] Back already? I see you've made it through");
-    quests.back().addDialogue   (4, "[2/3] That bow served you well, huh? Told you it'd come in handy");
-    quests.back().addDialogue   (4, "[3/3] You're stronger now. Maybe ready to carve your own legend");
-    quests.back().addDescription(4, "Return to Torren");
-    quests.back().addObjective  (4, std::make_shared<TalkObjective>(1));
-    // --- [End] ---
-    
-    // --- [Begin] - Into the Darkwood ---
-    quests.push_back(Quest("Into the Darkwood", 200));
-    quests.back().addRequiredLevel(3);
-    quests.back().addRequiredDescription("Find Mira. Min Lv.3");
-    // Stage 0: Mira khởi đầu
-    quests.back().addNpcID      (0, 2);
-    quests.back().addDialogue   (0, "[1/4] I've heard strange noises deeper in the forest lately...");
-    quests.back().addDialogue   (0, "[2/4] Something's not right. The animals are restless, the wind feels heavy");
-    quests.back().addDialogue   (0, "[3/4] I think it's time you meet someone who knows more-Bren, the forest keeper");
-    quests.back().addDialogue   (0, "[4/4] You'll find him beyond the old stone gate, deeper in the woods");
-    quests.back().addDescription(0, "Head deeper into the forest and find Bren");
-    quests.back().addObjective  (0, std::make_shared<TalkObjective>(2));
-    // Stage 1: Gặp Bren
-    quests.back().addNpcID      (1, 3);
-    quests.back().addDialogue   (1, "[1/5] So Mira sent you... Then the forest truly is crying out");
-    quests.back().addDialogue   (1, "[2/5] Long ago, a cursed gate was opened, unleashing horrors from beyond");
-    quests.back().addDialogue   (1, "[3/5] We sealed the gate, but remnants remain—twisted creatures, each guarding a fragment of power");
-    quests.back().addDialogue   (1, "[4/5] These fragments, we call them orbs. Two in particular: the Bat Orb and the Eye Orb");
-    quests.back().addDialogue   (1, "[5/5] Bring them to me. Only then can we confront what still lingers");
-    quests.back().addDescription(1, "Head deeper into the forest and find Bren");
-    quests.back().addObjective  (1, std::make_shared<TalkObjective>(3));
-    // Stage 2: Kiếm đồ
-    quests.back().addNpcID      (2, 3);
-    quests.back().addDialogue   (2, std::string());
-    quests.back().addDescription(2, "Collect the Bat Orb and Eye Orb from corrupted creatures");
-    quests.back().addObjective  (2, std::make_shared<CollectItemObjective>("Bat Orb", 1));
-    quests.back().addObjective  (2, std::make_shared<CollectItemObjective>("Eye Orb", 1));
-    // Stage 3: Trả đồ, nghe kể chuyện
-    quests.back().addNpcID      (3, 3);
-    quests.back().addDialogue   (3, "[1/6] You've returned with both orbs... I feared they were lost");
-    quests.back().addDialogue   (3, "[2/6] Each orb once belonged to ancient guardians-fallen to corruption");
-    quests.back().addDialogue   (3, "[3/6] These guardians were sealed, but now their power stirs once more");
-    quests.back().addDialogue   (3, "[4/6] We must awaken one-summon it at the altar, and destroy it completely");
-    quests.back().addDialogue   (3, "[5/6] Only by cleansing the past can we close the cursed gate forever");
-    quests.back().addDialogue   (3, "[6/6] Go. Use the orbs at the boss altar. Return to me once the deed is done");
-    quests.back().addDescription(3, "Return to Bren with the orbs and listen to his tale");
-    quests.back().addObjective  (3, std::make_shared<TalkObjective>(3));
-    // Stage 4: Triệu hồi và tiêu diệt boss
-    quests.back().addNpcID      (4, -1); // -1 nếu không cần NPC trong bước này
-    quests.back().addDialogue   (4, std::string());
-    quests.back().addDescription(4, "Find the altar to summon the boss and defeat it");
-    quests.back().addObjective  (4, std::make_shared<KillMonsterObjective>("Bat Boss Lv.10", 1));
-    // Stage 5: Gặp lại Bren
-    quests.back().addNpcID      (5, 3); 
-    quests.back().addDialogue   (5, "[1/4] So it's done... I felt the forest exhale for the first time in years");
-    quests.back().addDialogue   (5, "[2/4] That beast was only one of many, sealed across the lands");
-    quests.back().addDialogue   (5, "[3/4] The cursed gate is weakening still. To truly close it, more must fall");
-    quests.back().addDialogue   (5, "[4/4] Rest for now. But when you're ready... there is more to be done");
-    quests.back().addDescription(5, "Return to Bren after defeating the boss");
-    quests.back().addObjective  (5, std::make_shared<TalkObjective>(3));
-    // --- [End] ---
-
-    // quests.push_back(Quest(<name>, <exp>));
-    // quests.back().addRequiredLevel(<playerLevel>);
-    // quests.back().addRequiredDescription(<description>);
-
-    // quests.back().addNpcID      (<stage>, <npcID>);
-    // quests.back().addDialogue   (<stage>, <dialogue>);
-    // quests.back().addDescription(<stage>, <description>);
-    // quests.back().addObjective  (<stage>, <objective>);
-}
-
-void loadBossAltars(std::vector<BossAltar>& bossAltars, const std::unordered_map<int, sf::FloatRect>& bossAltarRects) {
-    bossAltars.emplace_back(
-        0,
-        bossAltarRects.at(0)
-    );
-}
+#include "BossAltarManager.hpp"
 
 int main() {
     sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Project_H", sf::Style::Close);
@@ -251,29 +46,34 @@ int main() {
     TextureManager::loadSprites();
     SoundManager::loadSounds();
     EntityEffects::loadShaders();
-    ItemManager::loadItems();
+    ItemDatabase::loadItems();
 
     // NaturalEffects naturalEffects;
     // naturalEffects.load("Assets/Shaders/naturalEffects.frag");
     // naturalEffects.loadSmartLightingShader("Assets/Shaders/smartLighting.frag");
 
-
     TileMap map;
     map.loadMap();
 
-    std::vector<std::unique_ptr<Enemy>> enemies;
-    loadEnemies(enemies, map.getEnemyRects());
+    EnemyManager enemies;
+    enemies.loadEnemies(map.getEnemyRects());
 
-    std::vector<std::unique_ptr<Npc>> npcs;
-    loadNpcs(npcs, map);
+    NpcManager npcs;
+    npcs.loadNpcs(map);
     
-    std::vector<Quest> quests;
-    loadQuests(quests);
+    QuestManager quests;
+    quests.loadQuests();
 
-    sf::Vector2f PlayerTiles = sf::Vector2f( 78, 110);
-    Player player(PlayerTiles * static_cast<float>(TILE_SIZE), 10.0f, std::move(quests));
-    UI ui;
-    ui.generateMinimapTexture(map);
+    sf::Vector2f playerPosition = sf::Vector2f( 78, 110) * static_cast<float>(TILE_SIZE);
+
+    ItemManager items;
+    items.addItem(playerPosition + sf::Vector2f(100.0f, 0), std::make_shared<Bow>   ("God Bow", "bow_00"      , 1, ItemRarity::Legendary, 10.0f));
+    items.addItem(playerPosition + sf::Vector2f(300.0f, 0), std::make_shared<Helmet>("God Helmet", "helmet_00", 1, ItemRarity::Mythic   , 10000.0f));
+
+    Player player(playerPosition, 10.0f, std::move(quests.getQuests()));
+    
+    player.addItem(ItemDatabase::get("Bat Orb", 10));
+    player.addItem(ItemDatabase::get("Eye Orb", 10));
 
     srand(static_cast<unsigned int>(time(0)));
 
@@ -281,7 +81,7 @@ int main() {
     bool      isMinimized  = false;
     bool      isFullscreen = false;
     sf::View  view         = window.getView();
-    view.setCenter(PlayerTiles.x * TILE_SIZE, PlayerTiles.y * TILE_SIZE);
+    view.setCenter(playerPosition);
     sf::View  uiView       = window.getDefaultView();
     
     sf::RenderTexture sceneTexture;                     //  for shader
@@ -296,18 +96,14 @@ int main() {
     // for (const sf::Vector2f lightPosition : map.getLights()) {
     //     naturalEffects.addLight(lightPosition);
     // }
-    
-    std::vector<Item> items;
-    items.emplace_back(player.getPosition() + sf::Vector2f(100.0f, 0), std::make_shared<Bow>("God Bow", "bow_00", 1, ItemRarity::Legendary, 10.0f));
-    items.emplace_back(player.getPosition() + sf::Vector2f(300.0f, 0), std::make_shared<Helmet>("God Helmet", "helmet_00", 1, ItemRarity::Mythic, 10000.0f));
-    player.addItem(ItemManager::get("Bat Orb", 10));
-    player.addItem(ItemManager::get("Eye Orb", 10));
 
+    UI ui;
+    ui.generateMinimapTexture(map);
     InventoryUI inventoryUI(static_cast<sf::Vector2f>(window.getSize()), player);
-    MerchantUI merchantUI(static_cast<sf::Vector2f>(window.getSize()), player);
+    MerchantUI  merchantUI (static_cast<sf::Vector2f>(window.getSize()), player);
 
-    std::vector<BossAltar> bossAltars;
-    loadBossAltars(bossAltars, map.getBossAltarRects());
+    BossAltarManager bossAltars;
+    bossAltars.loadBossAltars(map.getBossAltarRects());
     // --- [End] ---
 
     while (window.isOpen()) {
@@ -429,38 +225,12 @@ int main() {
         // --- [Begin] Update --- 
         gameClock.update(dt);
 
-        // Player collision Npcs
-        for (const std::unique_ptr<Npc>& npc : npcs) {
-            if (player.isCollision(npc->getHitbox())) {
-                player.collisionWithNpc  = true;
-                npc->collisionWithPlayer = true;
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::F)) {
-                    npc->interactWithPlayer(player);
-                }
-            }
-        }
-        // Player collision Items
-        for (auto it = items.begin(); it != items.end(); ) {
-            if (it->canPickup() && player.isCollision(it->getHitbox())) {
-                if (player.addItem(it->getItem())) {
-                    it = items.erase(it); 
-                }
-                else {
-                    ++it;
-                }
-            } else {
-                ++it; 
-            }
-        }
+        npcs.handlePlayerInteraction(player);
+        
+        items.handlePlayerCollision(player);
+
         // Player collision Boss Altars
-        for (BossAltar& bossAltar : bossAltars) {
-            if (player.isCollision(bossAltar.getHitbox())) {
-                bossAltar.collisionWithPlayer = true;
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::F)) {
-                    bossAltar.interactWithPlayer(player);
-                }
-            }
-        }
+        bossAltars.handlePlayerInteraction(player);
 
         player.update(dt, window, map.getCollisionRects(), map.getRegionRects());
         
@@ -468,49 +238,29 @@ int main() {
         
         player.updateView(dt, view);
         
-        for (auto& enemy : enemies) {
-            enemy->update(dt, player, map.getCollisionRects(), items);
-        }
-        // Enemies despawn
-        for (auto it = enemies.begin(); it != enemies.end(); ) {
-            if ((*it)->isDespawn()) {
-                it = enemies.erase(it);
-            }
-            else {
-                ++it;
-            }
-        }
+        enemies.update(dt, player, map.getCollisionRects(), items);
 
-        for (auto& npc : npcs) {
-            npc->update(dt);
-        }
+        npcs.update(dt);
 
-        for (Item& item : items) {
-            item.update(dt);
-        }
+        items.update(dt);
 
-        for (BossAltar& bossAltar : bossAltars) {
-            bossAltar.update(dt);
-            if (bossAltar.isSuitableForSummonBoss()) {
-                bossAltar.summonBoss(enemies);
-            }
-        }
+        bossAltars.update(dt, enemies);
         
         map.update(dt);
         map.updateOverlayTransparency(player.getHitbox());
-        for (const auto& enemy : enemies) {
+        for (const auto& enemy : enemies.getEnemies()) {
             map.updateOverlayTransparency(enemy->getHitbox());
         }
-        for (const Item& item : items) {
+        for (const Item& item : items.getItems()) {
             map.updateOverlayTransparency(item.getHitbox());
         }
         
         particleManager.update(dt, view);
         particleManager.isCollisionWithCloud(player.getHitbox());
-        for (const auto& enemy : enemies) {
+        for (const auto& enemy : enemies.getEnemies()) {
             particleManager.isCollisionWithCloud(enemy->getHitbox());
         }
-        for (const Item& item : items) {
+        for (const Item& item : items.getItems()) {
             particleManager.isCollisionWithCloud(item.getHitbox());
         }
         particleManager.isCollisionWithRain(player.getCollisionRegionID());
@@ -577,17 +327,11 @@ int main() {
         // --- [Begin] Draw layer 1 --- 
         sceneTexture.draw(map);
 
-        for (auto& enemy : enemies) if (enemy->calculateDistance(player) <= LOADING_DISTANCE) {
-            enemy->draw(sceneTexture);
-        }
+        enemies.draw(sceneTexture, player);
 
-        for (auto& npc : npcs) {
-            npc->draw(sceneTexture);
-        }
+        npcs.draw(sceneTexture);
 
-        for (auto& item : items) {
-            item.draw(sceneTexture);
-        }
+        items.draw(sceneTexture);
 
         player.draw(sceneTexture);
         
@@ -599,31 +343,17 @@ int main() {
         // --- [Begin] Draw layer 2 ---
         sceneTexture.setView(uiView);
         particleManager.drawScreen(sceneTexture);
-
-        bool merchantFlag = false;
-        for (std::unique_ptr<Npc>& npc : npcs) {
-            sceneTexture.setView(view);
-            npc->drawInteractText(sceneTexture);
-            
-            if (MerchantNpc* merchantNpc = dynamic_cast<MerchantNpc*>(npc.get())) {
-                if (merchantNpc->isInteractWithPlayer()) {
-                    merchantFlag = true;
-
-                    if (inventoryUI.isVisible()) {
-                        merchantNpc->interactWithPlayer(player);
-                        merchantFlag = false;
-                    }
-                }   
-            }
-        }
+        
+        sceneTexture.setView(view);
+        npcs.drawInteractText(sceneTexture);
+        
+        bool merchantFlag = npcs.isInteractWithMerchant(inventoryUI.isVisible());
         if (merchantUI.isVisible() && merchantFlag == false) {
             merchantUI.isPayment(player);
         }
         merchantUI.setVisible(merchantFlag);
 
-        for (const BossAltar& bossAltar : bossAltars) {
-            bossAltar.drawInteractText(sceneTexture);
-        }
+        bossAltars.drawInteractText(sceneTexture);
         // --- [End] ---
 
         sceneTexture.display(); 

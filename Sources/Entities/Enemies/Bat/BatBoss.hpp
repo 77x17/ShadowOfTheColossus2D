@@ -41,7 +41,7 @@ public:
     void updateTimer(const float& dt) override;
     void updateAnimation() override;
     void updateProjectiles(const float& dt, Player& player);
-    void update(const float& dt, Player& player, const std::vector<sf::FloatRect>& collisionRects, std::vector<Item>& items) override;
+    void update(const float& dt, Player& player, const std::vector<sf::FloatRect>& collisionRects, ItemManager& items) override;
 
     void draw(sf::RenderTarget& target) override;
 

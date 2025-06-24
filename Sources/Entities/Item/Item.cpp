@@ -50,7 +50,7 @@ void Item::update(const float& dt) {
     }
 }
 
-void Item::draw(sf::RenderTarget& target) {
+void Item::draw(sf::RenderTarget& target) const {
     target.draw(labelBackground);
     target.draw(label);
 
