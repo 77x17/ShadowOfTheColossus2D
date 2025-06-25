@@ -730,7 +730,8 @@ void TileMap::loadMap() {
         {"overworld_grass", "Maps/overworld_grass.png"},
         {"CastleWalls", "Maps/CastleWalls.png"},
         {"medium_oak_tree_static", "Maps/medium_oak_tree_static.png"},
-        {"big_oak_tree_static", "Maps/big_oak_tree_static.png"}
+        {"big_oak_tree_static", "Maps/big_oak_tree_static.png"},
+        {"Swamp", "Maps/Swamp.png"}
     });
 
     scale(2.f, 2.f);

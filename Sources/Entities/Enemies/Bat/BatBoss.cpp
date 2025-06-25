@@ -62,11 +62,6 @@ void BatBoss::respawn() {
 
 void BatBoss::followPlayer(const Player& player) {
     Enemy::followPlayer(player);
-    
-    if (alertCooldownTimer == -13.0f) {
-        shootCooldownTimer = SHOOT_COOLDOWN / 2.0f;
-        dashCooldownTimer  = DASH_COOLDOWN  / 2.0f;
-    }
 
     if (dashDuration <= 0 && dashCooldownTimer <= 0) {
         dashDuration      = DASH_DURATION;

@@ -60,10 +60,6 @@ void Eye::updateTimer(const float &dt) {
 void Eye::followPlayer(const Player& player) {
     sf::Vector2f normalizeDirection = Normalize::normalize(player.getPosition() - hitbox.getPosition());
 
-    if (alertCooldownTimer == -13.0f) {
-        shootCooldownTimer = SHOOT_COOLDOWN / 2.f;
-    }
-
     if (shootCooldownTimer <= 0) {
         projectile = std::make_unique<Projectile>(
             TextureManager::get("fireball"),
