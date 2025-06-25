@@ -1,19 +1,19 @@
 # Tiến độ phát triển
-| Ngày       | Enemies | Quests | NPCs | Boss | Items  | Regions | Particle |
-|------------|---------|--------|------|------|--------|---------|----------|
-| 08/06/2025 | 0       | 0      | 0    | 0    | 0      | 0       | 0        |
-| 09/06/2025 | 1       | 0      | 0    | 0    | 0      | 1       | 0        |
-| 10/06/2025 | 2       | 0      | 0    | 0    | 0      | 2       | 0        |
-| 12/06/2025 | 2       | 1      | 2    | 0    | 0      | 2       | 0        |
-| 18/06/2025 | 2       | 1      | 3    | 0    | 4      | 2       | 2        |
-| 22/06/2025 | 2       | 2      | 4    | 1    | 10     | 4       | 2        |
-| 26/06/2025 | 4       | 4      | 6    | 2    | 19     | 7       | 2        |
+| Ngày       | Enemies | Quests | NPCs | Bosses | Items  | Regions | Particles |
+|------------|---------|--------|------|--------|--------|---------|-----------|
+| 08/06/2025 | 0       | 0      | 0    | 0      | 0      | 0       | 0         |
+| 09/06/2025 | 1       | 0      | 0    | 0      | 0      | 1       | 0         |
+| 10/06/2025 | 2       | 0      | 0    | 0      | 0      | 2       | 0         |
+| 12/06/2025 | 2       | 1      | 2    | 0      | 0      | 2       | 0         |
+| 18/06/2025 | 2       | 1      | 3    | 0      | 4      | 2       | 2         |
+| 22/06/2025 | 2       | 2      | 4    | 1      | 10     | 4       | 2         |
+| 26/06/2025 | 4       | 4      | 6    | 2      | 19     | 7       | 2         |
 
 # Những kinh nghiệm rút ra khi làm dự án này
 - Đôi khi lỗi không đến từ những hàm mới thêm vào mà từ những hàm cũ.
 - modulo 0, float modulo (Error)
 - I hate collision
-- Jitter: Màn hình bị giật hở khi thay đổi view -> Vì view có tọa độ dạng số thực -> static_cast<unsigned int>
+- Jitter: Màn hình bị giật hở khi thay đổi view -> Vì view có tọa độ dạng số thực -> static_cast< unsigned int >
 - Screen Tearing: Màn hình bị xọc -> Bất đồng bộ với tần số quét của màn hình
 - Attack cooldown: Tránh trường hợp quái tấn công ngay lập tức 
 - Invincible: Bất tử khi mới respawn
