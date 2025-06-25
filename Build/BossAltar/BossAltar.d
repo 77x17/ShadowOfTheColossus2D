@@ -6,6 +6,8 @@ Build/BossAltar/BossAltar.o: Sources/BossAltar/BossAltar.cpp \
  Sources/EnemyManager/EnemyManager.hpp Sources/Entities/Enemies/Enemy.hpp \
  Sources/Entities/Enemies/Bat/Bat.hpp \
  Sources/Entities/Enemies/Eye/Eye.hpp \
- Sources/Entities/Enemies/Bat/BatBoss.hpp \
+ Sources/Entities/Enemies/Slime/Slime.hpp \
+ Sources/Entities/Enemies/VampireBat/VampireBat.hpp \
+ Sources/Entities/Enemies/BatBoss/BatBoss.hpp \
  Sources/Configuration/Constants.hpp Sources/Configuration/Font.hpp \
  Sources/ItemDatabase/ItemDatabase.hpp

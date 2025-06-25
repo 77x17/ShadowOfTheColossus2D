@@ -9,8 +9,11 @@
 #include "TextureManager.hpp"
 #include "SoundManager.hpp"
 
-BatBoss::BatBoss(const sf::Vector2f& position, const std::vector<std::pair<float, std::shared_ptr<ItemData>>>& _inventory) 
-: Enemy(position, sf::Vector2f(TILE_SIZE, TILE_SIZE) * 2.0f, 100.0f, "Bat Boss Lv.10", _inventory) {
+BatBoss::BatBoss(const sf::Vector2f& position,
+                 const std::string&  nameAndLevel,
+                 const float&        hp, 
+                 const std::vector<std::pair<float, std::shared_ptr<ItemData>>>& _inventory) 
+: Enemy(position, sf::Vector2f(TILE_SIZE, TILE_SIZE) * 2.0f, hp, nameAndLevel, _inventory) {
     // --- [Begin] - Configuration ---
     MOVE_SPEED = 100.0f; 
 

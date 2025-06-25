@@ -6,6 +6,8 @@ class Player;
 
 #include "Bat.hpp"
 #include "Eye.hpp"
+#include "Slime.hpp"
+#include "VampireBat.hpp"
 
 #include "BatBoss.hpp"
 

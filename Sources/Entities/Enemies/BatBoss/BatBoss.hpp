@@ -30,7 +30,10 @@ private:
     sf::Vector2f dashDirection;
 
 public:
-    BatBoss(const sf::Vector2f& position, const std::vector<std::pair<float, std::shared_ptr<ItemData>>>& _inventory);
+    BatBoss(const sf::Vector2f& position, 
+            const std::string&  nameAndLevel,
+            const float&        hp, 
+            const std::vector<std::pair<float, std::shared_ptr<ItemData>>>& _inventory);
 
     void respawn() override;
     

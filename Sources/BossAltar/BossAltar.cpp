@@ -127,13 +127,13 @@ void BossAltar::interactWithPlayer(Player& player) {
     else {
         switch (ID) {
             case 0: {
-                interactText.setString("Bat Lord Lv.10\n01 Bat Orb");
+                interactText.setString("Bat Boss Lv.5\n01 Bat Orb");
                 interactText.setOrigin(interactText.getLocalBounds().left + interactText.getLocalBounds().width  / 2, 
                                        interactText.getLocalBounds().top  + interactText.getLocalBounds().height / 2);
                 break;
             }
             case 1: {
-                interactText.setString("Gazer Lord Lv.20\n01 Eye Orb");
+                interactText.setString("Gazer Lord Lv.10\n01 Eye Orb");
                 interactText.setOrigin(interactText.getLocalBounds().left + interactText.getLocalBounds().width  / 2, 
                                        interactText.getLocalBounds().top  + interactText.getLocalBounds().height / 2);
                 break;
@@ -163,7 +163,7 @@ void BossAltar::summonBoss(EnemyManager& enemies) {
             batLordInventory.emplace_back(0.2f, ItemDatabase::get("Bat Leggings"));
             batLordInventory.emplace_back(0.2f, ItemDatabase::get("Bat Boots"));
 
-            enemies.summonEnemy(std::make_unique<BatBoss>(sf::Vector2f(hitbox.getPosition()), batLordInventory));
+            enemies.summonEnemy(std::make_unique<BatBoss>(sf::Vector2f(hitbox.getPosition()), "Bat Boss Lv.5", 100.0f, batLordInventory));
             
             break;
         }
@@ -175,7 +175,7 @@ void BossAltar::summonBoss(EnemyManager& enemies) {
             gazerBossInventory.emplace_back(0.2f, ItemDatabase::get("Bat Leggings"));
             gazerBossInventory.emplace_back(0.2f, ItemDatabase::get("Bat Boots"));
 
-            enemies.summonEnemy(std::make_unique<BatBoss>(sf::Vector2f(hitbox.getPosition()), gazerBossInventory));
+            enemies.summonEnemy(std::make_unique<BatBoss>(sf::Vector2f(hitbox.getPosition()), "Gazer Lord Lv.10", 500.0f, gazerBossInventory));
             
             break;
         }

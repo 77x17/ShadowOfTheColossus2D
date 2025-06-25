@@ -16,7 +16,10 @@ INCLUDES = -I"./Sources" \
 		   -I"./Sources/Entities" \
 		   -I"./Sources/Entities/Enemies" \
 		   -I"./Sources/Entities/Enemies/Bat" \
+		   -I"./Sources/Entities/Enemies/BatBoss" \
 		   -I"./Sources/Entities/Enemies/Eye" \
+		   -I"./Sources/Entities/Enemies/Slime" \
+		   -I"./Sources/Entities/Enemies/VampireBat" \
 		   -I"./Sources/Entities/Item" \
 		   -I"./Sources/Entities/Npc" \
 		   -I"./Sources/Entities/Player" \
@@ -52,7 +55,10 @@ SRCS := $(wildcard $(SRC_DIR)/*.cpp) \
         $(wildcard $(SRC_DIR)/EnemyManager/*.cpp) \
         $(wildcard $(SRC_DIR)/Entities/Enemies/*.cpp) \
         $(wildcard $(SRC_DIR)/Entities/Enemies/Bat/*.cpp) \
+        $(wildcard $(SRC_DIR)/Entities/Enemies/BatBoss/*.cpp) \
         $(wildcard $(SRC_DIR)/Entities/Enemies/Eye/*.cpp) \
+        $(wildcard $(SRC_DIR)/Entities/Enemies/Slime/*.cpp) \
+        $(wildcard $(SRC_DIR)/Entities/Enemies/VampireBat/*.cpp) \
         $(wildcard $(SRC_DIR)/Entities/Item/*.cpp) \
         $(wildcard $(SRC_DIR)/Entities/Npc/*.cpp) \
         $(wildcard $(SRC_DIR)/Entities/Player/*.cpp) \

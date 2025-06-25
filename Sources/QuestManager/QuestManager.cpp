@@ -3,7 +3,7 @@
 #include "ItemDatabase.hpp"
 
 void QuestManager::loadQuests() {
-    // --- [Begin] - Explore strange path --- 
+    // --- [Begin] - [0] - Explore strange path --- 
     quests.push_back(Quest(0, "Explore strange paths", 40));
     quests.back().addRequiredLevel(1);
     quests.back().addRequiredDescription("Talk to Elder Thorne. Min Lv.1");
@@ -39,7 +39,7 @@ void QuestManager::loadQuests() {
     quests.back().addDialogue   (3, std::string());
     quests.back().addDescription(3, "Help the villages defeat the monsters");
     quests.back().addObjective  (3, std::make_shared<KillMonsterObjective>("Bat Lv.1", 10));
-    quests.back().addObjective  (3, std::make_shared<KillMonsterObjective>("Bat Lv.3", 5));
+    quests.back().addObjective  (3, std::make_shared<KillMonsterObjective>("Vampire Bat Lv.3", 10));
     // Stage 4: Trở lại Torren
     quests.back().addNpcID      (4, 1);
     quests.back().addDialogue   (4, "[1/3] Back already? I see you've made it through");
@@ -49,7 +49,7 @@ void QuestManager::loadQuests() {
     quests.back().addObjective  (4, std::make_shared<TalkObjective>(1));
     // --- [End] ---
     
-    // --- [Begin] - Into the Darkwood ---
+    // --- [Begin] - [1] - Into the Darkwood ---
     quests.push_back(Quest(1, "Into the Darkwood", 200));
     quests.back().addRequiredLevel(3);
     quests.back().addRequiredQuestID(0);
@@ -90,7 +90,7 @@ void QuestManager::loadQuests() {
     quests.back().addNpcID      (4, -1); // -1 nếu không cần NPC trong bước này
     quests.back().addDialogue   (4, std::string());
     quests.back().addDescription(4, "Find the altar to summon the boss and defeat it");
-    quests.back().addObjective  (4, std::make_shared<KillMonsterObjective>("Bat Boss Lv.10", 1));
+    quests.back().addObjective  (4, std::make_shared<KillMonsterObjective>("Bat Boss Lv.5", 1));
     // Stage 5: Gặp lại Bren
     quests.back().addNpcID      (5, 3); 
     quests.back().addDialogue   (5, "[1/4] So it's done... I felt the forest exhale for the first time in years");
@@ -101,67 +101,108 @@ void QuestManager::loadQuests() {
     quests.back().addObjective  (5, std::make_shared<TalkObjective>(3));
     // --- [End] ---
 
-    // --- [Begin] - The Secret of the Gloom-Swamp ---
-    quests.push_back(Quest(2, "The Secret of the Gloom-Swamp", 1000));
+    // --- [Begin] - [2] - A Message for Elara ---
+    quests.push_back(Quest(2, "A Message for Elara", 750)); 
     quests.back().addRequiredLevel(6);
     quests.back().addRequiredQuestID(1); // Yêu cầu hoàn thành quest "Into the Darkwood"
-    quests.back().addRequiredDescription("Speak to Bren again. Min Lv.8");
+    quests.back().addRequiredDescription("Speak to Bren again. Min Lv.6");
 
-    // // Stage 0: Bren chỉ đường
+    // Stage 0: Nhận nhiệm vụ từ Bren
     quests.back().addNpcID      (0, 3); // NPC Bren
-    quests.back().addDialogue   (0, "[1/4] The forest breathes easier, but the corruption's roots run deep");
-    quests.back().addDialogue   (0, "[2/4] The spirit you cleansed was of the sky");
-    quests.back().addDialogue   (0, "[3/8] Its counterpart, a guardian of the deep places,");
-    quests.back().addDialogue   (0, "[4/8] ...remains bound in the Gloom-Swamp to the southeast");
-    quests.back().addDialogue   (0, "[5/8] Within that poisoned marsh lives an old hermit, Elara");
-    quests.back().addDialogue   (0, "[6/8] She watches over the swamp's heart.");
-    quests.back().addDialogue   (0, "[7/8] Find her. She will guide you on how to draw out the fallen guardian");
-    quests.back().addDialogue   (0, "[8/8] Be wary of the fog and what lurks beneath the water.");
-    quests.back().addDescription(0, "Travel southeast past the Darkwood to find the Gloom-Swamp");
-    quests.back().addObjective  (0, std::make_shared<ExploreObjective>(5)); // ID khu vực đầm lầy là 5
+    quests.back().addDialogue   (0, "[1/5] The corruption's heart lies deep within the Gloom-Swamp.");
+    quests.back().addDialogue   (0, "[2/5] An old friend of mine, the hermit Elara, resides there.");
+    quests.back().addDialogue   (0, "[3/5] She understands the land's secrets, but she is very cautious.");
+    quests.back().addDialogue   (0, "[4/5] Find her. Tell her that Bren sent you, and the time has come.");
+    quests.back().addDialogue   (0, "[5/5] She will need to trust you before she reveals anything more.");
+    quests.back().addDescription(0, "Speak to Bren");
+    quests.back().addObjective  (0, std::make_shared<TalkObjective>(3));
 
-    // // Stage 1: Gặp Elara
-    quests.back().addNpcID      (1, 4); // NPC mới Elara, ID 4
-    quests.back().addDialogue   (1, "[1/7] A new face... It has been a long time since anyone but the lost souls wandered here");
-    quests.back().addDialogue   (1, "[2/7] Bren sent you? Then you carry a heavy purpose");
-    quests.back().addDialogue   (1, "[3/7] You seek to quiet the Gazer Lord, the eye that never sleeps");
-    quests.back().addDialogue   (1, "[4/7] Its corruption has blinded this land, turning clear waters into this murky poison");
-    quests.back().addDialogue   (1, "[5/7]The creatures here weep corrupted tears");
-    quests.back().addDialogue   (1, "[6/7] To summon it, you must gather these 'Eye Orb' from the most tormented spirits of the swamp.");
-    quests.back().addDialogue   (1, "[7/7] Bring me three tears, and I will help you craft the lure to call it from the abyss.");
-    quests.back().addDescription(1, "Speak to Elara in the heart of the Gloom-Swamp");
-    quests.back().addObjective  (1, std::make_shared<TalkObjective>(4));
+    // Stage 1: Đi đến đầm lầy
+    quests.back().addNpcID      (1, -1);
+    quests.back().addDialogue   (1, std::string());
+    quests.back().addDescription(1, "Travel southeast past the Darkwood to find the Gloom-Swamp.");
+    quests.back().addObjective  (1, std::make_shared<ExploreObjective>(5)); // ID khu vực đầm lầy là 5
 
-    // // Stage 2: Thu thập Nước Mắt Tuyệt Vọng
+    // Stage 2: Gặp Elara và nhận thử thách
+    quests.back().addNpcID      (2, 4); // NPC Elara
+    quests.back().addDialogue   (2, "[1/5] Who are you to disturb this dying place? Speak quickly.");
+    quests.back().addDialogue   (2, "[2/5] Bren sent you? He always was too trusting of wanderers.");
+    quests.back().addDialogue   (2, "[3/5] Words are wind. This swamp demands proof, not promises.");
+    quests.back().addDialogue   (2, "[4/5] The very air here is poison. The creatures weep with corruption.");
+    quests.back().addDialogue   (2, "[5/5] Show me you can face this blight. Let your actions speak for you.");
+    quests.back().addDescription(2, "Find and speak to Elara in the heart of the Gloom-Swamp.");
+    quests.back().addObjective  (2, std::make_shared<TalkObjective>(4));
+
+    // Stage 3: Tiêu diệt quái vật để chứng tỏ sức mạnh
+    quests.back().addNpcID      (3, -1);
+    quests.back().addDialogue   (3, std::string());
+    quests.back().addDescription(3, "Defeat 10 Eye Lv.5 and 10 Slime Lv.5, then return to Elara.");
+    quests.back().addObjective  (3, std::make_shared<KillMonsterObjective>("Eye Lv.5", 10));
+    quests.back().addObjective  (3, std::make_shared<KillMonsterObjective>("Slime Lv.5", 10));
+
+    // Stage 4: Quay lại Elara báo cáo (Giai đoạn mới)
+    quests.back().addNpcID      (4, 4); // NPC Elara
+    quests.back().addDialogue   (4, "[1/4] You have returned. There is strength in you, I see that now.");
+    quests.back().addDialogue   (4, "[2/4] Your blade is sharp enough for what is to come. I will trust you.");
+    quests.back().addDialogue   (4, "[3/4] But Bren must be informed of our plan. Take this letter to him.");
+    quests.back().addDialogue   (4, "[4/4] Go now. Do not let it fall into the wrong hands.");
+    quests.back().addDescription(4, "You have proven your strength. Report back to Elara.");
+    quests.back().addObjective  (4, std::make_shared<TalkObjective>(4));
+
+    // Stage 5: Đem thư trả lại cho Bren
+    quests.back().addNpcID      (5, 3); // NPC Bren
+    quests.back().addDialogue   (5, "[1/4] Ah, you've returned with a message from Elara. Let me see...");
+    quests.back().addDialogue   (5, "[2/4] (He reads the letter) Just as I feared... the Gazer Lord.");
+    quests.back().addDialogue   (5, "[3/4] You have earned her trust. That is no small feat, hero.");
+    quests.back().addDialogue   (5, "[4/4] Your path is clear now. Go back to Elara; she will guide you.");
+    quests.back().addDescription(5, "Bring Elara's sealed letter back to Bren.");
+    quests.back().addObjective  (5, std::make_shared<TalkObjective>(3));
+    // --- [End] ---
+
+
+    // --- [Begin] - [3] - The Secret of the Gloom-Swamp ---
+    // Nhiệm vụ này vẫn giữ nguyên, bắt đầu sau khi Quest 2 hoàn thành.
+    quests.push_back(Quest(3, "The Secret of the Gloom-Swamp", 1000));
+    quests.back().addRequiredLevel(6);
+    quests.back().addRequiredQuestID(2); // Yêu cầu hoàn thành quest "A Message for Elara"
+    quests.back().addRequiredDescription("Speak to Elara in the Gloom-Swamp. Min Lv.6");
+
+    // Stage 0: Gặp Elara để bắt đầu
+    quests.back().addNpcID      (0, 4); // NPC Elara
+    quests.back().addDialogue   (0, "[1/3] You have returned, and proven your might. I will trust you.");
+    quests.back().addDialogue   (0, "[2/3] A great evil, the Gazer Lord, is the source of this poison.");
+    quests.back().addDialogue   (0, "[3/3] To summon it, you must gather an 'Eye Orb' from the creatures here.");
+    quests.back().addDescription(0, "Speak to Elara again to learn of the swamp's true secret.");
+    quests.back().addObjective  (0, std::make_shared<TalkObjective>(4));
+
+    // ... (Các giai đoạn còn lại của Quest 3 giữ nguyên như cũ)
+    // Stage 1: Thu thập Eye Orb
+    quests.back().addNpcID      (1, 4);
+    quests.back().addDialogue   (1, std::string());
+    quests.back().addDescription(1, "Collect an 'Eye Orb' from the swamp's creatures.");
+    quests.back().addObjective  (1, std::make_shared<CollectItemObjective>("Eye Orb", 1));
+
+    // Stage 2: Quay lại Elara
     quests.back().addNpcID      (2, 4);
-    quests.back().addDialogue   (2, std::string());
-    quests.back().addDescription(2, "Collect 'Eye Orb' from the swamp's creatures.");
-    quests.back().addObjective  (2, std::make_shared<CollectItemObjective>("Eye Orb", 1)); // Item mới
+    quests.back().addDialogue   (2, "[1/3] You have the orb... Its sorrow is potent.");
+    quests.back().addDialogue   (2, "[2/3] Take this to the stone altar nearby and place it on the pedestal.");
+    quests.back().addDialogue   (2, "[3/3] The Gazer Lord will be drawn to it. End its suffering, hero.");
+    quests.back().addDescription(2, "Return to Elara with the Eye Orb.");
+    quests.back().addObjective  (2, std::make_shared<TalkObjective>(4));
 
-    // // Stage 3: Quay lại Elara
-    quests.back().addNpcID      (3, 4); 
-    quests.back().addDialogue   (3, "[1/4] You have them... These poor souls. Their sorrow is potent.");
-    quests.back().addDialogue   (3, "[2/4] I will combine their essence with the Bat Orb you carry. This will create a beacon.");
-    quests.back().addDialogue   (3, "[3/4] Take that Orb to the stone altar nearby. Place it upon the pedestal.");
-    quests.back().addDialogue   (3, "[4/4] The Gazer Lord will be drawn to the sorrow. End its suffering, hero. For all our sakes.");
-    quests.back().addDescription(3, "Return to Elara with the Eye Orb.");
-    quests.back().addObjective  (3, std::make_shared<TalkObjective>(4));
+    // Stage 3: Triệu hồi và tiêu diệt Gazer Lord
+    quests.back().addNpcID      (3, -1);
+    quests.back().addDialogue   (3, std::string());
+    quests.back().addDescription(3, "Use the swamp altar to summon and defeat the Gazer Lord.");
+    quests.back().addObjective  (3, std::make_shared<KillMonsterObjective>("Gazer Lord Lv.10", 1)); // Boss
 
-    // // Stage 4: Triệu hồi và tiêu diệt Gazer Lord
-    quests.back().addNpcID      (4, -1);
-    quests.back().addDialogue   (4, std::string());
-    quests.back().addDescription(4, "Use the swamp altar to summon and defeat the Gazer Lord.");
-    quests.back().addObjective  (4, std::make_shared<KillMonsterObjective>("Bat Boss Lv.10", 1)); // Boss mới
-
-    // // Stage 5: Báo cáo với Elara
-    quests.back().addNpcID      (5, 4); // NPC Elara
-    quests.back().addDialogue   (5, "[1/5] The fog... it is lifting. The water seems... clearer. You have done it.");
-    quests.back().addDialogue   (5, "[2/5] You have freed two great spirits now. Their combined energy reveals a path forward.");
-    quests.back().addDialogue   (5, "[3/5] The source of the corruption, the Cursed Gate itself,");
-    quests.back().addDialogue   (5, "[4/5] ...is guarded by the one who opened it-The Gatekeeper.");
-    quests.back().addDialogue   (5, "[5/5] Go back to Bren. Tell him what we have learned. The final battle is drawing near.");
-    quests.back().addDescription(5, "Return to Elara after defeating the Gazer Lord.");
-    quests.back().addObjective  (5, std::make_shared<TalkObjective>(4));
+    // Stage 4: Báo cáo thành công với Elara
+    quests.back().addNpcID      (4, 4); // NPC Elara
+    quests.back().addDialogue   (4, "[1/3] The fog... it is lifting. The water seems clearer. You did it!");
+    quests.back().addDialogue   (4, "[2/3] The source of all corruption lies beyond, guarded by The Gatekeeper.");
+    quests.back().addDialogue   (4, "[3/3] Go back to Bren. Tell him. The final battle is drawing near.");
+    quests.back().addDescription(4, "Return to Elara after defeating the Gazer Lord.");
+    quests.back().addObjective  (4, std::make_shared<TalkObjective>(4));
     // --- [End] ---
 
     // quests.push_back(Quest(<name>, <exp>));

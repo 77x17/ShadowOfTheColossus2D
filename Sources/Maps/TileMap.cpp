@@ -330,11 +330,14 @@ bool TileMap::load(const std::string& tmxPath, const std::vector<std::pair<std::
                     if (objectGroupName == "Bat Lv.1") {
                         m_enemyRects["Bat Lv.1"].emplace_back(x, y, width, height);
                     }
-                    else if (objectGroupName == "Bat Lv.3") {
-                        m_enemyRects["Bat Lv.3"].emplace_back(x, y, width, height);
+                    else if (objectGroupName == "Vampire Bat Lv.3") {
+                        m_enemyRects["Vampire Bat Lv.3"].emplace_back(x, y, width, height);
                     }
                     else if (objectGroupName == "Eye Lv.5") {
                         m_enemyRects["Eye Lv.5"].emplace_back(x, y, width, height);
+                    }
+                    else if (objectGroupName == "Slime Lv.5") {
+                        m_enemyRects["Slime Lv.5"].emplace_back(x, y, width, height);
                     }
                     else {
                         std::cerr << "[Bug] - TileMap.cpp - load() - Enemy\n";

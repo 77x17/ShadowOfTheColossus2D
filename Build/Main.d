@@ -11,7 +11,9 @@ Build/Main.o: Sources/Main.cpp Sources/Configuration/Constants.hpp \
  Sources/Entities/Enemies/Bat/Bat.hpp \
  Sources/Entities/Enemies/Eye/Eye.hpp \
  Sources/Entities/Projectile/Projectile.hpp \
- Sources/Entities/Enemies/Bat/BatBoss.hpp \
+ Sources/Entities/Enemies/Slime/Slime.hpp \
+ Sources/Entities/Enemies/VampireBat/VampireBat.hpp \
+ Sources/Entities/Enemies/BatBoss/BatBoss.hpp \
  Sources/NpcManager/NpcManager.hpp Sources/Entities/Npc/Npc.hpp \
  Sources/Entities/Npc/QuestNpc.hpp Sources/Entities/Npc/MerchantNpc.hpp \
  Sources/Entities/Player/Player.hpp Sources/Quests/Quest.hpp \

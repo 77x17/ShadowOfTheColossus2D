@@ -8,4 +8,6 @@ Build/BossAltarManager/BossAltarManager.o: \
  Sources/EnemyManager/EnemyManager.hpp Sources/Entities/Enemies/Enemy.hpp \
  Sources/Entities/Enemies/Bat/Bat.hpp \
  Sources/Entities/Enemies/Eye/Eye.hpp \
- Sources/Entities/Enemies/Bat/BatBoss.hpp
+ Sources/Entities/Enemies/Slime/Slime.hpp \
+ Sources/Entities/Enemies/VampireBat/VampireBat.hpp \
+ Sources/Entities/Enemies/BatBoss/BatBoss.hpp

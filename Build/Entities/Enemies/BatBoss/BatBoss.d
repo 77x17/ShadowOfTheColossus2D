@@ -1,6 +1,6 @@
-Build/Entities/Enemies/Bat/BatBoss.o: \
- Sources/Entities/Enemies/Bat/BatBoss.cpp \
- Sources/Entities/Enemies/Bat/BatBoss.hpp \
+Build/Entities/Enemies/BatBoss/BatBoss.o: \
+ Sources/Entities/Enemies/BatBoss/BatBoss.cpp \
+ Sources/Entities/Enemies/BatBoss/BatBoss.hpp \
  Sources/Entities/Enemies/Enemy.hpp \
  Sources/AnimationManager/AnimationManager.hpp \
  Sources/Entities/Projectile/Projectile.hpp \
