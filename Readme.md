@@ -1,11 +1,13 @@
-# Tiến độ
-- 08/06/2025: Start
-- 09/06/2025: [Enemies] 1 |                                  | [Items]  0 | [Regions] 1
-- 10/06/2025: [Enemies] 2 |                                  | [Items]  0 | [Regions] 2
-- 12/06/2025: [Enemies] 2 | [Quests] 1 | [Npcs] 2            | [Items]  0 | [Regions] 2
-- 18/06/2025: [Enemies] 2 | [Quests] 1 | [Npcs] 3            | [Items]  4 | [Regions] 2 | [Particle] 2
-- 22/06/2025: [Enemies] 2 | [Quests] 2 | [Npcs] 4 | [Boss] 1 | [Items] 10 | [Regions] 4 | [Particle] 2
-- 26/06/2025: [Enemies] 4 | [Quests] 4 | [Npcs] 6 | [Boss] 2 | [Items] 19 | [Regions] 7 | [Particle] 2
+# Tiến độ phát triển
+| Ngày       | Enemies | Quests | NPCs | Boss | Items  | Regions | Particle |
+|------------|---------|--------|------|------|--------|---------|----------|
+| 08/06/2025 | 0       | 0      | 0    | 0    | 0      | 0       | 0        |
+| 09/06/2025 | 1       | 0      | 0    | 0    | 0      | 1       | 0        |
+| 10/06/2025 | 2       | 0      | 0    | 0    | 0      | 2       | 0        |
+| 12/06/2025 | 2       | 1      | 2    | 0    | 0      | 2       | 0        |
+| 18/06/2025 | 2       | 1      | 3    | 0    | 4      | 2       | 2        |
+| 22/06/2025 | 2       | 2      | 4    | 1    | 10     | 4       | 2        |
+| 26/06/2025 | 4       | 4      | 6    | 2    | 19     | 7       | 2        |
 
 # Những kinh nghiệm rút ra khi làm dự án này
 - Đôi khi lỗi không đến từ những hàm mới thêm vào mà từ những hàm cũ.
