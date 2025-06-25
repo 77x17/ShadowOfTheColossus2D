@@ -1306,7 +1306,7 @@
    <object id="421" x="1776" y="2768" width="25.3333" height="9.33333"/>
    <object id="422" x="1792" y="2736" width="10.6667" height="32"/>
   </objectgroup>
-  <objectgroup id="18" name="Region" visible="0">
+  <objectgroup id="18" name="Region">
    <object id="181" x="1056" y="1552" width="848" height="496">
     <properties>
      <property name="region_id" type="int" value="0"/>
