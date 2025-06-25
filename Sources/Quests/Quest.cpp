@@ -2,15 +2,16 @@
 
 #include "SoundManager.hpp"
 
-Quest::Quest(const std::string& _title, int exp) {
-    title = _title;
+Quest::Quest(int m_ID, const std::string& m_title, int exp) {
+    ID = m_ID;
+    title = m_title;
     npcIDs.clear();
     dialogues.clear();
     descriptions.clear();
     objectives.clear();
     requiredLevel = 0;
 
-    state       = QuestState::NOT_ACCEPTED;
+    state       = QuestState::LOCK;
     rewardExp   = exp;
     rewardGiven = false;
 
@@ -22,12 +23,16 @@ void Quest::addRequiredLevel(int level) {
     requiredLevel = level;
 }
 
+void Quest::addRequiredQuestID(int questID) {
+    requiredQuestID = questID;
+}
+
 void Quest::addRequiredDescription(const std::string& description) {
     requiredDescription = description;
 }
 
-void Quest::addNpcID(int _stage, int ID) {
-    npcIDs.push_back(ID);
+void Quest::addNpcID(int _stage, int npcID) {
+    npcIDs.push_back(npcID);
 }
 
 void Quest::addDialogue(int _stage, const std::string& dialogue) {
@@ -57,7 +62,7 @@ void Quest::addItemFromNpc(int _stage, const std::shared_ptr<ItemData>& item) {
 }
 
 bool Quest::isSuitableForGivingQuest(int playerLevel) {
-    return playerLevel >= requiredLevel;
+    return playerLevel >= requiredLevel && state != QuestState::LOCK;
 }
 
 bool Quest::isCompleted() const {
@@ -140,6 +145,11 @@ std::string Quest::getQuestInformation(const int& idx) const {
     std::string display = "[" + std::to_string(idx) + "] " + title + " ";
 
     switch (state) {
+        case QuestState::LOCK: {
+            display += "[Locked]\n";
+
+            break;
+        }
         case QuestState::NOT_ACCEPTED: {
             display += "[Not accepted]\n";
             display += "    " + requiredDescription + "\n";
@@ -198,7 +208,7 @@ int Quest::getRewardExp() {
     return rewardExp;
 }
 
-int Quest::getID() const {
+int Quest::getNpcID() const {
     if (stage >= static_cast<int>(npcIDs.size())) {
         return npcIDs[0];
     }
@@ -215,12 +225,26 @@ std::string Quest::getDialogue() {
     }
 }
 
-std::string Quest::getRequired() const {
+std::string Quest::getRequiredLevel() const {
     return "You must be at least Lv." + std::to_string(requiredLevel) + "\nto accept this quest";
 }
 
 void Quest::isInterruptedGivingQuest() {
     if (!isFinishedDialogue()) {
         dialogueIndex = 0;
+    }
+}
+
+int Quest::getID() const {
+    return ID;
+}
+
+bool Quest::isLocked() const {
+    return state == QuestState::LOCK;
+}
+
+void Quest::unlock(int currentQuestID) {
+    if (state == QuestState::LOCK && currentQuestID >= requiredQuestID) {
+        state = QuestState::NOT_ACCEPTED;
     }
 }

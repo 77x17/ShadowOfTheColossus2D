@@ -67,8 +67,8 @@ int main() {
     sf::Vector2f playerPosition = sf::Vector2f( 78, 110) * static_cast<float>(TILE_SIZE);
 
     ItemManager items;
-    items.addItem(playerPosition + sf::Vector2f(100.0f, 0), std::make_shared<Bow>   ("God Bow", "bow_00"      , 1, ItemRarity::Legendary, 10.0f));
-    items.addItem(playerPosition + sf::Vector2f(300.0f, 0), std::make_shared<Helmet>("God Helmet", "helmet_00", 1, ItemRarity::Mythic   , 10000.0f));
+    items.addItem(playerPosition + sf::Vector2f(100.0f, 0), std::make_shared<Bow>   ("God Bow", "bow_00"      , 1, ItemRarity::Mythic, 100.0f));
+    items.addItem(playerPosition + sf::Vector2f(300.0f, 0), std::make_shared<Helmet>("God Helmet", "helmet_00", 1, ItemRarity::Mythic, 100.0f));
 
     Player player(playerPosition, 10.0f, std::move(quests.getQuests()));
     

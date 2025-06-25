@@ -507,7 +507,18 @@ void Player::updateProjectiles(const float& dt) {
 }
 
 void Player::updateQuests() {
+    int lastFinishedQuestID = -1;
+    for (Quest& quest : quests) {
+        if (quest.isCompleted()) {
+            lastFinishedQuestID = std::max(lastFinishedQuestID, quest.getID());
+        }
+    }
+
     for (auto it = quests.begin(); it != quests.end(); /**/) {
+        if (it->isLocked()) {
+            it->unlock(lastFinishedQuestID);
+        }
+
         if (it->shouldGiveItemForPlayer()) {
             std::vector<std::shared_ptr<ItemData>> npcItems = it->getNpcItem();
             for (auto& item : npcItems) {

@@ -25,6 +25,12 @@ void NpcManager::loadNpcs(const TileMap& map) {
         "Bren",
         "npc_03"
     ));
+    npcs.push_back(std::make_unique<QuestNpc>(
+        4,
+        map.getQuestNpcRects().at(4),
+        "Elara",
+        "npc_02"
+    ));
 
     npcs.push_back(std::make_unique<MerchantNpc>(
         map.getMerchantNpcRects().at(0),

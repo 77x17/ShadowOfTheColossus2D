@@ -3,8 +3,11 @@
 #include "Constants.hpp"
 #include "TextureManager.hpp"
 
-Bat::Bat(const sf::Vector2f& position, const std::vector<std::pair<float, std::shared_ptr<ItemData>>>& _inventory) 
-: Enemy(position, sf::Vector2f(TILE_SIZE, TILE_SIZE), 5.0f, "Bat Lv.1", _inventory) {
+Bat::Bat(const sf::Vector2f& position, 
+         const std::string&  nameAndLevel,
+         const float&        hp, 
+         const std::vector<std::pair<float, std::shared_ptr<ItemData>>>& _inventory) 
+: Enemy(position, sf::Vector2f(TILE_SIZE, TILE_SIZE), hp, nameAndLevel, _inventory) {
     DETECION_RANGE = 150.0f;
 
     detectionBox.setRadius(DETECION_RANGE);

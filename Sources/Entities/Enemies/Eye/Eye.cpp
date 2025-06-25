@@ -9,8 +9,11 @@
 #include "TextureManager.hpp"
 #include "Normalize.hpp"
 
-Eye::Eye(const sf::Vector2f& position, const std::vector<std::pair<float, std::shared_ptr<ItemData>>>& _inventory) 
-: Enemy(position, sf::Vector2f(TILE_SIZE, TILE_SIZE), 10.0f, "Eye Lv.5", _inventory) {
+Eye::Eye(const sf::Vector2f& position, 
+         const std::string&  nameAndLevel,
+         const float&        hp, 
+         const std::vector<std::pair<float, std::shared_ptr<ItemData>>>& _inventory) 
+: Enemy(position, sf::Vector2f(TILE_SIZE, TILE_SIZE), hp, nameAndLevel, _inventory) {
     // --- [Begin] - Configuration ---
     MOVE_SPEED      = 80.0f; 
     

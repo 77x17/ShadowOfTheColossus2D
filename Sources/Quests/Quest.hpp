@@ -9,6 +9,7 @@
 #include "ItemData.hpp"
 
 enum class QuestState {
+    LOCK,
     NOT_ACCEPTED,
     IN_PROGRESS,
     COMPLETED
@@ -16,6 +17,8 @@ enum class QuestState {
 
 class Quest {
 private:
+    int ID;
+
     std::string      title;
     std::vector<int> npcIDs;
     std::vector<std::vector<std::string>> dialogues;
@@ -23,6 +26,7 @@ private:
     std::vector<std::vector<std::shared_ptr<QuestObjective>>> objectives;
     std::vector<std::pair<int, std::shared_ptr<ItemData>>> itemFromNpc;
     int requiredLevel;
+    int requiredQuestID = -1;
 
     QuestState state;
     bool rewardGiven;
@@ -34,11 +38,12 @@ private:
     std::string requiredDescription;
 
 public:
-    Quest(const std::string& _title, int exp);
+    Quest(int m_ID, const std::string& m_title, int exp);
     
     void addRequiredLevel(int level);
+    void addRequiredQuestID(int questID);
     void addRequiredDescription(const std::string& description);
-    void addNpcID      (int _stage, int ID);
+    void addNpcID      (int _stage, int npcID);
     void addDialogue   (int _stage, const std::string& dialogue);
     void addDescription(int _stage, const std::string& description);
     void addObjective  (int _stage, const std::shared_ptr<QuestObjective>& objective);
@@ -61,10 +66,14 @@ public:
 
     int getRewardExp();
 
-    int getID() const;
+    int getNpcID() const;
     std::string getDialogue();
-    std::string getRequired() const;
+    std::string getRequiredLevel() const;
 
     void isInterruptedGivingQuest();
 
+    int getID() const;
+
+    bool isLocked() const;
+    void unlock(int currentQuestID);
 };

@@ -44,7 +44,7 @@ void QuestNpc::interactWithPlayer(Player& player) {
         dataPack.npcID     = ID;
         quest.update(dataPack);
 
-        if (ID == quest.getID()) {
+        if (ID == quest.getNpcID()) {
             if (quest.isSuitableForGivingQuest(player.getLevel())) {
                 if (quest.isCompleted()) {
                     interactText.setString("Thanks for your help!");
@@ -120,8 +120,11 @@ void QuestNpc::interactWithPlayer(Player& player) {
                     interactText.setString(quest.getDialogue());
                 }
             }
+            else if (quest.isLocked()) {
+                // nothing
+            }
             else {
-                interactText.setString(quest.getRequired());
+                interactText.setString(quest.getRequiredLevel());
             }
 
             break;
