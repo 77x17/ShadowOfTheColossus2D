@@ -29,6 +29,9 @@ BossAltar::BossAltar(const int& m_ID, const sf::FloatRect& m_hitbox)
     switch (ID) {
         case 0: {
             requiredItems.emplace_back("Bat Orb", 1);
+            break;
+        }
+        case 1: {
             requiredItems.emplace_back("Eye Orb", 1);
             break;
         }
@@ -124,7 +127,13 @@ void BossAltar::interactWithPlayer(Player& player) {
     else {
         switch (ID) {
             case 0: {
-                interactText.setString("     Bat Boss Lv.10    \n01 Bat Orb - 01 Eye Orb");
+                interactText.setString("Bat Lord Lv.10\n01 Bat Orb");
+                interactText.setOrigin(interactText.getLocalBounds().left + interactText.getLocalBounds().width  / 2, 
+                                       interactText.getLocalBounds().top  + interactText.getLocalBounds().height / 2);
+                break;
+            }
+            case 1: {
+                interactText.setString("Gazer Lord Lv.20\n01 Eye Orb");
                 interactText.setOrigin(interactText.getLocalBounds().left + interactText.getLocalBounds().width  / 2, 
                                        interactText.getLocalBounds().top  + interactText.getLocalBounds().height / 2);
                 break;
@@ -145,14 +154,33 @@ bool BossAltar::isSuitableForSummonBoss() const {
 void BossAltar::summonBoss(EnemyManager& enemies) {
     suitableForSummonBoss = false;
 
-    if (ID == 0) {
-        std::vector<std::pair<float, std::shared_ptr<ItemData>>> batBossInventory;
-        batBossInventory.emplace_back(0.2f, ItemDatabase::get("Bat Bow"));
-        batBossInventory.emplace_back(0.2f, ItemDatabase::get("Bat Helmet"));
-        batBossInventory.emplace_back(0.2f, ItemDatabase::get("Bat Chestplate"));
-        batBossInventory.emplace_back(0.2f, ItemDatabase::get("Bat Leggings"));
-        batBossInventory.emplace_back(0.2f, ItemDatabase::get("Bat Boots"));
+    switch (ID) {
+        case 0: {
+            std::vector<std::pair<float, std::shared_ptr<ItemData>>> batLordInventory;
+            batLordInventory.emplace_back(0.2f, ItemDatabase::get("Bat Bow"));
+            batLordInventory.emplace_back(0.2f, ItemDatabase::get("Bat Helmet"));
+            batLordInventory.emplace_back(0.2f, ItemDatabase::get("Bat Chestplate"));
+            batLordInventory.emplace_back(0.2f, ItemDatabase::get("Bat Leggings"));
+            batLordInventory.emplace_back(0.2f, ItemDatabase::get("Bat Boots"));
 
-        enemies.summonEnemy(std::make_unique<BatBoss>(sf::Vector2f(hitbox.getPosition()), batBossInventory));
+            enemies.summonEnemy(std::make_unique<BatBoss>(sf::Vector2f(hitbox.getPosition()), batLordInventory));
+            
+            break;
+        }
+        case 1: {
+            std::vector<std::pair<float, std::shared_ptr<ItemData>>> gazerBossInventory;
+            gazerBossInventory.emplace_back(0.2f, ItemDatabase::get("Bat Bow"));
+            gazerBossInventory.emplace_back(0.2f, ItemDatabase::get("Bat Helmet"));
+            gazerBossInventory.emplace_back(0.2f, ItemDatabase::get("Bat Chestplate"));
+            gazerBossInventory.emplace_back(0.2f, ItemDatabase::get("Bat Leggings"));
+            gazerBossInventory.emplace_back(0.2f, ItemDatabase::get("Bat Boots"));
+
+            enemies.summonEnemy(std::make_unique<BatBoss>(sf::Vector2f(hitbox.getPosition()), gazerBossInventory));
+            
+            break;
+        }
+        default: {
+            break;
+        }
     }
 }

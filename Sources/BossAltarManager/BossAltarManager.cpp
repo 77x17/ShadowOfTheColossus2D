@@ -8,6 +8,10 @@ void BossAltarManager::loadBossAltars(const std::unordered_map<int, sf::FloatRec
         0,
         bossAltarRects.at(0)
     );
+    bossAltars.emplace_back(
+        1,
+        bossAltarRects.at(1)
+    );
 }
 
 void BossAltarManager::handlePlayerInteraction(Player& player) {

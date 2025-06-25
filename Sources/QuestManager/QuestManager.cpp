@@ -133,13 +133,13 @@ void QuestManager::loadQuests() {
     quests.back().addObjective  (1, std::make_shared<TalkObjective>(4));
 
     // // Stage 2: Thu thập Nước Mắt Tuyệt Vọng
-    quests.back().addNpcID      (2, 4); // NPC Elara
+    quests.back().addNpcID      (2, 4);
     quests.back().addDialogue   (2, std::string());
     quests.back().addDescription(2, "Collect 'Eye Orb' from the swamp's creatures.");
     quests.back().addObjective  (2, std::make_shared<CollectItemObjective>("Eye Orb", 1)); // Item mới
 
     // // Stage 3: Quay lại Elara
-    quests.back().addNpcID      (3, 4); // NPC Elara
+    quests.back().addNpcID      (3, 4); 
     quests.back().addDialogue   (3, "[1/4] You have them... These poor souls. Their sorrow is potent.");
     quests.back().addDialogue   (3, "[2/4] I will combine their essence with the Bat Orb you carry. This will create a beacon.");
     quests.back().addDialogue   (3, "[3/4] Take that Orb to the stone altar nearby. Place it upon the pedestal.");
@@ -151,7 +151,7 @@ void QuestManager::loadQuests() {
     quests.back().addNpcID      (4, -1);
     quests.back().addDialogue   (4, std::string());
     quests.back().addDescription(4, "Use the swamp altar to summon and defeat the Gazer Lord.");
-    quests.back().addObjective  (4, std::make_shared<KillMonsterObjective>("Gazer Lord Lv.20", 1)); // Boss mới
+    quests.back().addObjective  (4, std::make_shared<KillMonsterObjective>("Bat Boss Lv.10", 1)); // Boss mới
 
     // // Stage 5: Báo cáo với Elara
     quests.back().addNpcID      (5, 4); // NPC Elara
