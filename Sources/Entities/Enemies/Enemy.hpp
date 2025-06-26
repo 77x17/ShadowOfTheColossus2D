@@ -67,8 +67,10 @@ protected:
 public:
     Enemy(const sf::Vector2f& position, 
           const sf::Vector2f& size, 
-          const float&        hp, 
           const std::string&  nameAndLevel,
+          const float&        hp, 
+          const float&        damage,
+          const float&        exp,
           const std::vector<std::pair<float, std::shared_ptr<ItemData>>>& _inventory);
 
     virtual ~Enemy() = default;

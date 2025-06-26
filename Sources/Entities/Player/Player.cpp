@@ -709,24 +709,48 @@ bool Player::addItem(const std::shared_ptr<ItemData>& newItem) {
             SoundManager::playSound("pickupItem");
 
             added = true;
+
             break;
         }
     }
 
-    if (added) {
-        return true;
-    }
-    else {
+    if (!added) {
         for (auto& item : inventory) {
             if (!item) {
                 item = newItem;
 
                 SoundManager::playSound("pickupItem");
 
-                return true;
+                added = true;
+
+                break;
             }
         }
     }
+
+    if (added) {
+        for (Quest& quest : getQuests()) if (!quest.isCompleted()) {
+            for (auto& objective : quest.getQuestObjectives()) if (!objective->isFinished()) { 
+                QuestEventData objectiveData = objective->getQuestEventData();
+                if (objectiveData.eventType == "collectItem") {
+                    if (newItem->name == objectiveData.targetName) {
+                        QuestEventData collectItemData;
+                        collectItemData.eventType  = "collectItem";
+                        collectItemData.targetName = newItem->name;
+                        collectItemData.amount     = newItem->amount;
+                        quest.update(collectItemData);
+                        
+                        if (objective->isFinished()) {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        return true;
+    } 
+
     return false; // Hết chỗ
 }
 

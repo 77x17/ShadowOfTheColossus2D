@@ -62,7 +62,7 @@ public:
 
     std::string getQuestInformation(const int& idx) const;
     std::vector<std::shared_ptr<ItemData>> getNpcItem() const;
-    const std::vector<std::shared_ptr<QuestObjective>>& getQuestObjectives() const;
+    std::vector<std::shared_ptr<QuestObjective>>& getQuestObjectives();
 
     int getRewardExp();
 

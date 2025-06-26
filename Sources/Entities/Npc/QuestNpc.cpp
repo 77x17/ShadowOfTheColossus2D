@@ -57,8 +57,7 @@ void QuestNpc::interactWithPlayer(Player& player) {
                         quest.update(dataPack);
                     }
                     else {
-                        std::vector<std::shared_ptr<QuestObjective>> questObjectives = quest.getQuestObjectives();
-                        for (auto& objective : questObjectives) if (!objective->isFinished()) {
+                        for (auto& objective : quest.getQuestObjectives()) if (!objective->isFinished()) {
                             // --- [Begin] - giveItemObjective ---
                             QuestEventData objectiveData = objective->getQuestEventData();
                             if (objectiveData.eventType == "giveItem") {
@@ -79,23 +78,6 @@ void QuestNpc::interactWithPlayer(Player& player) {
                                         }
 
                                         quest.update(giveItemData);
-                                        
-                                        if (objective->isFinished()) {
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                            // --- [End] ---
-                            // --- [Begin] - giveItemObjective ---
-                            else if (objectiveData.eventType == "collectItem") {
-                                for (auto& item : *player.getInventory()) if (item) {
-                                    if (item->name == objectiveData.targetName) {
-                                        QuestEventData collectItemData;
-                                        collectItemData.eventType  = "collectItem";
-                                        collectItemData.targetName = item->name;
-                                        collectItemData.amount     = item->amount;
-                                        quest.update(collectItemData);
                                         
                                         if (objective->isFinished()) {
                                             break;

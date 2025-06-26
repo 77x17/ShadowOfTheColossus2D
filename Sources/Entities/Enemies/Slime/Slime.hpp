@@ -17,9 +17,11 @@ private:
     
 public:
     Slime(const sf::Vector2f& position, 
-        const std::string&    nameAndLevel, 
-        const float&          hp, 
-        const std::vector<std::pair<float, std::shared_ptr<ItemData>>>& _inventory);
+          const std::string&  nameAndLevel, 
+          const float&        hp,
+          const float&        damage,
+          const float&        exp,
+          const std::vector<std::pair<float, std::shared_ptr<ItemData>>>& _inventory);
 
     void followPlayer(const Player& player) override;
 

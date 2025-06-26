@@ -14,8 +14,10 @@
 
 Enemy::Enemy(const sf::Vector2f& position, 
              const sf::Vector2f& size, 
-             const float&        hp, 
              const std::string&  nameAndLevel,
+             const float&        hp, 
+             const float&        damage,
+             const float&        exp,
              const std::vector<std::pair<float, std::shared_ptr<ItemData>>>& _inventory) 
 : hitbox(position, size), inventory(_inventory)
 {
@@ -53,8 +55,8 @@ Enemy::Enemy(const sf::Vector2f& position,
     KNOCKBACK_COOLDOWN     = 0.2f;
     knockbackCooldownTimer = 0.0f;
 
-    damagePerAttack = 1.0f;
-    expAmount       = 1.0f;
+    damagePerAttack = damage;
+    expAmount       = exp;
     // --- [End] ---
 
     // --- [Begin] - Nametag ---

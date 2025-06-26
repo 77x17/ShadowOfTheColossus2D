@@ -12,8 +12,10 @@
 BatBoss::BatBoss(const sf::Vector2f& position,
                  const std::string&  nameAndLevel,
                  const float&        hp, 
+                 const float&        damage,
+                 const float&        exp,
                  const std::vector<std::pair<float, std::shared_ptr<ItemData>>>& _inventory) 
-: Enemy(position, sf::Vector2f(TILE_SIZE, TILE_SIZE) * 2.0f, hp, nameAndLevel, _inventory) {
+: Enemy(position, sf::Vector2f(TILE_SIZE, TILE_SIZE) * 2.0f, nameAndLevel, hp, damage, exp, _inventory) {
     // --- [Begin] - Configuration ---
     MOVE_SPEED = 100.0f; 
 
@@ -22,9 +24,6 @@ BatBoss::BatBoss(const sf::Vector2f& position,
     KNOCKBACK_STRENGTH = 50.0f;
 
     ATTACK_RANGE = 150.0f;
-
-    damagePerAttack = 5.0f;
-    expAmount       = 50.0f;
     // --- [End] ---
 
     // --- [Begin] - Animation ---

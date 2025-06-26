@@ -12,8 +12,10 @@
 Eye::Eye(const sf::Vector2f& position, 
          const std::string&  nameAndLevel,
          const float&        hp, 
+         const float&        damage,
+         const float&        exp,
          const std::vector<std::pair<float, std::shared_ptr<ItemData>>>& _inventory) 
-: Enemy(position, sf::Vector2f(TILE_SIZE, TILE_SIZE), hp, nameAndLevel, _inventory) {
+: Enemy(position, sf::Vector2f(TILE_SIZE, TILE_SIZE), nameAndLevel, hp, damage, exp, _inventory) {
     // --- [Begin] - Configuration ---
     MOVE_SPEED      = 80.0f; 
     

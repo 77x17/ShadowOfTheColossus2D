@@ -72,7 +72,7 @@ void QuestManager::loadQuests() {
     quests.back().addDescription(1, "Head deeper into the forest and find Bren");
     quests.back().addObjective  (1, std::make_shared<TalkObjective>(3));
     // Stage 2: Kiếm đồ
-    quests.back().addNpcID      (2, 3);
+    quests.back().addNpcID      (2, -1);
     quests.back().addDialogue   (2, std::string());
     quests.back().addDescription(2, "Collect the Bat Orb from corrupted creatures");
     quests.back().addObjective  (2, std::make_shared<CollectItemObjective>("Bat Orb", 1));
@@ -177,7 +177,7 @@ void QuestManager::loadQuests() {
 
     // ... (Các giai đoạn còn lại của Quest 3 giữ nguyên như cũ)
     // Stage 1: Thu thập Eye Orb
-    quests.back().addNpcID      (1, 4);
+    quests.back().addNpcID      (1, -1);
     quests.back().addDialogue   (1, std::string());
     quests.back().addDescription(1, "Collect an 'Eye Orb' from the swamp's creatures.");
     quests.back().addObjective  (1, std::make_shared<CollectItemObjective>("Eye Orb", 1));

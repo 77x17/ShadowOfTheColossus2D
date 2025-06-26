@@ -31,16 +31,16 @@ void EnemyManager::loadEnemies(const std::unordered_map<std::string, std::vector
     for (const auto& pair : enemyRects) {
         for (const sf::FloatRect& rect : pair.second) {
             if (pair.first == "Bat Lv.1") {
-                enemies.push_back(std::make_unique<Bat>(rect.getPosition(), pair.first,  5.0f, batInventory));
+                enemies.push_back(std::make_unique<Bat>(rect.getPosition(), pair.first, 5.0f, 1.0f, 1.0f, batInventory));
             }
             else if (pair.first == "Vampire Bat Lv.3") {
-                enemies.push_back(std::make_unique<VampireBat>(rect.getPosition(), pair.first, 10.0f, batInventory));
+                enemies.push_back(std::make_unique<VampireBat>(rect.getPosition(), pair.first, 10.0f, 1.5f, 2.0f, batInventory));
             }
             else if (pair.first == "Eye Lv.5") {
-                enemies.push_back(std::make_unique<Eye>(rect.getPosition(), pair.first, 20.0f, eyeInventory));
+                enemies.push_back(std::make_unique<Eye>(rect.getPosition(), pair.first, 20.0f, 2.5f, 5.0f, eyeInventory));
             }
             else if (pair.first == "Slime Lv.5") {
-                enemies.push_back(std::make_unique<Slime>(rect.getPosition(), pair.first, 20.0f, eyeInventory));
+                enemies.push_back(std::make_unique<Slime>(rect.getPosition(), pair.first, 20.0f, 5.0f, 5.0f, eyeInventory));
             }
             else {
                 std::cerr << "[Bug] - Main.cpp - loadEnemies()\n";

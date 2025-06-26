@@ -192,8 +192,13 @@ std::vector<std::shared_ptr<ItemData>> Quest::getNpcItem() const {
     return npcItems;
 }
 
-const std::vector<std::shared_ptr<QuestObjective>>& Quest::getQuestObjectives() const {
-    return objectives[stage];
+std::vector<std::shared_ptr<QuestObjective>>& Quest::getQuestObjectives() {
+    if (stage < static_cast<int>(objectives.size())) {
+        return objectives[stage];
+    }
+    else {
+        std::cerr << "[Bug] - Quest.cpp - getQuestObjectives()\n";
+    }
 }
 
 int Quest::getRewardExp() {

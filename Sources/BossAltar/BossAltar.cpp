@@ -163,7 +163,7 @@ void BossAltar::summonBoss(EnemyManager& enemies) {
             batLordInventory.emplace_back(0.2f, ItemDatabase::get("Bat Leggings"));
             batLordInventory.emplace_back(0.2f, ItemDatabase::get("Bat Boots"));
 
-            enemies.summonEnemy(std::make_unique<BatBoss>(sf::Vector2f(hitbox.getPosition()), "Bat Boss Lv.5", 100.0f, batLordInventory));
+            enemies.summonEnemy(std::make_unique<BatBoss>(sf::Vector2f(hitbox.getPosition()), "Bat Boss Lv.5", 100.0f, 5.0f, 100.0f, batLordInventory));
             
             break;
         }
@@ -175,7 +175,7 @@ void BossAltar::summonBoss(EnemyManager& enemies) {
             gazerBossInventory.emplace_back(0.2f, ItemDatabase::get("Bat Leggings"));
             gazerBossInventory.emplace_back(0.2f, ItemDatabase::get("Bat Boots"));
 
-            enemies.summonEnemy(std::make_unique<BatBoss>(sf::Vector2f(hitbox.getPosition()), "Gazer Lord Lv.10", 500.0f, gazerBossInventory));
+            enemies.summonEnemy(std::make_unique<BatBoss>(sf::Vector2f(hitbox.getPosition()), "Gazer Lord Lv.10", 500.0f, 10.0f, 500.0f, gazerBossInventory));
             
             break;
         }
