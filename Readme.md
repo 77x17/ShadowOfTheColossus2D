@@ -11,7 +11,7 @@
 
 # Mục tiêu cần thực hiện
 - 26/06/2025: Refactor lại hệ thống Quest để có thể lưu và dễ dàng quản lý (nâng cấp thành MMO-RPG về sau), tách Quest thành QuestInstant, QuestManager, QuestDatabase ...
-
+- 26/06/2025: Enemies, Npcs, Bosses, Items, Regions, Particles đã ổn và có thể quản lý thành hệ thống client - server.
 
 # Những kinh nghiệm rút ra khi làm dự án này
 - Đôi khi lỗi không đến từ những hàm mới thêm vào mà từ những hàm cũ.
