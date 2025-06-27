@@ -1,5 +1,5 @@
 Build/Inventory/InventorySlot.o: Sources/Inventory/InventorySlot.cpp \
- Sources/Inventory/InventorySlot.hpp Sources/Inventory/Items/AllItems.hpp \
- Sources/Inventory/Items/Armor.hpp Sources/Inventory/Items/EquipItem.hpp \
- Sources/Inventory/Items/ItemData.hpp Sources/Inventory/Items/Weapon.hpp \
- Sources/Inventory/Items/Material.hpp Sources/Configuration/Font.hpp
+ Sources/Inventory/InventorySlot.hpp Sources/Items/AllItems.hpp \
+ Sources/Items/Armor.hpp Sources/Items/EquipItem.hpp \
+ Sources/Items/ItemData.hpp Sources/Items/Weapon.hpp \
+ Sources/Items/Material.hpp Sources/Configuration/Font.hpp

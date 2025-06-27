@@ -7,7 +7,7 @@ class ItemManager;
 
 #include "AnimationManager.hpp"
 #include "Projectile.hpp"
-#include "Quest.hpp"
+#include "QuestProgress.hpp"
 
 enum class PlayerState {
     DYING = -2,
@@ -76,9 +76,11 @@ private:
     float KNOCKBACK_COOLDOWN;
     float knockbackCooldownTimer;
 
-    std::vector<Quest> quests;
+    // --- [Begin] - Quests ---
+    std::vector<QuestProgress> quests;
     float INTERUPTED_TIME;
     float interuptedCooldownTimer;
+    // --- [End] ---
     
     int collisionRegionID;
 
@@ -88,15 +90,15 @@ private:
 
     std::vector<std::shared_ptr<ItemData>> inventory;   // 10 x 4 = 40
     std::vector<std::shared_ptr<ItemData>> equipment;   // 8
-
     // --- [End] - Inventory --- 
+
 public:
     bool  collisionWithNpc = false;
     bool  updateQuest      = false;
     float golds = 0.0f;
 
 public:
-    Player(const sf::Vector2f& position, const float& baseHp, std::vector<Quest>&& _quests);
+    Player(const sf::Vector2f& position, const float& baseHp);
 
     void handleMove(const sf::RenderWindow& window);
     void handleDash(const sf::RenderWindow& window);
@@ -137,15 +139,15 @@ public:
     void  addVictim(const std::string& label, const float& expAmount);
 
     // --- [Begin] - UI ---
-    float               getHealthRatio() const;
-    std::string         getHealthPointsString() const;
-    float               getXPRatio() const;
-    std::string         getXPString() const;
-    int                 getLevel() const;
-    std::vector<Quest>& getQuests();
-    bool                isUpdateQuest();
-    sf::Vector2f        getCenterPosition() const;
-    int                 getCollisionRegionID() const;
+    bool         isUpdateQuest();
+    float        getHealthRatio() const;
+    std::string  getHealthPointsString() const;
+    float        getXPRatio() const;
+    std::string  getXPString() const;
+    int          getLevel() const;
+    sf::Vector2f getCenterPosition() const;
+    int          getCollisionRegionID() const;
+    std::vector<QuestProgress>& getQuests();
     // --- [End]
 
     void updateView(const float& dt, sf::View& view) const;

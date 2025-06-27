@@ -5,7 +5,7 @@
 class TileMap;
 class Player;
 class Clock;
-class Quest;
+class QuestProgress;
 
 class UI {
 private:
@@ -69,7 +69,7 @@ public:
 
     void updateHealthBar(const float& dt, const Player& player);
     void updateLevelAndXP(const float& dt, const Player& player);
-    void updateQuests(const float& dt, const std::vector<Quest>& quests, const sf::Vector2f& uiSize);
+    void updateQuests(const float& dt, const std::vector<QuestProgress>& quests, const sf::Vector2f& uiSize);
     void updateMinimap(const float& dt, const Player& player, const sf::Vector2f& uiSize);
     void updateClock(const sf::Vector2f& uiSize, const Clock& gameClock);
     void update(const float& dt, Player& player, const sf::Vector2f& uiSize, const Clock& gameClock);

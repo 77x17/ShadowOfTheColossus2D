@@ -17,63 +17,45 @@ enum class QuestState {
 
 class Quest {
 private:
-    int ID;
+    int questID;
 
-    std::string      title;
+    std::string title;
+    std::string requiredDescription;
     std::vector<int> npcIDs;
     std::vector<std::vector<std::string>> dialogues;
     std::vector<std::string> descriptions;
     std::vector<std::vector<std::shared_ptr<QuestObjective>>> objectives;
     std::vector<std::pair<int, std::shared_ptr<ItemData>>> itemFromNpc;
     int requiredLevel;
-    int requiredQuestID = -1;
+    int requiredQuestID;
 
-    QuestState state;
-    bool rewardGiven;
-    int  rewardExp;
-
-    int  stage;
-    int  dialogueIndex;
-
-    std::string requiredDescription;
+    int rewardExp;
 
 public:
-    Quest(int m_ID, const std::string& m_title, int exp);
+    Quest(int m_questID, const std::string& m_title, int exp);
     
     void addRequiredLevel(int level);
-    void addRequiredQuestID(int questID);
+    void addRequiredQuestID(int m_questID);
     void addRequiredDescription(const std::string& description);
-    void addNpcID      (int _stage, int npcID);
-    void addDialogue   (int _stage, const std::string& dialogue);
-    void addDescription(int _stage, const std::string& description);
-    void addObjective  (int _stage, const std::shared_ptr<QuestObjective>& objective);
-    void addItemFromNpc(int _stage, const std::shared_ptr<ItemData>& item);
+    void addNpcID      (int m_stage, int npcID);
+    void addDialogue   (int m_stage, const std::string& dialogue);
+    void addDescription(int m_stage, const std::string& description);
+    void addObjective  (int m_stage, const std::shared_ptr<QuestObjective>& objective);
+    void addItemFromNpc(int m_stage, const std::shared_ptr<ItemData>& item);
 
-    bool isSuitableForGivingQuest(int playerLevel);
-    bool isCompleted() const;
-    bool isFinishObjectives() const;
-    bool isReceiveReward() const;
-    bool isFinishedDialogue() const;
+    bool isFinishedDialogue(int m_stage, int m_dialogueIndex) const;
+    bool shouldGiveItemForPlayer(int m_stage) const;
 
-    bool accept();
-    bool updateStage();
-    bool shouldGiveItemForPlayer() const;
-    void update(const QuestEventData& data);
+    bool updateStage(int& m_stage, QuestState& m_state) const;
 
-    std::string getQuestInformation(const int& idx) const;
-    std::vector<std::shared_ptr<ItemData>> getNpcItem() const;
-    std::vector<std::shared_ptr<QuestObjective>>& getQuestObjectives();
+    int getNpcID(int m_stage) const;
+    int getRequiredQuestID() const;
+    int getRequiredLevel() const;
+    int getRewardExp() const;
+    std::string getDialogue(int m_stage, int m_dialogueIndex) const;
+    std::string getRequiredLevelString() const;
+    std::string getQuestInformation(QuestState state, int m_stage, int index) const;
+    const std::vector<std::shared_ptr<ItemData>> getNpcItem(int m_stage) const;
+    const std::vector<std::shared_ptr<QuestObjective>>& getQuestObjectives(const int& m_stage) const;
 
-    int getRewardExp();
-
-    int getNpcID() const;
-    std::string getDialogue();
-    std::string getRequiredLevel() const;
-
-    void isInterruptedGivingQuest();
-
-    int getID() const;
-
-    bool isLocked() const;
-    void unlock(int currentQuestID);
 };

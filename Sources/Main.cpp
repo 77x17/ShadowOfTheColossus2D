@@ -8,6 +8,7 @@
 
 // --- [Begin] - Database ---
 #include "ItemDatabase.hpp"
+#include "QuestDatabase.hpp"
 // --- [End] ---
 
 // --- [Begin] - Manager ---
@@ -16,7 +17,7 @@
 #include "ParticleManager.hpp"
 #include "EnemyManager.hpp"
 #include "NpcManager.hpp"
-#include "QuestManager.hpp"
+// #include "QuestManager.hpp"
 #include "ItemManager.hpp"
 // --- [End] ---
 
@@ -61,7 +62,7 @@ int main() {
     NpcManager npcs;
     npcs.loadNpcs(map);
     
-    QuestManager quests;
+    QuestDatabase quests;
     quests.loadQuests();
 
     sf::Vector2f playerPosition = sf::Vector2f( 78, 110) * static_cast<float>(TILE_SIZE);
@@ -70,7 +71,7 @@ int main() {
     items.addItem(playerPosition + sf::Vector2f(100.0f, 0), std::make_shared<Bow>   ("God Bow"   , "bow_00"   , 1, ItemRarity::Mythic, 100.0f));
     items.addItem(playerPosition + sf::Vector2f(300.0f, 0), std::make_shared<Helmet>("God Helmet", "helmet_00", 1, ItemRarity::Mythic, 100.0f));
 
-    Player player(playerPosition, 10.0f, std::move(quests.getQuests()));
+    Player player(playerPosition, 10.0f);
     
     player.addItem(ItemDatabase::get("Bat Orb", 10));
     player.addItem(ItemDatabase::get("Eye Orb", 10));

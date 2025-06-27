@@ -7,7 +7,8 @@ Build/EnemyManager/EnemyManager.o: Sources/EnemyManager/EnemyManager.cpp \
  Sources/Entities/Enemies/Slime/Slime.hpp \
  Sources/Entities/Enemies/VampireBat/VampireBat.hpp \
  Sources/Entities/Enemies/BatBoss/BatBoss.hpp \
- Sources/Entities/Player/Player.hpp Sources/Quests/Quest.hpp \
- Sources/Quests/QuestObjective.hpp Sources/Inventory/Items/ItemData.hpp \
- Sources/Configuration/Constants.hpp \
+ Sources/Entities/Player/Player.hpp Sources/Quests/QuestProgress.hpp \
+ Sources/Quests/Quest.hpp \
+ Sources/Quests/QuestObjectives/QuestObjective.hpp \
+ Sources/Items/ItemData.hpp Sources/Configuration/Constants.hpp \
  Sources/ItemDatabase/ItemDatabase.hpp

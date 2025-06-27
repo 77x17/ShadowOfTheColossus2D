@@ -25,15 +25,16 @@ INCLUDES = -I"./Sources" \
 		   -I"./Sources/Entities/Player" \
 		   -I"./Sources/Entities/Projectile" \
 		   -I"./Sources/Inventory" \
-		   -I"./Sources/Inventory/Items" \
 		   -I"./Sources/ItemDatabase" \
 		   -I"./Sources/ItemManager" \
+		   -I"./Sources/Items" \
 		   -I"./Sources/LightSource" \
 		   -I"./Sources/Maps" \
 		   -I"./Sources/NpcManager" \
 		   -I"./Sources/ParticleManager" \
 		   -I"./Sources/QuestManager" \
 		   -I"./Sources/Quests" \
+		   -I"./Sources/Quests/QuestObjectives" \
 		   -I"./Sources/SoundManager" \
 		   -I"./Sources/TextureManager" \
 		   -I"./Sources/UI"
@@ -64,15 +65,16 @@ SRCS := $(wildcard $(SRC_DIR)/*.cpp) \
         $(wildcard $(SRC_DIR)/Entities/Player/*.cpp) \
         $(wildcard $(SRC_DIR)/Entities/Projectile/*.cpp) \
         $(wildcard $(SRC_DIR)/Inventory/*.cpp) \
-        $(wildcard $(SRC_DIR)/Inventory/Items/*.cpp) \
         $(wildcard $(SRC_DIR)/ItemDatabase/*.cpp) \
         $(wildcard $(SRC_DIR)/ItemManager/*.cpp) \
+        $(wildcard $(SRC_DIR)/Items/*.cpp) \
         $(wildcard $(SRC_DIR)/LightSource/*.cpp) \
         $(wildcard $(SRC_DIR)/Maps/*.cpp) \
         $(wildcard $(SRC_DIR)/NpcManager/*.cpp) \
         $(wildcard $(SRC_DIR)/ParticleManager/*.cpp) \
         $(wildcard $(SRC_DIR)/QuestManager/*.cpp) \
         $(wildcard $(SRC_DIR)/Quests/*.cpp) \
+        $(wildcard $(SRC_DIR)/Quests/QuestObjectives/*.cpp) \
         $(wildcard $(SRC_DIR)/SoundManager/*.cpp) \
         $(wildcard $(SRC_DIR)/TextureManager/*.cpp) \
         $(wildcard $(SRC_DIR)/UI/*.cpp) 

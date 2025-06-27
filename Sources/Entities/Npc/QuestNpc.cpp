@@ -38,7 +38,7 @@ void QuestNpc::interactWithPlayer(Player& player) {
         return;
     }
 
-    for (Quest& quest : player.getQuests()) {
+    for (QuestProgress& quest : player.getQuests()) if (!quest.isCompleted() && !quest.isLocked()) {
         QuestEventData dataPack;
         dataPack.eventType = "talk";
         dataPack.npcID     = ID;
@@ -54,7 +54,7 @@ void QuestNpc::interactWithPlayer(Player& player) {
                     if (quest.accept()) {
                         player.updateQuest = true;
 
-                        quest.update(dataPack);
+                        quest.update(dataPack);     // Nhận quest thì xong nhiệm vụ nói chuyện với Npc luôn
                     }
                     else {
                         for (auto& objective : quest.getQuestObjectives()) if (!objective->isFinished()) {
@@ -106,7 +106,7 @@ void QuestNpc::interactWithPlayer(Player& player) {
                 // nothing
             }
             else {
-                interactText.setString(quest.getRequiredLevel());
+                interactText.setString(quest.getRequiredLevelString());
             }
 
             break;

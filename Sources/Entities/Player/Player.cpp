@@ -3,6 +3,7 @@
 #include <cmath>
 
 #include "ItemManager.hpp"
+#include "QuestDatabase.hpp"
 
 #include "Constants.hpp"
 #include "Font.hpp"
@@ -14,9 +15,8 @@
 #include "Normalize.hpp"
 #include "AllItems.hpp"
 
-Player::Player(const sf::Vector2f& position, const float& baseHp, std::vector<Quest>&& _quests) 
-: hitbox(position, sf::Vector2f(TILE_SIZE, TILE_SIZE))
-{
+Player::Player(const sf::Vector2f& position, const float& baseHp) 
+: hitbox(position, sf::Vector2f(TILE_SIZE, TILE_SIZE)) {
     state           = 0;
     MOVE_SPEED      = 200.0f; 
     basePosition    = position;
@@ -36,11 +36,11 @@ Player::Player(const sf::Vector2f& position, const float& baseHp, std::vector<Qu
     }
     // --- [End] - Inventory ---
 
-    baseHealthPoints = baseHp;
+    level            = 1;
+    baseHealthPoints = baseHp + 2.0f * (level - 1);
     healthPoints     = baseHealthPoints + equipmentHealth;
     damage           = equipmentDamage;
     BASE_EXPERIENCE  = 10.0f;
-    level            = 1;
     xp               = 0.0;
 
     DYING_TIME         = 1.0f;
@@ -98,10 +98,14 @@ Player::Player(const sf::Vector2f& position, const float& baseHp, std::vector<Qu
     KNOCKBACK_COOLDOWN     = 0.2f;
     knockbackCooldownTimer = 0.0f;
 
-    quests.clear();
-    quests = std::move(_quests);
+    // --- [Begin] --- Quests ---
+    int questsSize = QuestDatabase::getQuestsSize();
+    for (int questID = 0; questID < questsSize; ++questID) {
+        quests.push_back(QuestProgress(questID));
+    }
     INTERUPTED_TIME         = 0.5f;
     interuptedCooldownTimer = -11.0f;
+    // --- [End] ---
 
     collisionRegionID = -1;
 }
@@ -362,7 +366,7 @@ void Player::updateCollisionArea(const float& dt, const std::unordered_map<int, 
     }
     else if (interuptedCooldownTimer != -11.0f) {
         if (interuptedCooldownTimer <= 0) {
-            for (Quest& quest : quests) {
+            for (QuestProgress& quest : quests) {
                 quest.isInterruptedGivingQuest();
             }
             interuptedCooldownTimer = -11.0f;
@@ -371,7 +375,7 @@ void Player::updateCollisionArea(const float& dt, const std::unordered_map<int, 
 
     for (auto& regionRect : regionRects) {
         if (isCollision(regionRect.second)) {
-            for (Quest& quest : quests) {
+            for (QuestProgress& quest : quests) {
                 QuestEventData dataPack;
                 dataPack.eventType = "explore";
                 dataPack.regionID  = regionRect.first;
@@ -508,9 +512,9 @@ void Player::updateProjectiles(const float& dt) {
 
 void Player::updateQuests() {
     int lastFinishedQuestID = -1;
-    for (Quest& quest : quests) {
+    for (QuestProgress& quest : quests) {
         if (quest.isCompleted()) {
-            lastFinishedQuestID = std::max(lastFinishedQuestID, quest.getID());
+            lastFinishedQuestID = std::max(lastFinishedQuestID, quest.getQuestID());
         }
     }
 
@@ -530,7 +534,7 @@ void Player::updateQuests() {
             updateQuest = true;
         }
         
-        if (it->isCompleted() && !it->isReceiveReward()) {
+        if (it->isCompleted() && it->isRewardReceived() == false) {
             updateXP(it->getRewardExp());
         }
 
@@ -604,7 +608,7 @@ sf::Vector2f Player::getPosition() const {
 void Player::levelUp() {
     level++;
 
-    baseHealthPoints++;
+    baseHealthPoints += 2.0f;
     healthPoints = baseHealthPoints + equipmentHealth;
 
     SoundManager::playSound("levelUp");
@@ -630,7 +634,7 @@ void Player::updateXP(const float& amount) {
 }
 
 void Player::addVictim(const std::string& label, const float& expAmount) {
-    for (Quest& quest : quests) {
+    for (QuestProgress& quest : quests) {
         QuestEventData dataPack;
         dataPack.eventType  = "kill";
         dataPack.targetName = label;
@@ -668,7 +672,7 @@ int Player::getLevel() const {
     return level;
 }
 
-std::vector<Quest>& Player::getQuests() {
+std::vector<QuestProgress>& Player::getQuests() {
     return quests;
 }
 
@@ -729,7 +733,7 @@ bool Player::addItem(const std::shared_ptr<ItemData>& newItem) {
     }
 
     if (added) {
-        for (Quest& quest : getQuests()) if (!quest.isCompleted()) {
+        for (QuestProgress& quest : getQuests()) if (!quest.isCompleted()) {
             for (auto& objective : quest.getQuestObjectives()) if (!objective->isFinished()) { 
                 QuestEventData objectiveData = objective->getQuestEventData();
                 if (objectiveData.eventType == "collectItem") {

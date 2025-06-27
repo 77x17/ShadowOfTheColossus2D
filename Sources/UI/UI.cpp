@@ -172,13 +172,13 @@ void UI::updateLevelAndXP(const float& dt, const Player& player) {
     XPBar.setSize(sf::Vector2f(XP_BAR_SIZE.x * XPProgress, XP_BAR_SIZE.y));
 }
 
-void UI::updateQuests(const float& dt, const std::vector<Quest>& quests, const sf::Vector2f& uiSize) {
+void UI::updateQuests(const float& dt, const std::vector<QuestProgress>& quests, const sf::Vector2f& uiSize) {
     std::string display = "               \n";
 
     if (questsBoxVisible) {
-        int idx = 0;
-        for (const Quest& quest : quests) {
-            display += quest.getQuestInformation(++idx) + '\n';
+        int index = 0;
+        for (const QuestProgress& quest : quests) {
+            display += quest.getQuestInformation(++index) + '\n';
         }
         display.pop_back();
 

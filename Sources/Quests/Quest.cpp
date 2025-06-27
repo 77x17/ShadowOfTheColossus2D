@@ -2,147 +2,91 @@
 
 #include "SoundManager.hpp"
 
-Quest::Quest(int m_ID, const std::string& m_title, int exp) {
-    ID = m_ID;
+Quest::Quest(int m_questID, const std::string& m_title, int exp) {
+    questID = m_questID;
     title = m_title;
     npcIDs.clear();
     dialogues.clear();
     descriptions.clear();
     objectives.clear();
+
     requiredLevel = 0;
+    requiredQuestID = -1;
 
-    state       = QuestState::LOCK;
     rewardExp   = exp;
-    rewardGiven = false;
-
-    stage         = 0;
-    dialogueIndex = 0;
 }
 
 void Quest::addRequiredLevel(int level) {
     requiredLevel = level;
 }
 
-void Quest::addRequiredQuestID(int questID) {
-    requiredQuestID = questID;
+void Quest::addRequiredQuestID(int m_questID) {
+    requiredQuestID = m_questID;
 }
 
 void Quest::addRequiredDescription(const std::string& description) {
     requiredDescription = description;
 }
 
-void Quest::addNpcID(int _stage, int npcID) {
+void Quest::addNpcID(int m_stage, int npcID) {
     npcIDs.push_back(npcID);
 }
 
-void Quest::addDialogue(int _stage, const std::string& dialogue) {
-    if (_stage >= static_cast<int>(dialogues.size())) {
+void Quest::addDialogue(int m_stage, const std::string& dialogue) {
+    if (m_stage >= static_cast<int>(dialogues.size())) {
         dialogues.push_back(std::vector<std::string>());
     }
     
     if (dialogue != std::string()) {
-        dialogues[_stage].push_back(dialogue);
+        dialogues[m_stage].push_back(dialogue);
     }
 }
 
-void Quest::addDescription(int _stage, const std::string& description) {
+void Quest::addDescription(int m_stage, const std::string& description) {
     descriptions.push_back(description);
 }
 
-void Quest::addObjective(int _stage, const std::shared_ptr<QuestObjective>& objective) {
-    if (_stage >= static_cast<int>(objectives.size())) {
+void Quest::addObjective(int m_stage, const std::shared_ptr<QuestObjective>& objective) {
+    if (m_stage >= static_cast<int>(objectives.size())) {
         objectives.push_back(std::vector<std::shared_ptr<QuestObjective>>());
     }
 
-    objectives[_stage].push_back(objective);
+    objectives[m_stage].push_back(objective);
 }
 
-void Quest::addItemFromNpc(int _stage, const std::shared_ptr<ItemData>& item) {
-    itemFromNpc.emplace_back(_stage, item);
+void Quest::addItemFromNpc(int m_stage, const std::shared_ptr<ItemData>& item) {
+    itemFromNpc.emplace_back(m_stage, item);
 }
 
-bool Quest::isSuitableForGivingQuest(int playerLevel) {
-    return playerLevel >= requiredLevel && state != QuestState::LOCK;
+bool Quest::isFinishedDialogue(int m_stage, int m_dialogueIndex) const {
+    return m_dialogueIndex >= static_cast<int>(dialogues[m_stage].size());
 }
 
-bool Quest::isCompleted() const {
-    return state == QuestState::COMPLETED;
-}
-
-bool Quest::isFinishObjectives() const {
-    for (const std::shared_ptr<QuestObjective>& objective : objectives[stage]) {
-        if (!objective->isFinished()) {
-            return false;
-        }
+bool Quest::updateStage(int& m_stage, QuestState& m_state) const {
+    ++m_stage;
+    
+    if (m_stage == static_cast<int>(npcIDs.size())) {
+        m_state = QuestState::COMPLETED;
     }
-
-    return true;
-}
-
-bool Quest::isReceiveReward() const {
-    return rewardGiven;
-}
-
-bool Quest::isFinishedDialogue() const {
-    return dialogueIndex >= static_cast<int>(dialogues[stage].size());
-}
-
-bool Quest::accept() {
-    if (state == QuestState::NOT_ACCEPTED) {
-        state = QuestState::IN_PROGRESS;
-
-        SoundManager::playSound("updateQuest");
-        // std::cerr << "Quest accepted: '" << title << "' " << "stage: " << stage << "\n";
-
+    else {
         return true;
     }
 
     return false;
 }
 
-bool Quest::updateStage() {
-    if (state == QuestState::IN_PROGRESS && isFinishedDialogue() && isFinishObjectives()) {
-        ++stage;
-        
-        if (stage == static_cast<int>(npcIDs.size())) {
-            state = QuestState::COMPLETED;
-        }
-        else {
-            dialogueIndex = 0;
-        }
-
-        SoundManager::playSound("updateQuest");
-        
-        return true;
-    }
-
-    return false;
-}
-
-bool Quest::shouldGiveItemForPlayer() const {
-    if (state == QuestState::IN_PROGRESS && isFinishedDialogue() && isFinishObjectives()) {
-        for (const auto& pair : itemFromNpc) {
-            if (pair.first == stage) {
-                return true;
-            }
+bool Quest::shouldGiveItemForPlayer(int m_stage) const {
+    for (const auto& pair : itemFromNpc) {
+        if (pair.first == m_stage) {
+            return true;
         }
     }
 
     return false;
 }
 
-void Quest::update(const QuestEventData& data) {
-    if (state != QuestState::IN_PROGRESS) {
-        return;
-    }
-
-    for (std::shared_ptr<QuestObjective>& objective : objectives[stage]) {
-        objective->updateProgress(data);
-    }
-}
-
-std::string Quest::getQuestInformation(const int& idx) const {
-    std::string display = "[" + std::to_string(idx) + "] " + title + " ";
+std::string Quest::getQuestInformation(QuestState state, int m_stage, int index) const {
+    std::string display = "[" + std::to_string(index) + "] " + title + " ";
 
     switch (state) {
         case QuestState::LOCK: {
@@ -158,10 +102,10 @@ std::string Quest::getQuestInformation(const int& idx) const {
         }
         case QuestState::IN_PROGRESS: {
             display += "[In progress]\n";
-            if (descriptions[stage] != std::string()) {
-                display += "    " + descriptions[stage] + "\n";
+            if (descriptions[m_stage] != std::string()) {
+                display += "    " + descriptions[m_stage] + "\n";
             }
-            for (const std::shared_ptr<QuestObjective>& objective : objectives[stage]) {
+            for (const std::shared_ptr<QuestObjective>& objective : objectives[m_stage]) {
                 std::string str = objective->getDescription();
                 if (str != std::string()) {
                     display += "- " + str + (objective->isFinished() ? " (Done)" : "") + "\n";
@@ -180,76 +124,54 @@ std::string Quest::getQuestInformation(const int& idx) const {
     return display;
 }
 
-std::vector<std::shared_ptr<ItemData>> Quest::getNpcItem() const {
-    std::vector<std::shared_ptr<ItemData>> npcItems;
-    if (state == QuestState::IN_PROGRESS && isFinishedDialogue() && isFinishObjectives()) {
-        for (const auto& pair : itemFromNpc) {
-            if (pair.first == stage) {
-                npcItems.push_back(pair.second);
-            }
-        }
-    }
-    return npcItems;
-}
-
-std::vector<std::shared_ptr<QuestObjective>>& Quest::getQuestObjectives() {
-    if (stage < static_cast<int>(objectives.size())) {
-        return objectives[stage];
-    }
-    else {
+const std::vector<std::shared_ptr<QuestObjective>>& Quest::getQuestObjectives(const int& m_stage) const {
+    if (m_stage >= static_cast<int>(objectives.size())) {
         std::cerr << "[Bug] - Quest.cpp - getQuestObjectives()\n";
     }
+
+    return objectives[m_stage];
 }
 
-int Quest::getRewardExp() {
-    if (state != QuestState::COMPLETED) {
-        return 0;
-    }
-
-    rewardGiven = true;
-
-    SoundManager::playSound("finishedQuest");
-
+int Quest::getRewardExp() const {
     return rewardExp;
 }
 
-int Quest::getNpcID() const {
-    if (stage >= static_cast<int>(npcIDs.size())) {
-        return npcIDs[0];
+int Quest::getNpcID(int m_stage) const {
+    if (m_stage >= static_cast<int>(npcIDs.size())) {
+        std::cerr << "[Bug] - Quest.cpp - getNpcID()\n";
     }
 
-    return npcIDs[stage];
+    return npcIDs[m_stage];
 }
 
-std::string Quest::getDialogue() {
-    if (dialogueIndex < static_cast<int>(dialogues[stage].size())) {
-        return dialogues[stage][dialogueIndex++];
+std::string Quest::getDialogue(int m_stage, int m_dialogueIndex) const {
+    if (m_dialogueIndex >= static_cast<int>(dialogues[m_stage].size())) {
+        std::cerr << "[Bug] - Quest.cpp - getDialogue()\n";
     }
-    else {
-        return "[Bug] - Quest.cpp - getDialogue()";
-    }
+    
+    return dialogues[m_stage][m_dialogueIndex];
 }
 
-std::string Quest::getRequiredLevel() const {
+std::string Quest::getRequiredLevelString() const {
     return "You must be at least Lv." + std::to_string(requiredLevel) + "\nto accept this quest";
 }
 
-void Quest::isInterruptedGivingQuest() {
-    if (!isFinishedDialogue()) {
-        dialogueIndex = 0;
+int Quest::getRequiredQuestID() const {
+    return requiredQuestID;
+}
+
+const std::vector<std::shared_ptr<ItemData>> Quest::getNpcItem(int m_stage) const {
+    std::vector<std::shared_ptr<ItemData>> bags;
+
+    for (const auto& pair : itemFromNpc) {
+        if (pair.first == m_stage) {
+            bags.push_back(pair.second->clone());
+        }
     }
+
+    return bags;
 }
 
-int Quest::getID() const {
-    return ID;
-}
-
-bool Quest::isLocked() const {
-    return state == QuestState::LOCK;
-}
-
-void Quest::unlock(int currentQuestID) {
-    if (state == QuestState::LOCK && currentQuestID >= requiredQuestID) {
-        state = QuestState::NOT_ACCEPTED;
-    }
+int Quest::getRequiredLevel() const {
+    return requiredLevel;
 }
