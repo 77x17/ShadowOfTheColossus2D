@@ -24,10 +24,11 @@ void SoundManager::loadSounds() {
     loadSound("menuClose" , "Assets/Sounds/menu-close.wav");
     loadSound("pickupItem", "Assets/Sounds/pickupItem.wav");
     loadSound("payment"   , "Assets/Sounds/payment.wav");
-    loadSound("equipItem"   , "Assets/Sounds/equipItem.wav");
-    loadSound("blockEquipItem"   , "Assets/Sounds/blockEquipItem.wav");
-    loadSound("dash"      , "Assets/Sounds/roll.wav");
-    loadSound("fireball"      , "Assets/Sounds/fireball.wav");
+    loadSound("equipItem", "Assets/Sounds/equipItem.wav");
+    loadSound("blockEquipItem", "Assets/Sounds/blockEquipItem.wav");
+    loadSound("dash", "Assets/Sounds/roll.wav");
+    loadSound("fireball", "Assets/Sounds/fireball.wav");
+    loadSound("menutap" , "Assets/Sounds/menutap.wav");
     // loadMusic("region0"   , "Assets/Sounds/Salted - Wynn OST - 05 Detlas Suburb.ogg");
     // loadMusic("region1"   , "Assets/Sounds/Salted - Wynn OST - 04 Gavel Journey.ogg");
     // setMusicVolume("region0", 50.0f);

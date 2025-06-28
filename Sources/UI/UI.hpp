@@ -73,10 +73,9 @@ public:
     void updateMinimap(const float& dt, const Player& player, const sf::Vector2f& uiSize);
     void updateClock(const sf::Vector2f& uiSize, const Clock& gameClock);
     void update(const float& dt, Player& player, const sf::Vector2f& uiSize, const Clock& gameClock);
+    void updateQuestsBox();
 
     void draw(sf::RenderWindow& window);
-
-    void updateQuestsBox();
 
     void generateMinimapTexture(const TileMap &map);
     void updateMinimapBoxSize(bool minimize);

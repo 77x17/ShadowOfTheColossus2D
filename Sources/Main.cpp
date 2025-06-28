@@ -30,6 +30,7 @@
 #include "UI.hpp"
 #include "InventoryUI.hpp"
 #include "MerchantUI.hpp"
+#include "EscapeUI.hpp"
 // --- [End] ---
 
 #include "EntityEffects.hpp"
@@ -98,11 +99,14 @@ int main() {
     //     naturalEffects.addLight(lightPosition);
     // }
 
+    // --- UI ---
     UI ui;
     ui.generateMinimapTexture(map);
     InventoryUI inventoryUI(static_cast<sf::Vector2f>(window.getSize()), player);
     MerchantUI  merchantUI (static_cast<sf::Vector2f>(window.getSize()), player);
-
+    EscapeUI    escapeUI   (static_cast<sf::Vector2f>(window.getSize()));
+    // ---
+    
     BossAltarManager bossAltars;
     bossAltars.loadBossAltars(map.getBossAltarRects());
     // --- [End] ---
@@ -135,7 +139,7 @@ int main() {
             }
             else if (event.type == sf::Event::KeyPressed) {
                 if (event.key.code == sf::Keyboard::Escape) {
-                    window.close();
+                    escapeUI.toggle();
                 }
                 else if (event.key.code == sf::Keyboard::F11) {
                     isFullscreen = !isFullscreen;
@@ -161,7 +165,8 @@ int main() {
                     uiView = window.getDefaultView();
 
                     inventoryUI.updatePosition(static_cast<sf::Vector2f>(window.getSize()));
-                    merchantUI.updatePosition(static_cast<sf::Vector2f>(window.getSize()));
+                     merchantUI.updatePosition(static_cast<sf::Vector2f>(window.getSize()));
+                       escapeUI.updatePosition(static_cast<sf::Vector2f>(window.getSize()));
                 }
                 else if (event.key.code == sf::Keyboard::Q) {
                     ui.updateQuestsBox();
@@ -179,37 +184,39 @@ int main() {
                     inventoryUI.toggle();
                 }
             }
-            else if (inventoryUI.isVisible() && event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
+            else if (event.type == sf::Event::MouseButtonPressed) {
                 sf::Vector2f mousePos = window.mapPixelToCoords({event.mouseButton.x, event.mouseButton.y});
-                inventoryUI.handleClick(mousePos);
-            }
-            else if (inventoryUI.isVisible() && event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left) {
+                if (event.mouseButton.button == sf::Mouse::Left) {
+                    if (escapeUI.isVisible()) { 
+                        int menuStatus = escapeUI.handleClick(mousePos); 
+                        
+                        switch (menuStatus) {
+                            case 0: // Save
+                                break;
+                            case 1: // Load
+                                break;
+                            case 2: // Config
+                                break;
+                            case 3: // Quit
+                                window.close(); 
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    else if (inventoryUI.isVisible()) { inventoryUI.handleClick(mousePos); }
+                    else if ( merchantUI.isVisible()) {  merchantUI.handleClick(mousePos); }
+                }
+                else if (event.mouseButton.button == sf::Mouse::Right) {
+                    if (escapeUI.isVisible()) {}
+                    else if (inventoryUI.isVisible()) { inventoryUI.handleRightClick(mousePos); }
+                    else if ( merchantUI.isVisible()) {  merchantUI.handleRightClick(mousePos); }
+                }
+            } 
+            else if (event.type == sf::Event::MouseButtonReleased) {
                 sf::Vector2f mousePos = window.mapPixelToCoords({event.mouseButton.x, event.mouseButton.y});
-                inventoryUI.handleRelease(mousePos, player, items);
-            }
-            else if (merchantUI.isVisible() && event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
-                sf::Vector2f mousePos = window.mapPixelToCoords({event.mouseButton.x, event.mouseButton.y});
-                merchantUI.handleClick(mousePos);
-            }
-            else if (merchantUI.isVisible() && event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left) {
-                sf::Vector2f mousePos = window.mapPixelToCoords({event.mouseButton.x, event.mouseButton.y});
-                merchantUI.handleRelease(mousePos, player, items);
-            }
-            else if (inventoryUI.isVisible() && event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Right) {
-                sf::Vector2f mousePos = window.mapPixelToCoords({event.mouseButton.x, event.mouseButton.y});
-                inventoryUI.handleRightClick(mousePos);
-            }
-            else if (inventoryUI.isVisible() && event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Right) {
-                sf::Vector2f mousePos = window.mapPixelToCoords({event.mouseButton.x, event.mouseButton.y});
-                inventoryUI.handleRelease(mousePos, player, items);
-            }
-            else if (merchantUI.isVisible() && event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Right) {
-                sf::Vector2f mousePos = window.mapPixelToCoords({event.mouseButton.x, event.mouseButton.y});
-                merchantUI.handleRightClick(mousePos);
-            }
-            else if (merchantUI.isVisible() && event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Right) {
-                sf::Vector2f mousePos = window.mapPixelToCoords({event.mouseButton.x, event.mouseButton.y});
-                merchantUI.handleRelease(mousePos, player, items);
+                if (inventoryUI.isVisible()) { inventoryUI.handleRelease(mousePos, player, items); }
+                else if ( merchantUI.isVisible()) {  merchantUI.handleRelease(mousePos, player, items); }
             }
         }
 
@@ -281,8 +288,21 @@ int main() {
         //     naturalEffects.updateLightPosition(playerLightID, player.getCenterPosition()); 
         //     naturalEffects.updateSmartLighting(player.getCenterPosition(), view);
         // }
+        if (escapeUI.shouldDraw()) {
+            sf::Vector2f mousePos = static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
+            escapeUI.update(dt, mousePos);
 
-        if (inventoryUI.isVisible() && player.isAlive()) {
+            if (inventoryUI.isDrag()) {
+                inventoryUI.handleRelease(mousePos, player, items);
+                inventoryUI.updateAmount();
+            }
+            
+            if (merchantUI.isDrag()) {
+                merchantUI.handleRelease(mousePos, player, items);
+                merchantUI.updateAmount();
+            }
+        } 
+        else if (inventoryUI.isVisible() && player.isAlive()) {
             sf::Vector2f mousePos = static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
             if (sf::Mouse::isButtonPressed(sf::Mouse::Left) || sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
                 inventoryUI.updateDrag(mousePos);
@@ -294,15 +314,8 @@ int main() {
             inventoryUI.updateStats(player);
             
             inventoryUI.updateAmount();
-        }
-        else {
-            if (inventoryUI.isDrag()) {
-                sf::Vector2f mousePos = static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
-                inventoryUI.handleRelease(mousePos, player, items);
-            }
-        }
-
-        if (merchantUI.isVisible()) {
+        } 
+        else if (merchantUI.isVisible()) {
             sf::Vector2f mousePos = static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
             if (sf::Mouse::isButtonPressed(sf::Mouse::Left) || sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
                 merchantUI.updateDrag(mousePos);
@@ -314,12 +327,15 @@ int main() {
             merchantUI.updateAmount();
         }
         else {
+            sf::Vector2f mousePos = static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
+            if (inventoryUI.isDrag()) {
+                inventoryUI.handleRelease(mousePos, player, items);
+            }
+
             if (merchantUI.isDrag()) {
-                sf::Vector2f mousePos = static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
                 merchantUI.handleRelease(mousePos, player, items);
             }
         }
-
         // --- [End] ---
 
         sceneTexture.clear(sf::Color::White);
@@ -385,6 +401,9 @@ int main() {
         }
         if (merchantUI.isVisible()) {
             merchantUI.draw(window);
+        }
+        if (escapeUI.shouldDraw()) {
+            escapeUI.draw(window);
         }
 
         window.display();

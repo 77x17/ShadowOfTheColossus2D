@@ -24,6 +24,7 @@ Build/Main.o: Sources/Main.cpp Sources/Configuration/Constants.hpp \
  Sources/Inventory/InventorySlot.hpp Sources/Items/AllItems.hpp \
  Sources/Items/Armor.hpp Sources/Items/EquipItem.hpp \
  Sources/Items/Weapon.hpp Sources/Items/Material.hpp \
- Sources/Inventory/MerchantUI.hpp Sources/Effects/EntityEffects.hpp \
+ Sources/Inventory/MerchantUI.hpp Sources/UI/EscapeUI.hpp \
+ Sources/Effects/EntityEffects.hpp \
  Sources/BossAltarManager/BossAltarManager.hpp \
  Sources/BossAltar/BossAltar.hpp
