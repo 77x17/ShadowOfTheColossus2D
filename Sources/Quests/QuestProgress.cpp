@@ -3,14 +3,14 @@
 #include "QuestDatabase.hpp"
 #include "SoundManager.hpp"
 
-QuestProgress::QuestProgress(int questID)
-: questID(questID), stage(0), dialogueIndex(0), state(QuestState::LOCK), rewardGiven(false) {
-    quest      = &QuestDatabase::getQuestByID(questID);
-    objectives = quest->getQuestObjectives(stage);
+QuestProgress::QuestProgress(int m_questID)
+: data(m_questID, 0, 0, QuestState::LOCK, false) {
+    quest      = &QuestDatabase::getQuestByID(data.questID);
+    objectives = quest->getQuestObjectives(data.stage);
 }
 
 bool QuestProgress::isFinishedDialogue() const {
-    return quest->isFinishedDialogue(stage, dialogueIndex);
+    return quest->isFinishedDialogue(data.stage, data.dialogueIndex);
 }
 
 bool QuestProgress::isFinishObjectives() const {
@@ -25,12 +25,12 @@ bool QuestProgress::isFinishObjectives() const {
 
 void QuestProgress::isInterruptedGivingQuest() {
     if (!isFinishedDialogue()) {
-        dialogueIndex = 0;
+        data.dialogueIndex = 0;
     }
 }
 
 void QuestProgress::update(const QuestEventData& dataPack) {
-    if (state != QuestState::IN_PROGRESS) {
+    if (data.state != QuestState::IN_PROGRESS) {
         return;
     }
 
@@ -40,25 +40,25 @@ void QuestProgress::update(const QuestEventData& dataPack) {
 }
 
 bool QuestProgress::isCompleted() const {
-    return state == QuestState::COMPLETED;
+    return data.state == QuestState::COMPLETED;
 }
 
 bool QuestProgress::isLocked() const {
-    return state == QuestState::LOCK;
+    return data.state == QuestState::LOCK;
 }
 
 void QuestProgress::unlock(int currentQuestID) {
-    if (state == QuestState::LOCK && currentQuestID >= quest->getRequiredQuestID()) {
-        state = QuestState::NOT_ACCEPTED;
+    if (data.state == QuestState::LOCK && currentQuestID >= quest->getRequiredQuestID()) {
+        data.state = QuestState::NOT_ACCEPTED;
     }
 }
 
 int QuestProgress::getQuestID() const {
-    return questID;
+    return data.questID;
 }
 
 bool QuestProgress::shouldGiveItemForPlayer() const {
-    if (state == QuestState::IN_PROGRESS && isFinishedDialogue() && isFinishObjectives() && quest->shouldGiveItemForPlayer(stage)) {
+    if (data.state == QuestState::IN_PROGRESS && isFinishedDialogue() && isFinishObjectives() && quest->shouldGiveItemForPlayer(data.stage)) {
         return true;
     }
 
@@ -66,16 +66,16 @@ bool QuestProgress::shouldGiveItemForPlayer() const {
 }
 
 std::vector<std::shared_ptr<ItemData>> QuestProgress::getNpcItem() const {
-    return quest->getNpcItem(stage);
+    return quest->getNpcItem(data.stage);
 }
 
 bool QuestProgress::updateStage() {
-    if (state == QuestState::IN_PROGRESS && isFinishedDialogue() && isFinishObjectives()) {
-        if (quest->updateStage(stage, state)) {
-            dialogueIndex = 0;
+    if (data.state == QuestState::IN_PROGRESS && isFinishedDialogue() && isFinishObjectives()) {
+        if (quest->updateStage(data.stage, data.state)) {
+            data.dialogueIndex = 0;
             
             if (!isCompleted()) {
-                objectives = quest->getQuestObjectives(stage);
+                objectives = quest->getQuestObjectives(data.stage);
              
                 SoundManager::playSound("updateQuest");
             }
@@ -88,11 +88,11 @@ bool QuestProgress::updateStage() {
 }
 
 bool QuestProgress::isRewardReceived() const {
-    return rewardGiven == true;
+    return data.rewardGiven == true;
 }
 
 int QuestProgress::getRewardExp() {
-    rewardGiven = true;
+    data.rewardGiven = true;
 
     SoundManager::playSound("finishedQuest");
 
@@ -104,7 +104,7 @@ const std::vector<std::shared_ptr<QuestObjective>>& QuestProgress::getQuestObjec
 }
 
 int QuestProgress::getNpcID() const {
-    return quest->getNpcID(stage);
+    return quest->getNpcID(data.stage);
 }
 
 bool QuestProgress::isSuitableForGivingQuest(int playerLevel) const {
@@ -112,8 +112,8 @@ bool QuestProgress::isSuitableForGivingQuest(int playerLevel) const {
 }
 
 bool QuestProgress::accept() {
-    if (state == QuestState::NOT_ACCEPTED) {
-        state = QuestState::IN_PROGRESS;
+    if (data.state == QuestState::NOT_ACCEPTED) {
+        data.state = QuestState::IN_PROGRESS;
 
         SoundManager::playSound("updateQuest");
 
@@ -124,7 +124,7 @@ bool QuestProgress::accept() {
 }
 
 std::string QuestProgress::getDialogue() {
-    return quest->getDialogue(stage, dialogueIndex++);
+    return quest->getDialogue(data.stage, data.dialogueIndex++);
 }
 
 std::string QuestProgress::getRequiredLevelString() const {
@@ -132,5 +132,28 @@ std::string QuestProgress::getRequiredLevelString() const {
 }
 
 std::string QuestProgress::getQuestInformation(int index) const {
-    return quest->getQuestInformation(state, stage, index);
+    std::string display = quest->getQuestInformation(data.state, data.stage, index);;
+    if (data.state == QuestState::IN_PROGRESS) {
+        for (const std::shared_ptr<QuestObjective>& objective : objectives) {
+            std::string str = objective->getDescription();
+            if (str != std::string()) {
+                display += "- " + str + (objective->isFinished() ? " (Done)" : "") + "\n";
+            }
+        }
+    }
+    return display;
+}
+
+QuestProgressData QuestProgress::getData() const {
+    return data;
+}
+
+void QuestProgress::setData(const QuestProgressData& m_data) {
+    data = m_data;
+    if (data.state != QuestState::COMPLETED) {
+        objectives = quest->getQuestObjectives(data.stage);
+    }
+    else {
+        objectives = std::vector<std::shared_ptr<QuestObjective>>();
+    }
 }

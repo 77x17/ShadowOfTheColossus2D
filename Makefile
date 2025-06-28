@@ -24,6 +24,7 @@ INCLUDES = -I"./Sources" \
 		   -I"./Sources/Entities/Npc" \
 		   -I"./Sources/Entities/Player" \
 		   -I"./Sources/Entities/Projectile" \
+		   -I"./Sources/FileSystem" \
 		   -I"./Sources/Inventory" \
 		   -I"./Sources/ItemDatabase" \
 		   -I"./Sources/ItemManager" \
@@ -64,6 +65,7 @@ SRCS := $(wildcard $(SRC_DIR)/*.cpp) \
         $(wildcard $(SRC_DIR)/Entities/Npc/*.cpp) \
         $(wildcard $(SRC_DIR)/Entities/Player/*.cpp) \
         $(wildcard $(SRC_DIR)/Entities/Projectile/*.cpp) \
+        $(wildcard $(SRC_DIR)/FileSystem/*.cpp) \
         $(wildcard $(SRC_DIR)/Inventory/*.cpp) \
         $(wildcard $(SRC_DIR)/ItemDatabase/*.cpp) \
         $(wildcard $(SRC_DIR)/ItemManager/*.cpp) \

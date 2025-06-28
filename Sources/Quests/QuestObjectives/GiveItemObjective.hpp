@@ -18,4 +18,6 @@ public:
     std::string getDescription() const override;
 
     QuestEventData getQuestEventData() const override;
+
+    std::shared_ptr<QuestObjective> clone() const override;
 };

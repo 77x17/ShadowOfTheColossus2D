@@ -18,3 +18,7 @@ bool ExploreObjective::isFinished() const {
 std::string ExploreObjective::getDescription() const {
     return std::string();
 }
+
+std::shared_ptr<QuestObjective> ExploreObjective::clone() const {
+    return std::make_shared<ExploreObjective>(*this);
+}

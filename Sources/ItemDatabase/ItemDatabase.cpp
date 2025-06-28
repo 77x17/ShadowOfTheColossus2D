@@ -34,9 +34,16 @@ void ItemDatabase::loadItems() {
     itemStorage["Bat Orb"] = std::make_unique<Orb>("Bat Orb", "orb", ItemRarity::Rare);
     itemStorage["Eye Orb"] = std::make_unique<Orb>("Eye Orb", "orb", ItemRarity::Rare);
     // --- [End] ---
+
+    itemStorage["God Bow"] = std::make_unique<Bow>("God Bow", "bow_00", 1, ItemRarity::Mythic, 100.0f);
+    itemStorage["God Helmet"] = std::make_unique<Helmet>("God Helmet", "helmet_00", 1, ItemRarity::Mythic, 100.0f);
 }
 
 std::shared_ptr<ItemData> ItemDatabase::get(const std::string& name, const int& amount) {
+    if (name == std::string()) {
+        return nullptr;
+    }
+
     auto it = itemStorage.find(name);
     if (it != itemStorage.end()) {
         if (amount == 1) {

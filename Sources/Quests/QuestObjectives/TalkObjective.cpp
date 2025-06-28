@@ -18,3 +18,7 @@ bool TalkObjective::isFinished() const {
 std::string TalkObjective::getDescription() const {
     return std::string();
 }
+
+std::shared_ptr<QuestObjective> TalkObjective::clone() const {
+    return std::make_shared<TalkObjective>(*this);
+}

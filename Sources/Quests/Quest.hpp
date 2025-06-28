@@ -56,6 +56,6 @@ public:
     std::string getRequiredLevelString() const;
     std::string getQuestInformation(QuestState state, int m_stage, int index) const;
     const std::vector<std::shared_ptr<ItemData>> getNpcItem(int m_stage) const;
-    const std::vector<std::shared_ptr<QuestObjective>>& getQuestObjectives(const int& m_stage) const;
+    std::vector<std::shared_ptr<QuestObjective>> getQuestObjectives(const int& m_stage) const;
 
 };

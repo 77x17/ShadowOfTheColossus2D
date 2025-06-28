@@ -42,6 +42,7 @@ private:
     float RESPAWN_TIME;
     float respawnCooldownTimer;
     
+    float baseHp;
     float baseHealthPoints;
     float healthPoints;
     float damage;
@@ -98,7 +99,7 @@ public:
     float golds = 0.0f;
 
 public:
-    Player(const sf::Vector2f& position, const float& baseHp);
+    Player(const sf::Vector2f& position, const float& m_baseHp);
 
     void handleMove(const sf::RenderWindow& window);
     void handleDash(const sf::RenderWindow& window);
@@ -107,15 +108,9 @@ public:
 
     bool isCollisionProjectiles(const sf::FloatRect& rect);
     bool isCollision(const sf::FloatRect& rect) const;
-
     bool isAlive() const;
-    void hurt(const float& damage);
-    void knockback(const sf::Vector2f& enemyPosition);
-    void kill();
-    void respawn();
-
-    sf::FloatRect getHitbox() const;
-
+    bool isUpdateQuest();
+    
     void updateTimer(const float &dt);
     void updateCollisionArea(const float& dt, const std::unordered_map<int, sf::FloatRect>& regionRects);
     void updatePosition(const float& dt, const std::vector<sf::FloatRect>& collisionRects);
@@ -124,44 +119,49 @@ public:
     void updateProjectiles(const float& dt);
     void updateQuests();
     void update(const float& dt, 
-                const sf::RenderWindow& window, 
-                const std::vector<sf::FloatRect>& collisionRects, 
-                const std::unordered_map<int, sf::FloatRect>& regionRects);
-
-    void draw(sf::RenderTarget& target);
-
-    sf::Vector2f getPosition() const;
-
-    void  levelUp();
-    void  updateLevel();
-    float XPRequired() const;
-    void  updateXP(const float& amount);
-    void  addVictim(const std::string& label, const float& expAmount);
-
-    // --- [Begin] - UI ---
-    bool         isUpdateQuest();
-    float        getHealthRatio() const;
-    std::string  getHealthPointsString() const;
-    float        getXPRatio() const;
-    std::string  getXPString() const;
-    int          getLevel() const;
-    sf::Vector2f getCenterPosition() const;
-    int          getCollisionRegionID() const;
-    std::vector<QuestProgress>& getQuests();
-    // --- [End]
-
+        const sf::RenderWindow& window, 
+        const std::vector<sf::FloatRect>& collisionRects, 
+        const std::unordered_map<int, sf::FloatRect>& regionRects);
+    void updateLevel();
     void updateView(const float& dt, sf::View& view) const;
-
-    // --- [Begin] - Inventory --- 
-    bool addItem(const std::shared_ptr<ItemData>& newItem);
+    void updateXP(const float& amount);
     void updateEquipmentStats();
+                
+    void hurt(const float& damage);
+    void knockback(const sf::Vector2f& enemyPosition);
+    void kill();
+    void respawn();
+    void draw(sf::RenderTarget& target);
+    void levelUp();
+    bool addItem(const std::shared_ptr<ItemData>& newItem);
+    bool dropItem(const std::shared_ptr<ItemData>& item, ItemManager& items);
+    void addVictim(const std::string& label, const float& expAmount);
+    
+    int getLevel() const;
+    int getCollisionRegionID() const;
+    float XPRequired() const;
+    float getHealthRatio() const;
+    float getXPRatio() const;
+    float getXp() const;
+    const float& getDamage() const;
+    std::string getHealthPointsString() const;
+    std::string getXPString() const;
+    std::string getStats() const;
+    sf::Vector2f getCenterPosition() const;
+    sf::Vector2f getPosition() const;
+    sf::FloatRect getHitbox() const;
+    std::vector<QuestProgress>& getQuests();
     std::vector<std::shared_ptr<ItemData>>* getInventory();
     std::vector<std::shared_ptr<ItemData>>* getEquipment();
-    std::string getStats() const;
-    bool dropItem(const std::shared_ptr<ItemData>& item, ItemManager& items);
-    // --- [End]
+    std::vector<std::pair<std::string, int>> getInventoryString() const;
+    std::vector<std::pair<std::string, int>> getEquipmentString() const;
+    std::vector<QuestProgressData> getQuestsData() const;
 
-    // --- [Begin] - Enemy --- 
-    const float& getDamage() const;
-    // --- [End]
+    void setPosition(const sf::Vector2f& m_position);
+    void setLevel(const int& m_level);
+    void setXp(const float& m_xp);
+    void setInventory(const std::vector<std::pair<std::string, int>>& inventoryString);
+    void setEquipment(const std::vector<std::pair<std::string, int>>& equipmentString);
+    void setQuests(const std::vector<QuestProgressData>& questsData);
+    void modifierAfterLoad();
 };

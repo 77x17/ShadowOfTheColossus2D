@@ -27,3 +27,7 @@ QuestEventData CollectItemObjective::getQuestEventData() const {
     data.amount     = requiredAmount - currentAmount;
     return data;
 }
+
+std::shared_ptr<QuestObjective> CollectItemObjective::clone() const {
+    return std::make_shared<CollectItemObjective>(*this);
+}

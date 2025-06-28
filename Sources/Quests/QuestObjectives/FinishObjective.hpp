@@ -9,4 +9,6 @@ public:
     bool isFinished() const override;
 
     std::string getDescription() const override;
+
+    std::shared_ptr<QuestObjective> clone() const override;
 };

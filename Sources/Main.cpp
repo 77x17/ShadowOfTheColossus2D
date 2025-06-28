@@ -38,6 +38,8 @@
 
 #include "BossAltarManager.hpp"
 
+#include "FileSystem.hpp"
+
 int main() {
     sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Project_H", sf::Style::Close);
     // window.setFramerateLimit(60);
@@ -192,8 +194,10 @@ int main() {
                         
                         switch (menuStatus) {
                             case 0: // Save
+                                FileSystem::saveGame(player);
                                 break;
                             case 1: // Load
+                                FileSystem::loadSaveGame(player);
                                 break;
                             case 2: // Config
                                 break;
@@ -294,13 +298,14 @@ int main() {
 
             if (inventoryUI.isDrag()) {
                 inventoryUI.handleRelease(mousePos, player, items);
-                inventoryUI.updateAmount();
             }
             
             if (merchantUI.isDrag()) {
                 merchantUI.handleRelease(mousePos, player, items);
                 merchantUI.updateAmount();
             }
+            
+            inventoryUI.updateAmount();
         } 
         else if (inventoryUI.isVisible() && player.isAlive()) {
             sf::Vector2f mousePos = static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));

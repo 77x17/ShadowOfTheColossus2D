@@ -3,6 +3,7 @@
 #include <cmath>
 
 #include "ItemManager.hpp"
+#include "ItemDatabase.hpp"
 #include "QuestDatabase.hpp"
 
 #include "Constants.hpp"
@@ -15,7 +16,7 @@
 #include "Normalize.hpp"
 #include "AllItems.hpp"
 
-Player::Player(const sf::Vector2f& position, const float& baseHp) 
+Player::Player(const sf::Vector2f& position, const float& m_baseHp) 
 : hitbox(position, sf::Vector2f(TILE_SIZE, TILE_SIZE)) {
     state           = 0;
     MOVE_SPEED      = 200.0f; 
@@ -37,11 +38,12 @@ Player::Player(const sf::Vector2f& position, const float& baseHp)
     // --- [End] - Inventory ---
 
     level            = 1;
+    baseHp           = m_baseHp;
     baseHealthPoints = baseHp + 2.0f * (level - 1);
     healthPoints     = baseHealthPoints + equipmentHealth;
     damage           = equipmentDamage;
     BASE_EXPERIENCE  = 10.0f;
-    xp               = 0.0;
+    xp               = 0.0f;
 
     DYING_TIME         = 1.0f;
     dyingCooldownTimer = 0.0f;
@@ -813,8 +815,87 @@ bool Player::dropItem(const std::shared_ptr<ItemData>& item, ItemManager& items)
 }
 // --- [End] - Inventory --- 
 
-// --- [Begin] - Enemy --- 
 const float& Player::getDamage() const {
     return damage;
 };
-// --- [End] - Enemy --- 
+
+float Player::getXp() const {
+    return xp;
+}
+
+std::vector<std::pair<std::string, int>> Player::getInventoryString() const {
+    std::vector<std::pair<std::string, int>> inventoryString;
+    for (const std::shared_ptr<ItemData>& item : inventory) {
+        if (item == nullptr) {
+            inventoryString.emplace_back(std::string(), 0);
+        }
+        else {
+            inventoryString.emplace_back(item->name, item->amount);
+        }
+    }
+    return inventoryString;
+}
+
+std::vector<std::pair<std::string, int>> Player::getEquipmentString() const {
+    std::vector<std::pair<std::string, int>> equipmentString;
+    for (const std::shared_ptr<ItemData>& item : equipment) {
+        if (item == nullptr) {
+            equipmentString.emplace_back(std::string(), 0);
+        }
+        else {
+            equipmentString.emplace_back(item->name, item->amount);
+        }
+    }
+    return equipmentString;
+}
+
+std::vector<QuestProgressData> Player::getQuestsData() const {
+    std::vector<QuestProgressData> questsString;
+    for (const QuestProgress& quest : quests) {
+        questsString.push_back(quest.getData());
+    }
+    return questsString;
+}
+
+void Player::setPosition(const sf::Vector2f& m_position) {
+    hitbox.left = m_position.x, hitbox.top = m_position.y;
+}
+
+void Player::setLevel(const int& m_level) {
+    level = m_level;
+}
+
+void Player::setXp(const float& m_xp) {
+    xp = m_xp;
+}
+
+void Player::setInventory(const std::vector<std::pair<std::string, int>>& inventoryString) {
+    int inventorySize = inventory.size();
+    for (int index = 0; index < inventorySize; ++index) {
+        inventory[index] = ItemDatabase::get(inventoryString[index].first, inventoryString[index].second);
+    }
+}
+
+void Player::setEquipment(const std::vector<std::pair<std::string, int>>& equipmentString) {
+    int equipmentSize = equipment.size();
+    for (int index = 0; index < equipmentSize; ++index) {
+        equipment[index] = ItemDatabase::get(equipmentString[index].first, equipmentString[index].second);
+    }
+    updateEquipmentStats();
+}
+
+void Player::setQuests(const std::vector<QuestProgressData>& questsData) {
+    int questsSize = quests.size();
+    for (int index = 0; index < questsSize; ++index) {
+        quests[index].setData(questsData[index]);
+    }
+}
+
+void Player::modifierAfterLoad() {
+    invincibleCooldownTimer = INVINCIBLE_TIME;
+    
+    baseHealthPoints = baseHp + 2.0f * (level - 1);
+    if (healthPoints > baseHealthPoints + equipmentHealth) {
+        healthPoints = baseHealthPoints + equipmentHealth;
+    }
+}

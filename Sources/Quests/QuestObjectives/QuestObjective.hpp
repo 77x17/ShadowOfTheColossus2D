@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <memory>
 
 struct QuestEventData {
     std::string eventType;              
@@ -19,5 +20,5 @@ public:
     virtual QuestEventData getQuestEventData() const {
         return QuestEventData{};
     }
-
+    virtual std::shared_ptr<QuestObjective> clone() const = 0;
 };

@@ -105,12 +105,6 @@ std::string Quest::getQuestInformation(QuestState state, int m_stage, int index)
             if (descriptions[m_stage] != std::string()) {
                 display += "    " + descriptions[m_stage] + "\n";
             }
-            for (const std::shared_ptr<QuestObjective>& objective : objectives[m_stage]) {
-                std::string str = objective->getDescription();
-                if (str != std::string()) {
-                    display += "- " + str + (objective->isFinished() ? " (Done)" : "") + "\n";
-                }
-            }
 
             break;
         }
@@ -124,12 +118,18 @@ std::string Quest::getQuestInformation(QuestState state, int m_stage, int index)
     return display;
 }
 
-const std::vector<std::shared_ptr<QuestObjective>>& Quest::getQuestObjectives(const int& m_stage) const {
+std::vector<std::shared_ptr<QuestObjective>> Quest::getQuestObjectives(const int& m_stage) const {
     if (m_stage >= static_cast<int>(objectives.size())) {
         std::cerr << "[Bug] - Quest.cpp - getQuestObjectives()\n";
+        return std::vector<std::shared_ptr<QuestObjective>>();
     }
 
-    return objectives[m_stage];
+    std::vector<std::shared_ptr<QuestObjective>> clonedObjectives;
+    for (const std::shared_ptr<QuestObjective>& objective : objectives[m_stage]) {
+        clonedObjectives.push_back(objective->clone());
+    }
+
+    return clonedObjectives;
 }
 
 int Quest::getRewardExp() const {
@@ -139,6 +139,7 @@ int Quest::getRewardExp() const {
 int Quest::getNpcID(int m_stage) const {
     if (m_stage >= static_cast<int>(npcIDs.size())) {
         std::cerr << "[Bug] - Quest.cpp - getNpcID()\n";
+        return -2;
     }
 
     return npcIDs[m_stage];
@@ -147,6 +148,7 @@ int Quest::getNpcID(int m_stage) const {
 std::string Quest::getDialogue(int m_stage, int m_dialogueIndex) const {
     if (m_dialogueIndex >= static_cast<int>(dialogues[m_stage].size())) {
         std::cerr << "[Bug] - Quest.cpp - getDialogue()\n";
+        return "[Bug] - Quest.cpp - getDialogue()";
     }
     
     return dialogues[m_stage][m_dialogueIndex];

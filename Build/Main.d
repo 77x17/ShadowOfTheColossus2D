@@ -27,4 +27,4 @@ Build/Main.o: Sources/Main.cpp Sources/Configuration/Constants.hpp \
  Sources/Inventory/MerchantUI.hpp Sources/UI/EscapeUI.hpp \
  Sources/Effects/EntityEffects.hpp \
  Sources/BossAltarManager/BossAltarManager.hpp \
- Sources/BossAltar/BossAltar.hpp
+ Sources/BossAltar/BossAltar.hpp Sources/FileSystem/FileSystem.hpp
