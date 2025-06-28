@@ -497,9 +497,16 @@ void Player::updateAnimation() {
     shadow.setPosition(hitbox.getPosition() + sf::Vector2f(3, hitbox.getSize().y - 5));
 }
 
-void Player::updateProjectiles(const float& dt) {
+void Player::updateProjectiles(const float& dt, const std::vector<sf::FloatRect>& collisionRects) {
     for (auto& p : projectiles) {
         p.update(dt);
+        
+        for (const sf::FloatRect& rect : collisionRects) {
+            if (p.isCollision(rect)) {
+                p.kill();
+                break;
+            }
+        }
     }
 
     for (auto it = projectiles.begin(); it != projectiles.end(); /**/) {
@@ -571,7 +578,7 @@ void Player::update(const float& dt,
 
     updateAnimation();
 
-    updateProjectiles(dt); 
+    updateProjectiles(dt, collisionRects); 
 
     updateQuests();
 }

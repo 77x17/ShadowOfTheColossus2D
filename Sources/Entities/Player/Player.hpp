@@ -116,12 +116,12 @@ public:
     void updatePosition(const float& dt, const std::vector<sf::FloatRect>& collisionRects);
     void updateHitbox();
     void updateAnimation();
-    void updateProjectiles(const float& dt);
+    void updateProjectiles(const float& dt, const std::vector<sf::FloatRect>& collisionRects);
     void updateQuests();
     void update(const float& dt, 
-        const sf::RenderWindow& window, 
-        const std::vector<sf::FloatRect>& collisionRects, 
-        const std::unordered_map<int, sf::FloatRect>& regionRects);
+                const sf::RenderWindow& window, 
+                const std::vector<sf::FloatRect>& collisionRects, 
+                const std::unordered_map<int, sf::FloatRect>& regionRects);
     void updateLevel();
     void updateView(const float& dt, sf::View& view) const;
     void updateXP(const float& amount);

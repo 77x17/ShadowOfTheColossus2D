@@ -106,12 +106,20 @@ void Eye::updateAnimation() {
     shadow.setPosition(hitbox.getPosition() + sf::Vector2f(4, hitbox.getSize().y - 8));
 }
 
-void Eye::updateProjectiles(const float& dt, Player& player) {
+void Eye::updateProjectiles(const float& dt, Player& player, const std::vector<sf::FloatRect>& collisionRects) {
     if (!projectile) {
         return;
     }
 
     projectile->update(dt);
+
+    for (const sf::FloatRect& rect : collisionRects) {
+        if (projectile->isCollision(rect)) {
+            projectile->kill();
+
+            break;
+        }
+    }
 
     if (projectile->isAlive()) {
         if (projectile->isCollision(player.getHitbox())) {
@@ -130,7 +138,7 @@ void Eye::update(const float& dt, Player& player, const std::vector<sf::FloatRec
     Enemy::update(dt, player,collisionRects, items);
     
     if (invincibleCooldownTimer <= 0 && projectile) {
-        updateProjectiles(dt, player);
+        updateProjectiles(dt, player, collisionRects);
     }
 }
 
