@@ -10,9 +10,9 @@
 | 26/06/2025 | 4       | 4      | 6    | 2      | 19     | 7       | 2         |
 
 # Mục tiêu cần thực hiện
-- 26/06/2025: ~~Refactor lại hệ thống Quest để có thể lưu và dễ dàng quản lý (nâng cấp thành MMO-RPG về sau), tách Quest thành QuestProgress, QuestManager, QuestDatabase ...~~
-- 27/06/2025: Enemies, Quests, Npcs, Bosses, Items, Regions, Particles đã ổn và có thể quản lý thành hệ thống client - server.
-- 27/06/2025: Thêm [Esc] UI để Save, Load và Quit. 
+- 26/06/2025: [✔] Refactor lại hệ thống Quest để có thể lưu và dễ dàng quản lý (nâng cấp thành MMO-RPG về sau), tách Quest thành QuestProgress, QuestManager, QuestDatabase ...
+- 27/06/2025: [✔] Enemies, Quests, Npcs, Bosses, Items, Regions, Particles đã ổn và có thể quản lý thành hệ thống client - server.
+- 27/06/2025: [✔] Thêm [Esc] UI để Save, Load và Quit. 
 
 # Những kinh nghiệm rút ra khi làm dự án này
 - Đôi khi lỗi không đến từ những hàm mới thêm vào mà từ những hàm cũ.
