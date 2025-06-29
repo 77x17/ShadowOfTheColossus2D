@@ -36,60 +36,124 @@
         ],
         "inventory": [
             [
-                "Bat Orb",
-                9
+                "",
+                0
             ],
             [
-                "Eye Orb",
-                10
+                "",
+                0
             ],
             [
-                "Old Bow",
-                1
+                "",
+                0
             ],
             [
-                "Old Boots",
+                "",
+                0
+            ],
+            [
+                "",
+                0
+            ],
+            [
+                "",
+                0
+            ],
+            [
+                "",
+                0
+            ],
+            [
+                "",
+                0
+            ],
+            [
+                "",
+                0
+            ],
+            [
+                "",
+                0
+            ],
+            [
+                "",
+                0
+            ],
+            [
+                "",
+                0
+            ],
+            [
+                "",
+                0
+            ],
+            [
+                "",
+                0
+            ],
+            [
+                "",
+                0
+            ],
+            [
+                "Bat Bow",
+                5
+            ],
+            [
+                "Bat Helmet",
                 4
             ],
             [
-                "God Helmet",
-                1
-            ],
-            [
-                "God Bow",
-                1
-            ],
-            [
-                "Old Chestplate",
-                3
-            ],
-            [
                 "Bat Chestplate",
-                1
+                5
             ],
             [
                 "Bat Leggings",
-                1
+                3
             ],
             [
-                "Old Leggings",
+                "Bat Boots",
                 2
             ],
             [
-                "Old Helmet",
-                1
+                "",
+                0
             ],
             [
-                "Wooden Chestplate",
-                1
+                "",
+                0
             ],
             [
-                "Wooden Leggings",
-                1
+                "",
+                0
+            ],
+            [
+                "",
+                0
+            ],
+            [
+                "",
+                0
+            ],
+            [
+                "Wooden Bow",
+                8
             ],
             [
                 "Wooden Helmet",
-                1
+                12
+            ],
+            [
+                "Wooden Chestplate",
+                8
+            ],
+            [
+                "Wooden Leggings",
+                7
+            ],
+            [
+                "Wooden Boots",
+                8
             ],
             [
                 "",
@@ -112,94 +176,30 @@
                 0
             ],
             [
-                "",
-                0
+                "Old Bow",
+                5
             ],
             [
-                "",
-                0
+                "Old Helmet",
+                2
             ],
             [
-                "",
-                0
+                "Old Chestplate",
+                6
             ],
             [
-                "",
-                0
+                "Old Leggings",
+                3
             ],
             [
-                "",
-                0
-            ],
-            [
-                "",
-                0
-            ],
-            [
-                "",
-                0
-            ],
-            [
-                "",
-                0
-            ],
-            [
-                "",
-                0
-            ],
-            [
-                "",
-                0
-            ],
-            [
-                "",
-                0
-            ],
-            [
-                "",
-                0
-            ],
-            [
-                "",
-                0
-            ],
-            [
-                "",
-                0
-            ],
-            [
-                "",
-                0
-            ],
-            [
-                "",
-                0
-            ],
-            [
-                "",
-                0
-            ],
-            [
-                "",
-                0
-            ],
-            [
-                "",
-                0
-            ],
-            [
-                "",
-                0
-            ],
-            [
-                "",
-                0
+                "Old Boots",
+                9
             ]
         ],
-        "level": 6,
+        "level": 12,
         "position": {
-            "x": 4147.32958984375,
-            "y": 4288.6650390625
+            "x": 6388.95263671875,
+            "y": 2767.598388671875
         },
         "quests": [
             {
@@ -210,27 +210,27 @@
                 "state": 3
             },
             {
-                "dialogueIndex": 4,
+                "dialogueIndex": 0,
                 "questID": 1,
                 "rewardGiven": true,
                 "stage": 6,
                 "state": 3
             },
             {
-                "dialogueIndex": 0,
+                "dialogueIndex": 4,
                 "questID": 2,
-                "rewardGiven": false,
-                "stage": 1,
-                "state": 2
+                "rewardGiven": true,
+                "stage": 6,
+                "state": 3
             },
             {
-                "dialogueIndex": 0,
+                "dialogueIndex": 3,
                 "questID": 3,
-                "rewardGiven": false,
-                "stage": 0,
-                "state": 0
+                "rewardGiven": true,
+                "stage": 5,
+                "state": 3
             }
         ],
-        "xp": 10.0
+        "xp": 2117.5
     }
 }
