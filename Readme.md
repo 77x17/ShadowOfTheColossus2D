@@ -14,6 +14,7 @@
 - 27/06/2025: [✔] Enemies, Quests, Npcs, Bosses, Items, Regions, Particles đã ổn và có thể quản lý thành hệ thống client - server.
 - 27/06/2025: [✔] Thêm [Esc] UI để Save, Load và Quit.
 - 28/06/2025: [✔] Hoàn thành lưu game, load game cho quests, inventory, player.information.
+- 02/07/2025: [ ] Thêm quests và làm thêm tương tác với maps để giải đố, mở cửa, mở các khu vực mới vv...
 
 # Những kinh nghiệm rút ra khi làm dự án này
 - Đôi khi lỗi không đến từ những hàm mới thêm vào mà từ những hàm cũ.
