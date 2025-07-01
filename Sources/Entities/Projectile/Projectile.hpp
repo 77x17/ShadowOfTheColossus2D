@@ -2,12 +2,19 @@
 
 #include <SFML/Graphics.hpp>
 
+#include "AnimationManager.hpp"
+
 class Projectile {
 private:
     sf::RectangleShape hitbox;
     sf::Sprite         sprite;
     sf::Vector2f       velocity;
     float              lifetime;
+
+    float              FROZENCOOLDOWNTIME;
+    float              frozenTimer = 0.0f;
+
+    Animation          smoker;
 
 public:
     Projectile() = default;

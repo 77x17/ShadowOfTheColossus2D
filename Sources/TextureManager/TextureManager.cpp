@@ -46,6 +46,8 @@ void TextureManager::loadSprites() {
     load("boots_00"     , "Assets/Items/boots_00.png");
     load("orb"          , "Assets/Items/orb.png");
     // --- [End] ---
+
+    load("smoker", "Assets/Effects/smoker.png");
 }
 
 // Tải một texture từ file và lưu bằng một ID

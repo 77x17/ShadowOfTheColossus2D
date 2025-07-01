@@ -45,7 +45,11 @@ void Animation::drawWithShader(sf::RenderTarget& target, sf::RenderStates states
     target.draw(sprite, states);
 }
 
-sf::Sprite Animation::getSprite() const {
+sf::Sprite& Animation::getSprite() {
+    return sprite;
+}
+
+const sf::Sprite& Animation::getSpriteConst() const {
     return sprite;
 }
 
@@ -95,5 +99,5 @@ void AnimationManager::drawWithShader(sf::RenderTarget& target,  sf::RenderState
 }
 
 sf::Sprite AnimationManager::getSprite() const {
-    return animations.at(currentState).getSprite();
+    return animations.at(currentState).getSpriteConst();
 }

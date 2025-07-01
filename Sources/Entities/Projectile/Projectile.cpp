@@ -2,6 +2,7 @@
 
 #include "Constants.hpp"
 #include "Normalize.hpp"
+#include "TextureManager.hpp"
 
 #include <cmath>
 #include <iostream>
@@ -34,10 +35,18 @@ Projectile::Projectile(const sf::Texture& texture,
     sprite.setRotation(angle);
     
     hitbox.setRotation(angle);
+
+    smoker = Animation(TextureManager::get("smoker"), 64, 64, 11, 14, 0.05f, false);
+    
+    FROZENCOOLDOWNTIME = 0.55f;
+    bounds = smoker.getSprite().getLocalBounds();
+    smoker.getSprite().setOrigin(bounds.width / 2.f, bounds.height / 2.f);
+    smoker.getSprite().setRotation(angle);
+    smoker.getSprite().setScale(1.0f, 1.0f);
 }
 
 bool Projectile::isCollision(const sf::FloatRect& rect) const {
-    if (!isAlive()) {
+    if (lifetime <= 0.0f) {
         return false;
     }
     return hitbox.getGlobalBounds().intersects(rect);
@@ -47,28 +56,42 @@ void Projectile::update(const float& dt) {
     if (lifetime > 0) {
         lifetime -= dt;
     } 
+    if (frozenTimer > 0) {
+        frozenTimer -= dt;
+    }
 
-    if (isAlive()) {
+    if (lifetime > 0) {
         hitbox.move(velocity * dt * static_cast<float>(std::pow(4, 1.0 - lifetime)));
 
         sprite.setPosition(hitbox.getPosition()); 
     }
+    else if (frozenTimer > 0) {
+        smoker.setPosition(hitbox.getPosition());
+        smoker.update();
+    }
 }
 
 void Projectile::draw(sf::RenderTarget& target) const {
-    if (isAlive()) {
-        // target.draw(hitbox);
+    if (lifetime > 0) {
+        target.draw(hitbox);
 
         target.draw(sprite);
+    }
+    else if (frozenTimer > 0) {
+        smoker.draw(target);
     }
 }
 
 bool Projectile::isAlive() const {
-    return lifetime > 0.0f;
+    return lifetime > 0.0f || frozenTimer > 0.0f;
 }
 
 void Projectile::kill() {
     lifetime = 0.0f;
+
+    if (frozenTimer <= 0.0f) {
+        frozenTimer = FROZENCOOLDOWNTIME;
+    }
 }
 
 sf::Vector2f Projectile::getPosition() const {

@@ -29,7 +29,8 @@ public:
     void draw(sf::RenderTarget& target, sf::Shader* shader = nullptr) const;
     void drawWithShader(sf::RenderTarget& target, sf::RenderStates states = sf::RenderStates::Default) const;
 
-    sf::Sprite getSprite() const;
+    sf::Sprite& getSprite();
+    const sf::Sprite& getSpriteConst() const;
 };
 
 class AnimationManager {

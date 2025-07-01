@@ -31,12 +31,21 @@ void NpcManager::loadNpcs(const TileMap& map) {
         "Elara",
         "npc_02"
     ));
-
-    npcs.push_back(std::make_unique<MerchantNpc>(
-        map.getMerchantNpcRects().at(0),
-        "Merchant",
-        "npc_00"
+    npcs.push_back(std::make_unique<QuestNpc>(
+        5,
+        map.getQuestNpcRects().at(5),
+        "???",
+        "npc_02"
     ));
+
+    for (const sf::FloatRect& merchantRect : map.getMerchantNpcRects()) {    
+        npcs.push_back(std::make_unique<MerchantNpc>(
+            merchantRect,
+            "Merchant",
+            "npc_00"
+        ));
+    }
+    
 }
 
 void NpcManager::handlePlayerInteraction(Player& player) {
